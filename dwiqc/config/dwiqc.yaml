@@ -1,0 +1,10 @@
+dwiqc:
+  dwi:
+    tags:
+      - .*(^|\s)#dwi_main(?P<run>_\d+)?(\s|$).*
+  dwi_PA:
+    tags:
+      - .*(^|\s)#dwi_fmap_pa(?P<run>_\d+)?(\s|$).*
+  dwi_AP:
+    tags:
+      - .*(^|\s)#dwi_fmap_ap(?P<run>_\d+)?(\s|$).*
