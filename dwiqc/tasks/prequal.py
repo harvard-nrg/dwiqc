@@ -62,7 +62,6 @@ class Task(tasks.BaseTask):
 		# get the basename of the file and then remove the extension
 		for fmap in fmap_files:
 			no_ext = os.path.splitext(os.path.basename(fmap))[0]
-			print(no_ext)
 
 			# create a .bval file with a single 0
 
@@ -81,12 +80,12 @@ class Task(tasks.BaseTask):
 	# the contents of the file depends on the SeriesDescription stored in the metadata
 
 	def create_spec(self):
-		dwi_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz', return_type='BIDSFile')
+		dwi_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz')
 		#dwi_file = layout.get()[10]
 		if len(dwi_file) > 1:
-			#raise DWISpecError
+			raise DWISpecError('Found more than one dwi file. Please verify there are no duplicates.')
 		if not dwi_file:
-			#raise DWISpecError
+			raise DWISpecError(f'No dwi scan found for subject {self._sub} session {self._ses} run {self._run}')
 		else:
 			dwi_file = dwi_file.pop()
 
@@ -124,11 +123,54 @@ class Task(tasks.BaseTask):
 
 			# Create a text file
 			with open(f"{self._inputs}/slspec_ABCD_dMRI.txt", "w") as file:
-			    # Write the values into the text file
-			    file.write(ABCD_values)
+				# Write the values into the text file
+				file.write(ABCD_values)
+
+
+		# check for the UK Bio bank version of the scan and then create the slspec file accordingly
+
+		elif 'UKbioDiff_ABCDseq_ABCDdvs' in series_desc:
+			# Define Values
+			UKBio_values = """1 25 49
+			3 27 51
+			5 29 53
+			7 31 55
+			9 33 57
+			11 35 59
+			23 47 71
+			13 37 61
+			15 39 63
+			17 41 65
+			19 43 67
+			21 45 69
+			2 26 50
+			4 28 52
+			6 30 54
+			8 32 56
+			10 34 58
+			12 36 60
+			0 24 48
+			14 38 62
+			16 40 64
+			18 42 66
+			20 44 68
+			22 46 70"""
+
+
+			# Create a text file
+			with open(f"{self._inputs}/slspec_UKBio_dMRI.txt", "w") as file:
+				# Write the values into the text file
+				file.write(UKBio_values)
+
+
+		
+
+		else:
+			logger.info('Unable to determine dwi scan type. Moving on without creating slspec file.')
 
 
 
+	# build the prequal sbatch command and create job
 
 	def build(self):
 		self.create_symlink()
@@ -159,5 +201,10 @@ class Task(tasks.BaseTask):
 			output=logfile,
 			error=logfile
 		)
+
+
+
+class DWISpecError(Exception):
+	pass
 
 
