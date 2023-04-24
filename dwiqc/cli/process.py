@@ -59,8 +59,8 @@ def do(args):
     # prequal job
     prequal_outdir = None
     if 'prequal' in args.sub_tasks:
-        mriqc_outdir = B.derivatives_dir('anatqc-mriqc') # path to output dir, change for prequal
-        mriqc_outdir = os.path.join(mriqc_outdir, 'anat', raw[1]) 
+        chopped_bids = os.path.dirname(bids_dir)
+        prequal_outdir = os.path.join(chopped_bids, 'dwiqc-prequal', 'OUTPUTS') # path to output dir, change for prequal
         task = mriqc.Task(
             sub=args.sub,
             ses=args.ses,
@@ -77,8 +77,8 @@ def do(args):
     # qsiprep job
     qsiprep_outdir = None
     if 'qsiprep' in args.sub_tasks:
-        mriqc_outdir = B.derivatives_dir('anatqc-mriqc')
-        mriqc_outdir = os.path.join(mriqc_outdir, 'anat', raw[1])
+        chopped_bids = os.path.dirname(bids_dir)
+        qsiprep_outdir = os.path.join(chopped_bids, 'dwiqc-qsiprep', 'qsiprep_output') # path to output dir, change for prequal
         task = mriqc.Task(
             sub=args.sub,
             ses=args.ses,
@@ -86,7 +86,7 @@ def do(args):
             bids=args.bids_dir,
             outdir=mriqc_outdir,
             tempdir=tempfile.gettempdir(),
-            pipenv='/sw/apps/mriqc'
+            venv='/sw/apps/qsiprep'
         )
         os.environ['OPENBLAS_NUM_THREADS'] = '1'
         logger.info(json.dumps(task.command, indent=1))
@@ -113,27 +113,16 @@ def do(args):
         if failed > 0:
             sys.exit(1)
 
-    # create archive of FreeSurfer results
-    if 'morph' in args.sub_tasks:
-        archive = os.path.join(morph_outdir, 'archive.tar.gz')
-        if not os.path.exists(archive):
-            logger.info('creating anat-morph archive %s', archive)
-            anatqc.archive(morph_outdir, archive)
-    
-    # artifacts directory
-    if not args.artifacts_dir:
-        args.artifacts_dir = os.path.join(
-            morph_outdir,
-            'xnat-artifacts'
-        )
 
-    # build data to upload to xnat
-    R = Report(args.bids_dir, args.sub, args.ses, args.run)
-    logger.info('building xnat artifacts to %s', args.artifacts_dir)
-    R.build_assessment(args.artifacts_dir)
+# this section will get updated when we get to the xnat phase
 
-    # upload data to xnat over rest api
-    if args.xnat_upload:
-        logger.info('Uploading artifacts to XNAT')
-        auth = yaxil.auth2(args.xnat_alias)
-        yaxil.storerest(auth, args.artifacts_dir, 'anatqc-resource')
+#    # build data to upload to xnat
+#    R = Report(args.bids_dir, args.sub, args.ses, args.run)
+#    logger.info('building xnat artifacts to %s', args.artifacts_dir)
+#    R.build_assessment(args.artifacts_dir)#
+
+#    # upload data to xnat over rest api
+#    if args.xnat_upload:
+#        logger.info('Uploading artifacts to XNAT')
+#        auth = yaxil.auth2(args.xnat_alias)
+#        yaxil.storerest(auth, args.artifacts_dir, 'anatqc-resource')
