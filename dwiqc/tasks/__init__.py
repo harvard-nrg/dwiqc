@@ -50,7 +50,7 @@ class BaseTask(ABC):
     def workdir(self):
         if not os.path.exists(self._tempdir):
             os.makedirs(self._tempdir)
-        return tf.mkdtemp(suffix='.anatqc', dir=self._tempdir)
+        return tf.mkdtemp(suffix='.dwiqc', dir=self._tempdir)
 
     def logdir(self):
         if not os.path.exists(self._logdir):
