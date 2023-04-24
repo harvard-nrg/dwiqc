@@ -4,7 +4,7 @@
 
 
 import sys
-sys.path.insert(0, 'PATH to cli folder')
+sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/cli')
 import get
 import logging
 import argparse as ap
