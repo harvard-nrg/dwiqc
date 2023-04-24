@@ -45,6 +45,44 @@ def main():
         help='Do not execute any jobs')
     parser_get.set_defaults(func=get.do) #(func=cli.get.do)
 
+    # process mode
+    parser_process = subparsers.add_parser('process', help='process -h')
+    parser_process.add_argument('--partition', default='fasse_gpu',
+        help='Job scheduler partition')
+    parser_process.add_argument('--scheduler', default=None,
+        help='Choose a specific job scheduler')
+    parser_process.add_argument('--rate-limit', type=int, default=None, 
+        help='Rate limit the number of tasks executed in parallel (1=serial)')
+    parser_process.add_argument('--sub', required=True,
+        help='BIDS subject')
+    parser_process.add_argument('--ses',
+        help='BIDS session')
+    parser_process.add_argument('--mod', default='dwi',
+        help='BIDS modality')
+    parser_process.add_argument('--run', default=1, type=int,
+        help='BIDS run')
+    parser_process.add_argument('--bids-dir', required=True,
+        help='BIDS root directory')
+    parser_process.add_argument('--dry-run', action='store_true',
+        help='Do not execute any jobs')
+    parser_process.add_argument('--sub-tasks', nargs='+', default=['prequal', 'qsiprep'],
+        help='Run only certain sub tasks')
+    parser_process.add_argument('--fs-license',
+        help='Base64 encoded FreeSurfer license file')
+    parser_process.add_argument('--xnat-alias',
+        help='YAXIL authentication alias')
+    parser_process.add_argument('--xnat-host',
+        help='XNAT host')
+    parser_process.add_argument('--xnat-user',
+        help='XNAT username')
+    parser_process.add_argument('--xnat-pass',
+        help='XNAT password')
+    parser_process.add_argument('--artifacts-dir',
+        help='Location for generated assessors and resources')
+    parser_process.add_argument('--xnat-upload', action='store_true',
+        help='Upload results to XNAT over REST API')
+    parser_process.set_defaults(func=process.do) # (func=cli.process.do)
+
     args = parser.parse_args()
 
 
