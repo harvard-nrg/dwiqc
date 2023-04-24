@@ -48,7 +48,7 @@ class Task(tasks.BaseTask):
 		
 
 
-
+		## keeping this code here just in case the symlinks don't work
 			#shutil.copy(file, inputs)
 
 
