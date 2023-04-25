@@ -5,12 +5,13 @@
 
 import sys
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/cli')
+sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/config')
 import get
 import process
 import logging
 import argparse as ap
 #import dwiqc.cli as cli
-#import dwiqc.config as config
+import default as config
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ def main():
     parser = ap.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true',
         help='Enable verbose logging')
-    parser.add_argument('-c', '--config', #default=config.default(),
+    parser.add_argument('-c', '--config', default=config.default(),
         help='dwiQC configuration file')
     parser.add_argument('--insecure', action='store_true',
         help='Disable SSL certificate verification')
