@@ -6,6 +6,7 @@
 import sys
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/cli')
 import get
+import process
 import logging
 import argparse as ap
 #import dwiqc.cli as cli
@@ -81,7 +82,7 @@ def main():
         help='Location for generated assessors and resources')
     parser_process.add_argument('--xnat-upload', action='store_true',
         help='Upload results to XNAT over REST API')
-    parser_process.set_defaults(func=process.do) # (func=cli.process.do)
+    parser_process.set_defaults(func=process.do) #(func=cli.process.do)
 
     args = parser.parse_args()
 
