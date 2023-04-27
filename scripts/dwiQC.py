@@ -11,7 +11,7 @@ import process
 import logging
 import argparse as ap
 #import dwiqc.cli as cli
-import default as config
+#import dwiqc.config as config
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ def main():
     parser = ap.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true',
         help='Enable verbose logging')
-    parser.add_argument('-c', '--config', default=config.default(),
+    parser.add_argument('-c', '--config', #default=config.default(),
         help='dwiQC configuration file')
     parser.add_argument('--insecure', action='store_true',
         help='Disable SSL certificate verification')
@@ -106,3 +106,4 @@ def configure_logging(verbose):
 
 if __name__ == '__main__':
     main()
+

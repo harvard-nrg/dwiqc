@@ -14,9 +14,11 @@ import tempfile
 import subprocess as sp
 from executors.models import Job, JobArray
 from bids import BIDSLayout
+sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
+import prequal
+#import dwiqc.tasks.mriqc as mriqc
 #from anatqc.bids import BIDS
 #from anatqc.xnat import Report
-#import anatqc.tasks.mriqc as mriqc
 #import anatqc.tasks.vnav as vnav
 #import anatqc.tasks.morph as morph
 #from anatqc.state import State
@@ -47,7 +49,7 @@ def do(args):
 
     dwi_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='dwi', run=args.run, return_type='file').pop())
 
-    t1w_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='T1w', run=args.run, return_type='file').pop())
+    #t1w_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='T1w', run=args.run, return_type='file').pop())
 
 
     # ⬇️ not sure what to do with these... will come back here.
@@ -59,16 +61,16 @@ def do(args):
     # prequal job
     prequal_outdir = None
     if 'prequal' in args.sub_tasks:
-        chopped_bids = os.path.dirname(bids_dir)
+        chopped_bids = os.path.dirname(args.bids_dir)
         prequal_outdir = os.path.join(chopped_bids, 'dwiqc-prequal', 'OUTPUTS') # path to output dir, change for prequal
-        task = mriqc.Task(
+        task = prequal.Task(
             sub=args.sub,
             ses=args.ses,
             run=args.run,
             bids=args.bids_dir,
-            outdir=mriqc_outdir,
+            outdir=prequal_outdir,
             tempdir=tempfile.gettempdir(),
-            venv='/sw/apps/prequal'
+            pipenv='/sw/apps/prequal'
         )
         os.environ['OPENBLAS_NUM_THREADS'] = '1'
         logger.info(json.dumps(task.command, indent=1))
@@ -77,9 +79,9 @@ def do(args):
     # qsiprep job
     qsiprep_outdir = None
     if 'qsiprep' in args.sub_tasks:
-        chopped_bids = os.path.dirname(bids_dir)
+        chopped_bids = os.path.dirname(args.bids_dir)
         qsiprep_outdir = os.path.join(chopped_bids, 'dwiqc-qsiprep', 'qsiprep_output') # path to output dir, change for prequal
-        task = mriqc.Task(
+        task = prequal.Task(
             sub=args.sub,
             ses=args.ses,
             run=args.run,

@@ -7,6 +7,9 @@ import subprocess
 import os
 import logging
 from bids import BIDSLayout
+import sys
+sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
+import __init__ as tasks
 import shutil
 from executors.models import Job
 
@@ -22,6 +25,8 @@ logger = logging.getLogger(__name__)
 
 # pull in some parameters from the BaseTask class in the __init__.py directory
 
+#class Task(tasks.BaseTask):
+
 class Task(tasks.BaseTask):
 	def __init__(self, sub, ses, run, bids, outdir, tempdir=None, pipenv=None):
 		self._sub = sub
@@ -30,21 +35,21 @@ class Task(tasks.BaseTask):
 		self._bids = bids
 		self._layout = BIDSLayout(bids)
 		super().__init__(outdir, tempdir, pipenv)
-		self._inputs = f'{self._tempdir}/INPUTS'
+		#self._inputs = f'{self._tempdir}/INPUTS'
 
 
 	# create an INPUTS dir next to the OUTPUTS dir
-	def create_symlinks(self):
-		os.makedirs(self._inputs)
+	def create_symlinks(self, inputs_dir):
+		os.makedirs(inputs_dir)
 		#layout = BIDSLayout(self._bids) # load the data layout into pybids
 		all_files = self._layout.get(subject=self._sub, session=self._ses, run=self._run, return_type='filename') # get a list of all of the subject's files
 		# copy the all the subject's files into the INPUTS directory
 		for file in all_files:
 			basename = os.path.basename(file)
-			dest = os.path.join(self._inputs, basename)
+			dest = os.path.join(inputs_dir, basename)
 			os.symlink(file, dest)
 
-		self.create_bfiles(self, self._inputs)
+		self.create_bfiles(inputs_dir)
 		
 
 
@@ -53,7 +58,7 @@ class Task(tasks.BaseTask):
 
 
 	# the fieldmap data needs accompanying 'dummy' bval and bvec files that consist of 0's
-	def create_bfiles(self, inputs):
+	def create_bfiles(self, inputs_dir):
 		# get a list of all the fmap files that end with .json (this it's helpful to have a file with just one extension)
 
 		#layout = BIDSLayout(self._bids)
@@ -65,21 +70,22 @@ class Task(tasks.BaseTask):
 
 			# create a .bval file with a single 0
 
-			with open(f'{inputs}/{no_ext}.bval', 'w') as bval:
+			with open(f'{inputs_dir}/{no_ext}.bval', 'w') as bval:
 				bval.write('0')
 
 			# create .bvec file with 3 0's
 
-			with open(f'{inputs}/{no_ext}.bvec', 'w') as bvec:
+			with open(f'{inputs_dir}/{no_ext}.bvec', 'w') as bvec:
 				bvec.write('0\n0\n0')
 
-		self.create_spec()
+		self.create_spec(inputs_dir)
+		
 
 
 	# this method serves to create the accompanying spec file for prequal 
 	# the contents of the file depends on the SeriesDescription stored in the metadata
 
-	def create_spec(self):
+	def create_spec(self, inputs_dir):
 		dwi_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz')
 		#dwi_file = layout.get()[10]
 		if len(dwi_file) > 1:
@@ -122,7 +128,7 @@ class Task(tasks.BaseTask):
 			25 52 79"""
 
 			# Create a text file
-			with open(f"{self._inputs}/slspec_ABCD_dMRI.txt", "w") as file:
+			with open(f"{inputs_dir}/slspec_ABCD_dMRI.txt", "w") as file:
 				# Write the values into the text file
 				file.write(ABCD_values)
 
@@ -158,7 +164,7 @@ class Task(tasks.BaseTask):
 
 
 			# Create a text file
-			with open(f"{self._inputs}/slspec_UKBio_dMRI.txt", "w") as file:
+			with open(f"{inputs_dir}/slspec_UKBio_dMRI.txt", "w") as file:
 				# Write the values into the text file
 				file.write(UKBio_values)
 
@@ -169,24 +175,115 @@ class Task(tasks.BaseTask):
 			logger.info('Unable to determine dwi scan type. Moving on without creating slspec file.')
 
 
+		self.create_csv(inputs_dir, dwi_file)
+
+	# this method will grab the phase encode direction and total readout time for the main dwi scan and both fieldmaps and place them into a csv file named
+	# dtiQA_config.csv
+
+	def create_csv(self, inputs_dir, dwi_file):
+
+
+		# grab TotalReadoutTime from json file
+
+		readout_time = dwi_file.get_metadata()['TotalReadoutTime']
+
+		# get phase encode directions of the PA and AP files
+
+		PA_dir, AP_dir = self.get_phase_encode()
+
+
+		# get all three json files (dwi, PA, AP)
+
+		filenames = self._layout.get(subject=self._sub, session=self._ses, run=self._run, extension='.json', return_type='filename')
+
+		# remove the extension from each file name to prepare for writing into csv file
+
+		no_ext = [os.path.splitext(os.path.basename(file))[0] for file in filenames]
+
+		# iterate through each file, checking for dwi, PA or AP in the file name. Check phase encoding direction for
+		# the PA and AP files. Assign a + or - depending on the direction
+
+		for file in no_ext:
+			if file.endswith('dwi'):
+				dwi_line = f'{file},+,{readout_time}'
+			elif 'PA' in file:
+				if PA_dir == 'j':
+					PA_line = f'{file},+,{readout_time}'
+				else:
+					PA_line = f'{file},-,{readout_time}'
+			elif 'AP' in file:
+				if AP_dir == 'j':
+					AP_line = f'{file},+,{readout_time}'
+				else:
+					AP_line = f'{file},-,{readout_time}'
+
+		# write each of the created lines into a csv file
+
+		with open(f'{inputs_dir}/dtiQA_config.csv', 'w') as csv:
+			csv.write(f'{dwi_line}\n')
+			csv.write(f'{PA_line}\n')
+			csv.write(f'{AP_line}\n')
+
+
+
+	def get_phase_encode(self):
+		PA_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='epi', direction='PA', extension='.nii.gz').pop()
+
+		PA_phase = PA_file.get_metadata()['PhaseEncodingDirection']
+
+		AP_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='epi', direction='AP', extension='.nii.gz').pop()
+
+		AP_phase = AP_file.get_metadata()['PhaseEncodingDirection']
+
+		return PA_phase, AP_phase
 
 	# build the prequal sbatch command and create job
 
 	def build(self):
-		self.create_symlink()
+		inputs_dir = f'{self._tempdir}/INPUTS'
+		self.create_symlinks(inputs_dir)
 		self._command = [
 			'selfie',
 			'--lock',
 			'--output-file', self._prov,
-			'singularity run -e --contain --nv',
-			f'-B {self._inputs}:/INPUTS',
-			f'-B {self._outdir}:/OUTPUTS',
-			f'-B {self._tempdir}:/tmp',
-			f'-B /n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-			f'-B /n/helmod/apps/centos7/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
-			f'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
-			f'j --eddy_cuda 9.1 --num_threads ${SLURM_JOB_CPUS_PER_NODE} --denoise off --degibbs off --rician off --prenormalize on --correct_bias on --topup_first_b0s_only',
-			f'--subject {self._sub} --project SSBC --session {self._ses}'
+			'singularity',
+			'run',
+			'-e',
+			'--contain',
+			'--nv',
+			'-B',
+			f'{inputs_dir}:/INPUTS',
+			'-B',
+			f'{self._outdir}:/OUTPUTS',
+			'-B',
+			f'{self._tempdir}:/tmp',
+			'-B',
+			'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
+			'-B',
+			'/n/helmod/apps/centos7/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
+			'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
+			'j',
+			'--eddy_cuda',
+			'9.1',
+			'--num_threads',
+			'2',
+			'--denoise',
+			'off',
+			'--degibbs',
+			'off',
+			'--rician',
+			'off',
+			'--prenormalize',
+			'on',
+			'--correct_bias',
+			'on',
+			'--topup_first_b0s_only',
+			'--subject',
+			self._sub,
+			'--project',
+			'SSBC',
+			'--session',
+			self._ses
 		]
 
 		logdir = self.logdir()
@@ -194,7 +291,7 @@ class Task(tasks.BaseTask):
 		self.job = Job(
 			name='dwiqc-prequal',
 			time='360',
-			memory='10G',
+			memory='20G',
 			gpus=1,
 			nodes=1,
 			command=self._command,
@@ -206,5 +303,4 @@ class Task(tasks.BaseTask):
 
 class DWISpecError(Exception):
 	pass
-
 
