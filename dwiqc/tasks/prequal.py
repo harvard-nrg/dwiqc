@@ -8,6 +8,7 @@ import os
 import logging
 from bids import BIDSLayout
 import sys
+import json
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
 import __init__ as tasks
 import shutil
@@ -176,6 +177,7 @@ class Task(tasks.BaseTask):
 
 
 		self.create_csv(inputs_dir, dwi_file)
+		self.add_intended_for(inputs_dir)
 
 	# this method will grab the phase encode direction and total readout time for the main dwi scan and both fieldmaps and place them into a csv file named
 	# dtiQA_config.csv
@@ -236,6 +238,29 @@ class Task(tasks.BaseTask):
 		AP_phase = AP_file.get_metadata()['PhaseEncodingDirection']
 
 		return PA_phase, AP_phase
+
+
+	# ******** this will also need to be added to qsiprep.py ***********
+
+
+
+# this method will add an "IntendedFor" key-value pair to the fieldmap scans
+
+	def add_intended_for(self, inputs_dir):	
+
+		fmap_json_files = self._layout.get(run=self._run, suffix='epi', extension='.json', return_type='filename')
+
+		dwi_file = os.path.basename(self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz', return_type='filename').pop())
+
+		for file in fmap_json_files:
+			with open(file, 'r+') as f:
+				file_data = json.load(f)
+				if "IntendedFor" in file_data:
+					continue
+				else:
+					file_data["IntendedFor"] = f"ses-{self._ses}/dwi/{dwi_file}"
+					json.dump(file_data, f)
+
 
 	# build the prequal sbatch command and create job
 
@@ -300,7 +325,7 @@ class Task(tasks.BaseTask):
 		)
 
 
-
 class DWISpecError(Exception):
 	pass
+
 

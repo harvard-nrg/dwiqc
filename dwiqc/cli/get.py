@@ -9,6 +9,10 @@ import argparse as ap
 import subprocess as sp
 import collections as col
 from xnattagger import Tagger
+from bids import BIDSLayout
+
+
+#### Need to add support for downloading the T1w data as well. Primarily for qsiprep.
 
 logger = logging.getLogger(__name__)
 
@@ -18,10 +22,8 @@ def do(args):
         yaxil.CHECK_CERTIFICATE = False
 
 
-    # create xnattagger instance here
-    # tag the dwi scans for the designated project
+    # ******* potential idea here-- call and run tagger on the diffusion data ******
 
-    #t = Tagger(args.xnat_alias, $path_to_config_file, 'dwi', args.label)
 
     # load authentication data and set environment variables for ArcGet.py
     auth = yaxil.auth2(
@@ -147,6 +149,7 @@ def get_pa(args, auth, run, scan, verbose=False):
     if not args.dry_run:
         sp.check_output(cmd, input=config.encode('utf-8'))
 
+
 def get_ap(args, auth, run, scan, verbose=False):
     config = {
         'fmap': {
@@ -189,3 +192,6 @@ def match(note, patterns):
         if m:
             return m
     return None
+
+
+
