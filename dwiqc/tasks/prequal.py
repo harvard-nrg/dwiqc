@@ -40,7 +40,7 @@ class Task(tasks.BaseTask):
 
 
 	# create an INPUTS dir next to the OUTPUTS dir
-	def create_symlinks(self, inputs_dir):
+	def copy_inputs(self, inputs_dir):
 		os.makedirs(inputs_dir)
 		#layout = BIDSLayout(self._bids) # load the data layout into pybids
 		all_files = self._layout.get(subject=self._sub, session=self._ses, run=self._run, return_type='filename') # get a list of all of the subject's files
@@ -48,7 +48,7 @@ class Task(tasks.BaseTask):
 		for file in all_files:
 			basename = os.path.basename(file)
 			dest = os.path.join(inputs_dir, basename)
-			os.symlink(file, dest)
+			shutil.copy(file, dest)
 
 		self.create_bfiles(inputs_dir)
 		
@@ -246,11 +246,13 @@ class Task(tasks.BaseTask):
 
 # this method will add an "IntendedFor" key-value pair to the fieldmap scans
 
-	def add_intended_for(self, inputs_dir):	
+	def add_intended_for(self):	
 
 		fmap_json_files = self._layout.get(run=self._run, suffix='epi', extension='.json', return_type='filename')
 
 		dwi_file = os.path.basename(self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz', return_type='filename').pop())
+
+		intended_for = {"IntendedFor":f"ses-{self._ses}/dwi/{dwi_file}"}
 
 		for file in fmap_json_files:
 			with open(file, 'r+') as f:
@@ -258,15 +260,17 @@ class Task(tasks.BaseTask):
 				if "IntendedFor" in file_data:
 					continue
 				else:
-					file_data["IntendedFor"] = f"ses-{self._ses}/dwi/{dwi_file}"
-					json.dump(file_data, f)
+					file_data.update(intended_for)
+					f.seek(0)
+					json.dump(file_data, f, indent = 2)
 
 
 	# build the prequal sbatch command and create job
 
 	def build(self):
-		inputs_dir = f'{self._tempdir}/INPUTS'
-		self.create_symlinks(inputs_dir)
+		self.add_intended_for()
+		inputs_dir = f'{self._tempdir}/INPUTS/'
+		self.copy_inputs(inputs_dir)
 		self._command = [
 			'selfie',
 			'--lock',
@@ -277,7 +281,7 @@ class Task(tasks.BaseTask):
 			'--contain',
 			'--nv',
 			'-B',
-			f'{inputs_dir}:/INPUTS',
+			f'{inputs_dir}:/INPUTS/',
 			'-B',
 			f'{self._outdir}:/OUTPUTS',
 			'-B',
