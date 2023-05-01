@@ -65,6 +65,8 @@ def main():
         help='BIDS run')
     parser_process.add_argument('--bids-dir', required=True,
         help='BIDS root directory')
+    parser_process.add_argument('--output-resolution',
+        help='Resolution of output data. Defaut is resolution of input data.')
     parser_process.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
     parser_process.add_argument('--sub-tasks', nargs='+', default=['prequal', 'qsiprep'],
@@ -106,4 +108,5 @@ def configure_logging(verbose):
 
 if __name__ == '__main__':
     main()
+
 
