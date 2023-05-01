@@ -8,3 +8,9 @@ dwiqc:
   dwi_AP:
     tags:
       - .*(^|\s)#dwi_fmap_ap(?P<run>_\d+)?(\s|$).*
+  t1w_vnav:
+    tags:
+      - .*(^|\s)#t1w_move(?P<run>_\d+)?(\s|$).*
+  t1w:
+    tags:
+      - .*(^|\s)#t1w(?P<run>_\d+)?(\s|$).*
