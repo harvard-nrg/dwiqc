@@ -43,8 +43,21 @@ class Task(tasks.BaseTask):
 	def calc_mporder(self):
 		pass
 
+
+	# this method creates the nipype config file necessary for qsiprep. This file ensures that intermediate files
+	# don't get deleted for subsequent run of eddy_quad	
+
 	def create_nipype(self):
-		pass
+		nipype = """[logging]
+
+		[execution]
+		remove_unnecessary_outputs = false
+
+		[monitoring]"""
+
+		with open(f"{self._bids}/nipype.cfg", "w") as file:
+			file.write(nipype)
+
 
 def create_spec(self):
 		dwi_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz')
