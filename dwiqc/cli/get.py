@@ -48,7 +48,6 @@ def do(args):
             dwi_match = match(note, conf['dwiqc']['dwi']['tags'])
             pa_match = match(note, conf['dwiqc']['dwi_PA']['tags'])
             ap_match = match(note, conf['dwiqc']['dwi_AP']['tags'])
-            move_match = match(note, conf['dwiqc']['t1w_vnav']['tags'])
             anat_match = match(note, conf['dwiqc']['t1w']['tags'])
 
             if dwi_match:
@@ -63,10 +62,6 @@ def do(args):
                 run = ap_match.group('run')
                 run = re.sub('[^0-9]', '', run or '1')
                 scans[run]['ap'] = scan['id']
-            if move_match:
-                run = move_match.group('run')
-                run = re.sub('[^0-9]', '', run or '1')
-                scans[run]['move'] = scan['id']
             if anat_match:
                 run = anat_match.group('run')
                 run = re.sub('[^0-9]', '', run or '1')
@@ -91,9 +86,6 @@ def do(args):
         if 'anat' in scansr:
             logger.info('getting anat run=%s, scan=%s', run, scansr['anat'])
             get_anat(args, auth, run, scansr['anat'], verbose=args.verbose)
-        if 'move' in scansr:
-            logger.info('getting move run=%s, scan=%s', run, scansr['move'])
-            get_move(args, auth, run, scansr['move'], verbose=args.verbose)
 
 
 
@@ -206,41 +198,6 @@ def get_ap(args, auth, run, scan, verbose=False):
     if not args.dry_run:
         sp.check_output(cmd, input=config.encode('utf-8'))
 
-
-def get_move(args, auth, run, scan, verbose=False):
-    config = {
-        'anat': {
-            'T1vnav': [
-                {
-                    'run': int(run),
-                    'scan': scan
-                }
-            ]
-        }
-    }
-    config = yaml.safe_dump(config)
-    cmd = [
-        'ArcGet.py',
-        '--label', args.label,
-        '--output-dir', args.bids_dir,
-        '--output-format', 'bids',
-    ]
-    if args.project:
-        cmd.extend([
-            '--project', args.project
-        ])
-    if args.insecure:
-        cmd.extend([
-            '--insecure'
-        ])
-    cmd.extend([
-        '--config', '-'
-    ])
-    if verbose:
-        cmd.append('--debug')
-    logger.info(sp.list2cmdline(cmd))
-    if not args.dry_run:
-        sp.check_output(cmd, input=config.encode('utf-8'))
  
 def get_anat(args, auth, run, scan, verbose=False):
     config = {
