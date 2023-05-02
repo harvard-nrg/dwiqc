@@ -122,6 +122,10 @@ class Task(tasks.BaseTask):
 			with open(f"{inputs_dir}/slspec_ABCD_dMRI.txt", "w") as file:
 				# Write the values into the text file
 				file.write(ABCD_values)
+				
+			shutil.copy(f"{inputs_dir}/slspec_ABCD_dMRI.txt", self._outdir)
+
+
 
 
 		# check for the UK Bio bank version of the scan and then create the slspec file accordingly
@@ -158,6 +162,7 @@ class Task(tasks.BaseTask):
 			with open(f"{inputs_dir}/slspec_UKBio_dMRI.txt", "w") as file:
 				# Write the values into the text file
 				file.write(UKBio_values)
+			shutil.copy(f"{inputs_dir}/slspec_UKBio_dMRI.txt", self._outdir)
 
 
 		
