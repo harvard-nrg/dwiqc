@@ -16,6 +16,7 @@ from executors.models import Job, JobArray
 from bids import BIDSLayout
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
 import prequal
+import qsiprep
 #import dwiqc.tasks.mriqc as mriqc
 #from anatqc.bids import BIDS
 #from anatqc.xnat import Report
@@ -62,7 +63,7 @@ def do(args):
     prequal_outdir = None
     if 'prequal' in args.sub_tasks:
         chopped_bids = os.path.dirname(args.bids_dir)
-        prequal_outdir = os.path.join(chopped_bids, 'dwiqc-prequal', 'OUTPUTS') # path to output dir, change for prequal
+        prequal_outdir = os.path.join(chopped_bids, 'dwiqc-prequal', 'OUTPUTS')
         task = prequal.Task(
             sub=args.sub,
             ses=args.ses,
@@ -80,15 +81,15 @@ def do(args):
     qsiprep_outdir = None
     if 'qsiprep' in args.sub_tasks:
         chopped_bids = os.path.dirname(args.bids_dir)
-        qsiprep_outdir = os.path.join(chopped_bids, 'dwiqc-qsiprep', 'qsiprep_output') # path to output dir, change for prequal
-        task = prequal.Task(
+        qsiprep_outdir = os.path.join(chopped_bids, 'dwiqc-qsiprep', 'qsiprep_output')
+        task = qsiprep.Task(
             sub=args.sub,
             ses=args.ses,
             run=args.run,
             bids=args.bids_dir,
-            outdir=mriqc_outdir,
+            outdir=qsiprep_outdir,
             tempdir=tempfile.gettempdir(),
-            venv='/sw/apps/qsiprep'
+            pipenv='/sw/apps/qsiprep'
         )
         os.environ['OPENBLAS_NUM_THREADS'] = '1'
         logger.info(json.dumps(task.command, indent=1))
@@ -128,3 +129,4 @@ def do(args):
 #        logger.info('Uploading artifacts to XNAT')
 #        auth = yaxil.auth2(args.xnat_alias)
 #        yaxil.storerest(auth, args.artifacts_dir, 'anatqc-resource')
+

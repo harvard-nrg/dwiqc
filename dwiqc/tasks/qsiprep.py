@@ -7,21 +7,18 @@ import logging
 from bids import BIDSLayout
 import sys
 import json
+import nibabel as nib
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
 import __init__ as tasks
 import shutil
 from executors.models import Job
-
-#### To Do list: 
-
-#		1) Add --output-resolution as optional command line argument in dwiqc.py
 
 
 
 # currently loading modules via subprocess call. Is there a better way?
 
 
-load_modules = 'module load qsiprep/0.14.0-ncf; unset DISPLAY; module load cuda/9.1.85-fasrc01; nvidia-smi; export SINGULARITY_NV=1'
+load_modules = 'export cuda=/n/helmod/apps/centos7/Core/cuda/9.1.85-fasrc01'
 proc1 = subprocess.Popen(load_modules, shell=True, stdout=subprocess.PIPE)
 proc1.communicate()
 
@@ -30,18 +27,40 @@ logger = logging.getLogger(__name__)
 
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, output_resolution=None, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
 		self._layout = BIDSLayout(bids)
+		self._output_resolution = output_resolution
 		super().__init__(outdir, tempdir, pipenv)
 
 
 
 	def calc_mporder(self):
-		pass
+		# need to get the length of the SliceTiming File (i.e. number of slices) divided by the "MultibandAccelerationFactor". From there, 
+		# divide that number by both 4 and 2. calculate the midpoint. that's the number passed to mporder.
+
+		# this will grab the dwi file, pop it off the list, get the slice timing metadata, then grab the length of the slice timing array
+		num_slices = len(self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz').pop().get_metadata()['SliceTiming'])
+
+		multiband_factor = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz').pop().get_metadata()['MultibandAccelerationFactor']
+
+		mporder = (num_slices / multiband_factor) // 3
+
+		return int(mporder)
+
+
+
+	# this method checks if the user has passed a desired output resolution to dwiqc.py
+	# if they haven't, the resolution of the T1w input image will be used.
+
+	def check_output_resolution(self):
+		if not self._output_resolution:
+			t1_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='T1w', extension='.nii.gz', return_type='filename').pop()
+
+			self._output_resolution = str(nib.load(t1_file).header['pixdim'][1])
 
 
 	# this method creates the nipype config file necessary for qsiprep. This file ensures that intermediate files
@@ -59,7 +78,7 @@ class Task(tasks.BaseTask):
 			file.write(nipype)
 
 
-def create_spec(self):
+	def create_spec(self):
 		dwi_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz')
 		#dwi_file = layout.get()[10]
 		if len(dwi_file) > 1:
@@ -155,91 +174,88 @@ def create_spec(self):
 
 	# create necessary fsl eddy parameters json file using output from create_spec and calc_mporder
 
-	def create_eddy_params(self, mporder, spec_path):
-
+	def create_eddy_params(self):
+		mporder = self.calc_mporder()
+		spec_file = self.create_spec()
 		params_file = {
-          "flm": "quadratic",
-          "slm": "linear",
-          "fep": false,
-          "interp": "spline",
-          "nvoxhp": 1000,
-          "fudge_factor": 10,
-          "dont_sep_offs_move": false,
-          "dont_peas": false,
-          "niter": 5,
-          "method": "jac",
-          "repol": true,
-          "num_threads": 1,
-          "is_shelled": true,
-          "use_cuda": true,
-          "cnr_maps": true,
-          "residuals": true,
-          "output_type": "NIFTI_GZ",
-          "estimate_move_by_susceptibility": true,
-          "mporder": mporder,
-          "slice_order": f"{self._bids}/{spec_file}",
-          "args": "--ol_nstd=4 --ol_type=gw"
+			"flm": "quadratic",
+			"slm": "linear",
+			"fep": False,
+			"interp": "spline",
+			"nvoxhp": 1000,
+			"fudge_factor": 10,
+			"dont_sep_offs_move": False,
+			"dont_peas": False,
+			"niter": 5,
+			"method": "jac",
+			"repol": True,
+			"num_threads": 1,
+			"is_shelled": True,
+			"use_cuda": True,
+			"cnr_maps": True,
+			"residuals": True,
+			"output_type": "NIFTI_GZ",
+			"estimate_move_by_susceptibility": True,
+			"mporder": mporder,
+			"slice_order": f"{self._bids}/{spec_file}",
+			"args": "--ol_nstd=4 --ol_type=gw"
 		}
 
-		with open(f"{self._bids}/params_file.json", "w") as f:
+		with open(f"{self._bids}/eddy_params_s2v_mbs.json", "w") as f:
 			json.dump(params_file, f)
 
 
-
-
-qsiprep ${1:-/n/home_fasse/dasay/qsiprep_test} ${2:-/n/home_fasse/dasay/qsiprep_test/qsiprep_output} participant --separate-all-dwis --output-space T1w --eddy-config eddy_params_s2v_mbs.json --recon-spec reorient_fslstd --notrack --n_cpus ${SLURM_JOB_CPUS_PER_NODE} --mem_mb ${MEM_IN_MB} --fs-license-file /ncf/nrg/sw/apps/freesurfer/6.0.0/license.txt -w ${WD} && cp -r ${WD} . && rm -r ${WD}
-
+	# create qsiprep command to be executed
 
 	def build(self):
+		self.create_eddy_params()
+		self.create_nipype()
+		self.check_output_resolution()
 		self._command = [
 			'selfie',
 			'--lock',
 			'--output-file', self._prov,
+			#'qsiprep',
 			'singularity',
 			'run',
-			'-e',
-			'--contain',
-			'--nv',
-			'-B',
-			f'{inputs_dir}:/INPUTS/',
-			'-B',
-			f'{self._outdir}:/OUTPUTS',
-			'-B',
-			f'{self._tempdir}:/tmp',
-			'-B',
-			'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-			'-B',
-			'/n/helmod/apps/centos7/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
-			'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
-			'j',
-			'--eddy_cuda',
-			'9.1',
-			'--num_threads',
+			'/ncf/nrg/sw/apps/qsiprep/0.14.0/qsiprep.sif',
+			self._bids,
+			self._outdir,
+			'participant',
+			'--output-resolution',
+			self._output_resolution,
+			'--separate-all-dwis',
+			'--output-space',
+			'T1w',
+			'--eddy-config',
+			f'{self._bids}/eddy_params_s2v_mbs.json',
+			'--recon-spec',
+			'reorient_fslstd',
+			'--notrack',
+			'--n_cpus',
 			'2',
-			'--denoise',
-			'off',
-			'--degibbs',
-			'off',
-			'--rician',
-			'off',
-			'--prenormalize',
-			'on',
-			'--correct_bias',
-			'on',
-			'--topup_first_b0s_only',
-			'--subject',
-			self._sub,
-			'--project',
-			'SSBC',
-			'--session',
-			self._ses
+			'--mem_mb',
+			'20000',
+			'--fs-license-file',
+			'/ncf/nrg/sw/apps/freesurfer/6.0.0/license.txt',
+			'-w',
+			self._tempdir,
+			'&&',
+			'cp',
+			'-r',
+			self._tempdir,
+			self._bids,
+			'&&',
+			'rm',
+			'-r',
+			self._tempdir
 		]
 
 		logdir = self.logdir()
-		logfile = os.path.join(logdir, 'dwiqc-prequal.log')
+		logfile = os.path.join(logdir, 'dwiqc-qsiprep.log')
 		self.job = Job(
-			name='dwiqc-prequal',
-			time='360',
+			name='dwiqc-qsiprep',
+			time='480',
 			memory='20G',
 			gpus=1,
 			nodes=1,

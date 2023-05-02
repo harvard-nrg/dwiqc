@@ -1,5 +1,3 @@
-# There are  few things this script will need in order to be successful. 
-
 
 #### load necessary libraries
 
@@ -14,19 +12,11 @@ import __init__ as tasks
 import shutil
 from executors.models import Job
 
-# 1. Need to figure out how to load the necessary modules via the python script. subprocess call?
-
-load_modules = 'module load masilab/prequal/1.0.8-ncf cuda/9.1.85-fasrc01;unset DISPLAY'
-proc1 = subprocess.Popen(load_modules, shell=True, stdout=subprocess.PIPE)
-proc1.communicate()
-
 
 logger = logging.getLogger(__name__)
 
 
 # pull in some parameters from the BaseTask class in the __init__.py directory
-
-#class Task(tasks.BaseTask):
 
 class Task(tasks.BaseTask):
 	def __init__(self, sub, ses, run, bids, outdir, tempdir=None, pipenv=None):
@@ -177,7 +167,7 @@ class Task(tasks.BaseTask):
 
 
 		self.create_csv(inputs_dir, dwi_file)
-		self.add_intended_for(inputs_dir)
+		self.add_intended_for()
 
 	# this method will grab the phase encode direction and total readout time for the main dwi scan and both fieldmaps and place them into a csv file named
 	# dtiQA_config.csv
@@ -246,7 +236,7 @@ class Task(tasks.BaseTask):
 
 # this method will add an "IntendedFor" key-value pair to the fieldmap scans
 
-	def add_intended_for(self):	
+	def add_intended_for(self):
 
 		fmap_json_files = self._layout.get(run=self._run, suffix='epi', extension='.json', return_type='filename')
 
@@ -331,5 +321,6 @@ class Task(tasks.BaseTask):
 
 class DWISpecError(Exception):
 	pass
+
 
 
