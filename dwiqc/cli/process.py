@@ -17,6 +17,7 @@ from bids import BIDSLayout
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
 import prequal
 import qsiprep
+import prequal_EQ
 #import dwiqc.tasks.mriqc as mriqc
 #from anatqc.bids import BIDS
 #from anatqc.xnat import Report
@@ -50,9 +51,6 @@ def do(args):
 
     dwi_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='dwi', run=args.run, return_type='file').pop())
 
-    #t1w_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='T1w', run=args.run, return_type='file').pop())
-
-
     # ⬇️ not sure what to do with these... will come back here.
    
     #logger.debug('DWI raw: %s', raw)
@@ -62,9 +60,10 @@ def do(args):
     # prequal job
     prequal_outdir = None
     if 'prequal' in args.sub_tasks:
+        logger.debug('building prequal task')
         chopped_bids = os.path.dirname(args.bids_dir)
         prequal_outdir = os.path.join(chopped_bids, 'dwiqc-prequal', 'OUTPUTS')
-        task = prequal.Task(
+        prequal_task = prequal.Task(
             sub=args.sub,
             ses=args.ses,
             run=args.run,
@@ -74,15 +73,26 @@ def do(args):
             pipenv='/sw/apps/prequal'
         )
         os.environ['OPENBLAS_NUM_THREADS'] = '1'
-        logger.info(json.dumps(task.command, indent=1))
-        jarray.add(task.job)
+        logger.info(json.dumps(prequal_task.command, indent=1))
+        jarray.add(prequal_task.job)
+
+        # eq_task = prequal_EQ.Task(
+        #     sub=args.sub,
+        #     ses=args.ses,
+        #     run=args.run,
+        #     bids=args.bids_dir,
+        #     outdir=prequal_outdir,
+        #     tempdir=tempfile.gettempdir(),
+        #     parent=prequal_task
+        # )
+        # jarray.add(eq_task.job)
 
     # qsiprep job
     qsiprep_outdir = None
     if 'qsiprep' in args.sub_tasks:
         chopped_bids = os.path.dirname(args.bids_dir)
         qsiprep_outdir = os.path.join(chopped_bids, 'dwiqc-qsiprep', 'qsiprep_output')
-        task = qsiprep.Task(
+        qsiprep_task = qsiprep.Task(
             sub=args.sub,
             ses=args.ses,
             run=args.run,
@@ -93,7 +103,7 @@ def do(args):
         )
         os.environ['OPENBLAS_NUM_THREADS'] = '1'
         logger.info(json.dumps(task.command, indent=1))
-        jarray.add(task.job)
+        jarray.add(qsiprep_task.job)
 
     # submit jobs and wait for them to finish
     if not args.dry_run:
@@ -104,6 +114,10 @@ def do(args):
         numjobs = len(jarray.array)
         failed = len(jarray.failed)
         complete = len(jarray.complete)
+        if 'qsiprep' in args.sub_tasks:
+            qsiprep_task.copy_eddy_files()
+        prequal_eddy(args, prequal_outdir)
+        #qsiprep_eddy(args, qsiprep_outdir)
         if failed:
             logger.info('%s/%s jobs failed', failed, numjobs)
             for pid,job in iter(jarray.failed.items()):
@@ -115,6 +129,36 @@ def do(args):
         logger.info('%s/%s jobs completed', complete, numjobs)
         if failed > 0:
             sys.exit(1)
+
+
+
+def prequal_eddy(args, prequal_outdir):
+    if 'prequal' in args.sub_tasks:
+        eq_task = prequal_EQ.Task(
+            sub=args.sub,
+            ses=args.ses,
+            run=args.run,
+            bids=args.bids_dir,
+            outdir=prequal_outdir,
+            tempdir=tempfile.gettempdir(),
+        )
+
+        eq_task.run()
+
+def qsiprep_eddy(args, qsiprep_outdir):
+    if 'qsiprep' in args.sub_tasks:
+        eq_task = qsiprep_EQ.Task(
+            sub=args.sub,
+            ses=args.ses,
+            run=args.run,
+            bids=args.bids_dir,
+            outdir=qsiprep_outdir,
+            tempdir=tempfile.gettempdir(),
+        )
+
+        eq_task.run()    
+
+
 
 
 # this section will get updated when we get to the xnat phase

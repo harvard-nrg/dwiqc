@@ -8,8 +8,6 @@ from bids import BIDSLayout
 import sys
 import json
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
-sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
-from env_modules_python import module
 import __init__ as tasks
 import shutil
 from executors.models import Job
@@ -261,7 +259,7 @@ class Task(tasks.BaseTask):
 					json.dump(file_data, f, indent = 2)
 
 
-	def run_eddy_quad(self, ):
+	def run_eddy_quad(self):
 		#load the fsl module
 		module('load', 'fsl/6.0.4-ncf')
 		os.chdir(f'{self._outdir}/EDDY')
@@ -360,7 +358,6 @@ class Task(tasks.BaseTask):
 			error=logfile
 		)
 
-		self.run_eddy_quad()
 
 
 

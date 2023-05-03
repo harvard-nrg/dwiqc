@@ -10,17 +10,13 @@ import json
 import nibabel as nib
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
 import __init__ as tasks
+sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
+from env_modules_python import module
 import shutil
 from executors.models import Job
 
 
-
-# currently loading modules via subprocess call. Is there a better way?
-
-
-load_modules = 'export cuda=/n/helmod/apps/centos7/Core/cuda/9.1.85-fasrc01'
-proc1 = subprocess.Popen(load_modules, shell=True, stdout=subprocess.PIPE)
-proc1.communicate()
+module('load', 'cuda/9.1.85-fasrc01')
 
 
 logger = logging.getLogger(__name__)
@@ -40,7 +36,7 @@ class Task(tasks.BaseTask):
 
 	def calc_mporder(self):
 		# need to get the length of the SliceTiming File (i.e. number of slices) divided by the "MultibandAccelerationFactor". From there, 
-		# divide that number by both 4 and 2. calculate the midpoint. that's the number passed to mporder.
+		# divide that number by 3. That's the number passed to mporder.
 
 		# this will grab the dwi file, pop it off the list, get the slice timing metadata, then grab the length of the slice timing array
 		num_slices = len(self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz').pop().get_metadata()['SliceTiming'])
@@ -204,6 +200,10 @@ class Task(tasks.BaseTask):
 		with open(f"{self._bids}/eddy_params_s2v_mbs.json", "w") as f:
 			json.dump(params_file, f)
 
+	def copy_eddy_files(self):
+		shutil.copytree(self._tempdir, self._outdir)
+		os.remove(self._tempdir)
+
 
 	# create qsiprep command to be executed
 
@@ -218,7 +218,8 @@ class Task(tasks.BaseTask):
 			#'qsiprep',
 			'singularity',
 			'run',
-			'/ncf/nrg/sw/apps/qsiprep/0.14.0/qsiprep.sif',
+			'--nv',
+			'/ncf/nrg/sw/apps/qsiprep/0.14.0/qsiprep.sif',			
 			self._bids,
 			self._outdir,
 			'participant',
@@ -239,16 +240,16 @@ class Task(tasks.BaseTask):
 			'--fs-license-file',
 			'/ncf/nrg/sw/apps/freesurfer/6.0.0/license.txt',
 			'-w',
-			self._tempdir,
-			'&&',
-			'cp',
-			'-r',
-			self._tempdir,
-			self._bids,
-			'&&',
-			'rm',
-			'-r',
-			self._tempdir
+			self._tempdir#,
+			#'&&',
+			#'cp',
+			#'-r',
+			#self._tempdir,
+			#self._bids,
+			#'&&',
+			#'rm',
+			#'-r',
+			#self._tempdir
 		]
 
 		logdir = self.logdir()
