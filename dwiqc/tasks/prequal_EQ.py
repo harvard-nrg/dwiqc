@@ -29,7 +29,7 @@ class Task(tasks.BaseTask):
 		#### copy tempdir
 
 		#load the fsl module
-		module('load','fsl/6.0.4-ncf')
+		module('load','fsl/6.0.4-centos7_64-ncf')
 		while not os.path.exists(f'{self._outdir}/EDDY'):
 			time.sleep(120)
 
@@ -52,15 +52,14 @@ class Task(tasks.BaseTask):
 
 		## run eddy quad
 
-		eddy_quad = f"""
-		eddy_quad \
+		eddy_quad = f"""eddy_quad \
 		eddy_results \
 		-idx index.txt \
 		-par acqparams.txt \
 		--mask=eddy_mask.nii.gz \
 		--bvals=../PREPROCESSED/dwmri.bval \
-		--bvecs=../PREPROCESSED/dwmri.bvec' \
-		--field	../TOPUP/topup_field.nii.gz \
+		--bvecs=../PREPROCESSED/dwmri.bvec \
+		--field ../TOPUP/topup_field.nii.gz \
 		-s ../{spec_file} \
 		-v"""
 

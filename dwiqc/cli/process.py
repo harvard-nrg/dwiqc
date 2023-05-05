@@ -12,12 +12,14 @@ import tarfile
 import executors
 import tempfile
 import subprocess as sp
+import shutil
 from executors.models import Job, JobArray
 from bids import BIDSLayout
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
 import prequal
 import qsiprep
 import prequal_EQ
+import qsiprep_EQ
 #import dwiqc.tasks.mriqc as mriqc
 #from anatqc.bids import BIDS
 #from anatqc.xnat import Report
@@ -102,7 +104,8 @@ def do(args):
             pipenv='/sw/apps/qsiprep'
         )
         os.environ['OPENBLAS_NUM_THREADS'] = '1'
-        logger.info(json.dumps(task.command, indent=1))
+        logger.info(json.dumps(qsiprep_task.command, indent=1))
+        check_for_output(args, qsiprep_outdir)
         jarray.add(qsiprep_task.job)
 
     # submit jobs and wait for them to finish
@@ -114,10 +117,9 @@ def do(args):
         numjobs = len(jarray.array)
         failed = len(jarray.failed)
         complete = len(jarray.complete)
-        if 'qsiprep' in args.sub_tasks:
-            qsiprep_task.copy_eddy_files()
         prequal_eddy(args, prequal_outdir)
-        #qsiprep_eddy(args, qsiprep_outdir)
+        copy_eddy_files(args,qsiprep_outdir)
+        qsiprep_eddy(args, qsiprep_outdir)
         if failed:
             logger.info('%s/%s jobs failed', failed, numjobs)
             for pid,job in iter(jarray.failed.items()):
@@ -156,7 +158,25 @@ def qsiprep_eddy(args, qsiprep_outdir):
             tempdir=tempfile.gettempdir(),
         )
 
-        eq_task.run()    
+        eq_task.run()   
+
+def copy_eddy_files(args, qsiprep_outdir):
+    if 'qsiprep' in args.sub_tasks:
+        #tempdir = '/n/holyscratch01/LABS/nrg/Lab/dasay/2251028'
+        tempdir=tempfile.gettempdir()
+        try:
+            shutil.copytree(tempdir, f'{qsiprep_outdir}/qsiprep/eddy_files')
+        except:
+            print('files have already been copied')
+        #os.remove(self._tempdir)
+
+#### this function is primarily for debugging and development purposes
+def check_for_output(args, qsiprep_outdir):
+    if os.path.isfile(f'{qsiprep_outdir}/qsiprep/sub-{args.sub}.html'):
+        print('Qsiprep has already been run on this subject.\nRunning eddy quad.')
+        copy_eddy_files(args, qsiprep_outdir)
+        # write the qsiprep_EQ.py script
+        qsiprep_eddy(args, qsiprep_outdir)
 
 
 

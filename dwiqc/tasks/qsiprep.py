@@ -200,11 +200,6 @@ class Task(tasks.BaseTask):
 		with open(f"{self._bids}/eddy_params_s2v_mbs.json", "w") as f:
 			json.dump(params_file, f)
 
-	def copy_eddy_files(self):
-		shutil.copytree(self._tempdir, self._outdir)
-		os.remove(self._tempdir)
-
-
 	# create qsiprep command to be executed
 
 	def build(self):
@@ -219,7 +214,7 @@ class Task(tasks.BaseTask):
 			'singularity',
 			'run',
 			'--nv',
-			'/ncf/nrg/sw/apps/qsiprep/0.14.0/qsiprep.sif',			
+			'/n/sw/ncf/apps/qsiprep/0.14.0/qsiprep.sif',			
 			self._bids,
 			self._outdir,
 			'participant',
@@ -236,9 +231,9 @@ class Task(tasks.BaseTask):
 			'--n_cpus',
 			'2',
 			'--mem_mb',
-			'20000',
+			'40000',
 			'--fs-license-file',
-			'/ncf/nrg/sw/apps/freesurfer/6.0.0/license.txt',
+			'/n/helmod/apps/centos7/Core/freesurfer/6.0.0-fasrc01/license.txt',
 			'-w',
 			self._tempdir#,
 			#'&&',
@@ -256,8 +251,8 @@ class Task(tasks.BaseTask):
 		logfile = os.path.join(logdir, 'dwiqc-qsiprep.log')
 		self.job = Job(
 			name='dwiqc-qsiprep',
-			time='480',
-			memory='20G',
+			time='1000',
+			memory='40G',
 			gpus=1,
 			nodes=1,
 			command=self._command,
