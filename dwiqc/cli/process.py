@@ -105,7 +105,7 @@ def do(args):
         )
         os.environ['OPENBLAS_NUM_THREADS'] = '1'
         logger.info(json.dumps(qsiprep_task.command, indent=1))
-        check_for_output(args, qsiprep_outdir)
+        #check_for_output(args, qsiprep_outdir)
         jarray.add(qsiprep_task.job)
 
     # submit jobs and wait for them to finish
@@ -118,7 +118,7 @@ def do(args):
         failed = len(jarray.failed)
         complete = len(jarray.complete)
         prequal_eddy(args, prequal_outdir)
-        copy_eddy_files(args,qsiprep_outdir)
+        #copy_eddy_files(args,qsiprep_outdir)
         qsiprep_eddy(args, qsiprep_outdir)
         if failed:
             logger.info('%s/%s jobs failed', failed, numjobs)
@@ -145,7 +145,7 @@ def prequal_eddy(args, prequal_outdir):
             tempdir=tempfile.gettempdir(),
         )
 
-        eq_task.run()
+        eq_task.build()
 
 def qsiprep_eddy(args, qsiprep_outdir):
     if 'qsiprep' in args.sub_tasks:
@@ -158,16 +158,17 @@ def qsiprep_eddy(args, qsiprep_outdir):
             tempdir=tempfile.gettempdir(),
         )
 
-        eq_task.run()   
+        eq_task.build()   
 
 def copy_eddy_files(args, qsiprep_outdir):
     if 'qsiprep' in args.sub_tasks:
         #tempdir = '/n/holyscratch01/LABS/nrg/Lab/dasay/2251028'
         tempdir=tempfile.gettempdir()
-        try:
-            shutil.copytree(tempdir, f'{qsiprep_outdir}/qsiprep/eddy_files')
-        except:
-            print('files have already been copied')
+        shutil.copytree(tempdir, f'{qsiprep_outdir}/qsiprep/eddy_files')
+#        try:
+#            shutil.copytree(tempdir, f'{qsiprep_outdir}/qsiprep/eddy_files')
+#        except:
+#            print('files have already been copied')
         #os.remove(self._tempdir)
 
 #### this function is primarily for debugging and development purposes

@@ -14,6 +14,9 @@ import json
 from executors.models import Job
 
 
+old_out = sys.stdout
+
+
 
 class Task(tasks.BaseTask):
 	def __init__(self, sub, ses, run, bids, outdir, parent=None, tempdir=None, pipenv=None):
@@ -26,7 +29,7 @@ class Task(tasks.BaseTask):
 
 	def build(self):
 
-		#### copy tempdir
+		log_file = open("eddy_quad.log", "w")		
 
 		#load the fsl module
 		module('load','fsl/6.0.4-centos7_64-ncf')
@@ -35,6 +38,8 @@ class Task(tasks.BaseTask):
 
 		if os.path.isdir(f'{self._outdir}/EDDY'):
 			os.chdir(f'{self._outdir}/EDDY')
+			log_file = open(f"{self._outdir}/EDDY/eddy_quad.log", "w")	
+			sys.stdout = log_file
 
 		# copy the necessary file to EDDY directory
 
@@ -65,5 +70,9 @@ class Task(tasks.BaseTask):
 
 		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
 		proc1.communicate()
+
+		sys.stdout = old_stdout
+
+		log_file.close()
 
 

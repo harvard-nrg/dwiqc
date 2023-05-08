@@ -12,6 +12,8 @@ import subprocess
 import json
 from executors.models import Job
 
+old_out = sys.stdout
+
 
 class Task(tasks.BaseTask):
 	def __init__(self, sub, ses, run, bids, outdir, parent=None, tempdir=None, pipenv=None):
@@ -26,6 +28,13 @@ class Task(tasks.BaseTask):
 
 		#### copy tempdir
 
+		print('copying all eddy output files...')
+
+		shutil.copytree({self._tempdir}, f'{qsiprep_outdir}/qsiprep/eddy_files')
+
+		log_file = open(f"{self._outdir}/EDDY/eddy_quad.log", "w")	
+		sys.stdout = log_file
+
 		#load the fsl module
 		module('load','fsl/6.0.4-centos7_64-ncf')
 
@@ -38,16 +47,21 @@ class Task(tasks.BaseTask):
 
 		hmc_dir = f'{eddy_dir}/qsiprep_wf/single_subject_{self._sub}_wf/dwi_preproc_ses_{self._ses}_run_{self._run}_wf/hmc_sdc_wf'
 
-		# copy over eddy_corrected.eddy_rotated_bvecs
+		# copy over all files from eddy directory
 
-		shutil.copy(f'{hmc_dir}/eddy/eddy_corrected.eddy_rotated_bvecs', eddy_dir)
+		for file in os.listdir(f'{hmc_dir}/eddy'):
+			if os.path.isfile(file):
+				shutil.copy(f'{hmc_dir}/eddy/{file}', eddy_dir)
+
+		#shutil.copy(f'{hmc_dir}/eddy/eddy_corrected.eddy_rotated_bvecs', eddy_dir)
+		#shutil.copy(f'{hmc_dir}/eddy/eddy_corrected.nii.gz', eddy_dir)
 		print("copy success #1/6")
 
 		# copy all files that end with txt and start with eddy in qsiprep/eddy_files/qsiprep_wf/single_subject_PE161458_wf/dwi_preproc_ses_PE161458221111_run_1_wf/hmc_sdc_wf/gather_inputs
 
-		for file in os.listdir(f'{hmc_dir}/gatherinputs'):
+		for file in os.listdir(f'{hmc_dir}/gather_inputs'):
 			if file.endswith('.txt') and file.startswith('eddy'):
-				shutil.copy(file, eddy_dir)
+				shutil.copy(f'{hmc_dir}/gather_inputs/{file}', eddy_dir)
 
 		print("copy success #2/6")
 
@@ -68,65 +82,36 @@ class Task(tasks.BaseTask):
 
 		# copy sub-PE161458_ses-PE161458221111_run-1_space-T1w_desc-preproc_space-T1w_fslstd_dwi.bval (rename to bval) from /qsirecon/sub-PE161458/ses-PE161458221111/dwi
 
-		shutil.copy(f'{self._outdir}/qsirecon/sub-{self._sub}/ses-{self._ses}/dwi/sub-{self._sub}_ses-{self._ses}_run_{self._run}_space-T1w_desc-preproc_space-T1w_fslstd_dwi.bval', eddy_dir)
+		shutil.copy(f'{self._outdir}/qsirecon/sub-{self._sub}/ses-{self._ses}/dwi/sub-{self._sub}_ses-{self._ses}_run-{self._run}_space-T1w_desc-preproc_space-T1w_fslstd_dwi.bval', eddy_dir)
 
-		os.rename(f'{eddy_dir}/sub-{self._sub}_ses-{self._ses}_run_{self._run}_space-T1w_desc-preproc_space-T1w_fslstd_dwi.bval', f'{self._sub}.bval')
+		os.rename(f'{eddy_dir}/sub-{self._sub}_ses-{self._ses}_run-{self._run}_space-T1w_desc-preproc_space-T1w_fslstd_dwi.bval', f'{self._sub}.bval')
 
 		print('copy success #6/6')
 
 
+		for file in os.listdir(self._bids):
+			if 'slspec' in file and file.endswith('.txt'):
+				spec_file = file
+
   		## run eddy_quad command
 
-#		eddy_quad = f"""eddy_quad \
-#		eddy_results \
-#		-idx index.txt \
-#		-par acqparams.txt \
-#		--mask=eddy_mask.nii.gz \
-#		--bvals=../PREPROCESSED/dwmri.bval \
-#		--bvecs=../PREPROCESSED/dwmri.bvec \
-#		--field ../TOPUP/topup_field.nii.gz \
-#		-s ../{spec_file} \
-#		-v"""
+		eddy_quad = f"""eddy_quad \
+		eddy_corrected \
+		-idx eddy_index.txt \
+		-par eddy_acqp.txt \
+		--mask=topup_imain_corrected_avg_mask.nii.gz \
+		--bvals={self._sub}.bval \
+		--bvecs=eddy_corrected.eddy_rotated_bvecs \
+		--field fieldmap_HZ.nii.gz \
+		-s {self._bids}/{spec_file} \
+		-v"""
 
+		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
+		proc1.communicate()
 
+		sys.stdout = old_stdout
 
+		log_file.close()
 
-
-
-#		while not os.path.exists(f'{self._outdir}/EDDY'):
-#			time.sleep(120)#
-
-#		if os.path.isdir(f'{self._outdir}/EDDY'):
-#			os.chdir(f'{self._outdir}/EDDY')#
-
-#		# copy the necessary file to EDDY directory#
-
-#		while not os.path.exists('../PREPROCESSED/dwmri.nii.gz'):
-#			time.sleep(120)#
-
-#		if os.path.isfile('../PREPROCESSED/dwmri.nii.gz'):
-#			shutil.copy('../PREPROCESSED/dwmri.nii.gz', 'eddy_results.nii.gz')#
-
-#		# grab name of slspec file#
-
-#		for file in os.listdir(self._outdir):
-#			if 'slspec' in file and file.endswith('.txt'):
-#				spec_file = file#
-
-#		## run eddy quad#
-
-#		eddy_quad = f"""eddy_quad \
-#		eddy_results \
-#		-idx index.txt \
-#		-par acqparams.txt \
-#		--mask=eddy_mask.nii.gz \
-#		--bvals=../PREPROCESSED/dwmri.bval \
-#		--bvecs=../PREPROCESSED/dwmri.bvec \
-#		--field ../TOPUP/topup_field.nii.gz \
-#		-s ../{spec_file} \
-#		-v"""#
-
-#		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
-#		proc1.communicate()
 
 
