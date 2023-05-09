@@ -53,7 +53,7 @@ def do(args):
 
     dwi_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='dwi', run=args.run, return_type='file').pop())
 
-    # ⬇️ not sure what to do with these... will come back here.
+    #  not sure what to do with these... will come back here.
    
     #logger.debug('DWI raw: %s', raw)
     #logger.debug('T1vnav sourcedata: %s', source)
@@ -64,7 +64,8 @@ def do(args):
     if 'prequal' in args.sub_tasks:
         logger.debug('building prequal task')
         chopped_bids = os.path.dirname(args.bids_dir)
-        prequal_outdir = os.path.join(chopped_bids, 'dwiqc-prequal', 'OUTPUTS')
+        prequal_outdir = os.path.join(args.bids_dir, 'dwiqc-prequal', 'OUTPUTS')
+        #prequal_outdir = os.path.join(chopped_bids, 'dwiqc-prequal', 'OUTPUTS')
         prequal_task = prequal.Task(
             sub=args.sub,
             ses=args.ses,

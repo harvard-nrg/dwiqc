@@ -64,7 +64,7 @@ class Task(tasks.BaseTask):
 
 	def create_nipype(self):
 		nipype = """[logging]
-
+		
 		[execution]
 		remove_unnecessary_outputs = false
 

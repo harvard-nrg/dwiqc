@@ -109,9 +109,8 @@ class Task(tasks.BaseTask):
 		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
 		proc1.communicate()
 
-		sys.stdout = old_stdout
-
 		log_file.close()
+
 
 
 

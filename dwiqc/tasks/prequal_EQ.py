@@ -43,11 +43,15 @@ class Task(tasks.BaseTask):
 
 		# copy the necessary file to EDDY directory
 
-		while not os.path.exists('../PREPROCESSED/dwmri.nii.gz'):
-			time.sleep(120)
+		#while not os.path.exists('../PREPROCESSED/dwmri.nii.gz'):
+		#	time.sleep(120)
 
 		if os.path.isfile('../PREPROCESSED/dwmri.nii.gz'):
 			shutil.copy('../PREPROCESSED/dwmri.nii.gz', 'eddy_results.nii.gz')
+
+		else:
+			print("prequal failed... exiting.")
+			sys.exit()
 
 		# grab name of slspec file
 
@@ -70,8 +74,6 @@ class Task(tasks.BaseTask):
 
 		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
 		proc1.communicate()
-
-		sys.stdout = old_stdout
 
 		log_file.close()
 
