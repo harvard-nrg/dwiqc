@@ -325,6 +325,7 @@ class Task(tasks.BaseTask):
 			'-B',
 			'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
 			'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
+			'--save_component_pngs',
 			'j',
 			'--eddy_cuda',
 			'9.1',

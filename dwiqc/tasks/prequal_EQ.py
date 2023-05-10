@@ -33,8 +33,8 @@ class Task(tasks.BaseTask):
 
 		#load the fsl module
 		module('load','fsl/6.0.4-centos7_64-ncf')
-		while not os.path.exists(f'{self._outdir}/EDDY'):
-			time.sleep(120)
+		#while not os.path.exists(f'{self._outdir}/EDDY'):
+		#	time.sleep(120)
 
 		if os.path.isdir(f'{self._outdir}/EDDY'):
 			os.chdir(f'{self._outdir}/EDDY')
@@ -61,7 +61,22 @@ class Task(tasks.BaseTask):
 
 		## run eddy quad
 
-		eddy_quad = f"""eddy_quad \
+#		eddy_quad = f"""eddy_quad \
+#		eddy_results \
+#		-idx index.txt \
+#		-par acqparams.txt \
+#		--mask=eddy_mask.nii.gz \
+#		--bvals=../PREPROCESSED/dwmri.bval \
+#		--bvecs=../PREPROCESSED/dwmri.bvec \
+#		--field ../TOPUP/topup_field.nii.gz \
+#		-s ../{spec_file} \
+#		-v"""
+
+
+		eddy_quad = f"""singularity exec \
+		-B /n/home_fasse/dasay/eddy_quad_mofication/quad_mot.py:/APPS/fsl/fslpython/pkgs/eddy_qc-1.0.3-py_0/site-packages/eddy_qc/QUAD/quad_mot.py \
+		/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif \
+		/APPS/fsl/bin/eddy_quad \
 		eddy_results \
 		-idx index.txt \
 		-par acqparams.txt \
@@ -73,6 +88,8 @@ class Task(tasks.BaseTask):
 		-v"""
 
 		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
+
+
 		proc1.communicate()
 
 		log_file.close()
