@@ -53,7 +53,7 @@ def do(args):
 
     dwi_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='dwi', run=args.run, return_type='file').pop())
 
-    #  not sure what to do with these... will come back here.
+    # ⬇️ not sure what to do with these... will come back here.
    
     #logger.debug('DWI raw: %s', raw)
     #logger.debug('T1vnav sourcedata: %s', source)
@@ -78,17 +78,6 @@ def do(args):
         os.environ['OPENBLAS_NUM_THREADS'] = '1'
         logger.info(json.dumps(prequal_task.command, indent=1))
         jarray.add(prequal_task.job)
-
-        # eq_task = prequal_EQ.Task(
-        #     sub=args.sub,
-        #     ses=args.ses,
-        #     run=args.run,
-        #     bids=args.bids_dir,
-        #     outdir=prequal_outdir,
-        #     tempdir=tempfile.gettempdir(),
-        #     parent=prequal_task
-        # )
-        # jarray.add(eq_task.job)
 
     # qsiprep job
     qsiprep_outdir = None
@@ -119,7 +108,6 @@ def do(args):
         failed = len(jarray.failed)
         complete = len(jarray.complete)
         prequal_eddy(args, prequal_outdir)
-        #copy_eddy_files(args,qsiprep_outdir)
         qsiprep_eddy(args, qsiprep_outdir)
         if failed:
             logger.info('%s/%s jobs failed', failed, numjobs)
