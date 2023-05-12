@@ -30,7 +30,7 @@ class Task(tasks.BaseTask):
 
 		print('copying all eddy output files...')
 
-		shutil.copytree({self._tempdir}, f'{self._outdir}/qsiprep/eddy_files')
+		shutil.copytree(self._tempdir, f'{self._outdir}/qsiprep/eddy_files')
 
 		log_file = open(f"{self._outdir}/qsiprep/eddy_files/eddy_quad.log", "w")	
 		sys.stdout = log_file
