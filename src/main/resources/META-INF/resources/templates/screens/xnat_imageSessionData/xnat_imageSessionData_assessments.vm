@@ -1,0 +1,40 @@
+<!-- BEGIN dwiQC plugin - xnat_imageSessionData_assessments.vm -->
+#if ( $om.getMinimalLoadAssessors().size() > 0 )
+  <br /><br />
+  <div class="edit_header1" style="margin-bottom:16px">Assessments</div>
+  <table cellspacing="0" cellpadding="1" border="0">
+    <tr>
+      <th class="underscore">Experiment</th>
+      <th class="underscore">Name</th>
+      <th class="underscore">Date</th>
+      <th class="underscore">$displayManager.getSingularDisplayNameForProject()</th>
+    </tr>
+    #foreach ( $assessor in $om.getMinimalLoadAssessors() )
+      #set( $fullAssessor = $om.getAssessorById($assessor.getId()) )
+      <tr>
+        #if ( $assessor.canRead($user) )
+          #set ( $assessorID = $!assessor.getProperty("ID") )
+          #set ( $assessorField = "${assessor.getXSIType()}.ID" )
+          #set ( $xsiTypeSingularName = $displayManager.getSingularDisplayNameForElement($assessor.getXSIType()) )
+          #set ( $url = "$link.setAction('DisplayItemAction').addPathInfo('search_element',$!assessor.getXSIType()).addPathInfo('search_field',$assessorField).addPathInfo('search_value',$assessorID).addPathInfo('popup',$popup).addPathInfo('project',$!project)" )
+          #if ( $assessor.getHeader() )
+            <td nowrap><a href="$url" title="$assessor.getIdentifier($project)">$!assessor.getHeader()</a></td>
+          #else
+            <td nowrap><a href="$url" title="$assessor.getIdentifier($project)">$!xsiTypeSingularName</a></td>
+          #end
+          <td nowrap><a href="$url" title="$assessor.getIdentifier($project)">$!fullAssessor.getLabel()</a></td>
+        #else
+          #if ( $assessor.getHeader() )
+            <td nowrap><a title="$assessor.getIdentifier($project)">$!assessor.getHeader()</a></td>
+          #else
+            <td nowrap><a title="$assessor.getIdentifier($project)">$!xsiTypeSingularName</a></td>
+          #end
+          <td nowrap><a title="$assessor.getIdentifier($project)">$!fullAssessor.getLabel()</a></td>
+        #end
+        <td nowrap>$!assessor.getProperty("date")</td>
+        <td nowrap>$!assessor.getProjectDisplayID()</td>
+      </tr>
+    #end
+  </table>
+#end
+<!-- END dwiQC plugin - xnat_imageSessionData_assessments.vm -->

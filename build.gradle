@@ -1,0 +1,90 @@
+import org.gradle.internal.jvm.Jvm
+
+// TODO: This block is required for the "xnat-data-builder" plugin to function.
+buildscript {
+    ext {
+        vXnat = "1.7.6"
+    }
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        gradlePluginPortal()
+        maven { url "https://nrgxnat.jfrog.io/nrgxnat/libs-release" }
+        maven { url "https://nrgxnat.jfrog.io/nrgxnat/libs-snapshot" }
+    }
+    dependencies {
+        classpath "org.nrg.xnat.build:xnat-data-builder:${vXnat}"
+        classpath "io.franzbecker:gradle-lombok:3.2.0"
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.8.RELEASE"
+    }
+}
+
+group "org.nrg.ssbc"
+version "1.0.0"
+
+apply plugin: "java"
+apply plugin: "xnat-data-builder"
+apply plugin: "io.franzbecker.gradle-lombok"
+apply plugin: "io.spring.dependency-management"
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+    maven { url "https://nrgxnat.jfrog.io/nrgxnat/libs-release" }
+    maven { url "https://nrgxnat.jfrog.io/nrgxnat/libs-snapshot" }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencyManagement.imports {
+    mavenBom "org.nrg:parent:${vXnat}"
+}
+
+dependencies {
+    implementation "org.nrg.xnat:web"
+    implementation "org.nrg.xnat:xnat-data-models"
+    implementation "org.nrg.xdat:core"
+    implementation "io.springfox:springfox-swagger2"
+    implementation "io.springfox:springfox-swagger-ui"
+}
+
+lombok {
+    version = dependencyManagement.importedProperties["lombok.version"] as String
+    sha256 = dependencyManagement.importedProperties["lombok.checksum"] as String
+}
+
+def javaVersion = Jvm.current().javaVersion
+if (javaVersion.java8Compatible || javaVersion.java9Compatible) {
+    if (hasProperty("rt.17.jar")) {
+        // Solution for bootstrap classpath warning and possible issues with compatibility with 1.7 libraries
+        // was taken from this post on discuss.gradle.org: http://bit.ly/24xD9j0
+        def rt17jar = property "rt.17.jar"
+        logger.info "Using ${rt17jar} as the bootstrap class path jar."
+        gradle.projectsEvaluated {
+            tasks.withType(JavaCompile) {
+                options.fork = true
+                options.compilerArgs << "-XDignore.symbol.file"
+                options.bootstrapClasspath = files(rt17jar as String)
+            }
+        }
+    } else {
+        logger.warn "No value was set for the rt.17.jar build property, using the default bootstrap class path. You should consider setting rt.17.jar to indicate a jar file containing the Java 1.7 run-time library:\n"
+        logger.warn "  ./gradlew -Prt.17.jar=rt-1.7.0_45.jar war\n"
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "src/main/java"
+            srcDir "build/xnat-generated/src/main/java"
+        }
+        resources {
+            srcDir "src/main/resources"
+            srcDir "build/xnat-generated/src/main/resources"
+        }
+    }
+}

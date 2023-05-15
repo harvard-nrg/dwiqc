@@ -1,0 +1,23 @@
+#* @vtlvariable name="dateTime" type="java.lang.String" *#
+$page.setTitle("Template Screen")
+$page.setLinkColor($ui.alink)
+$page.setVlinkColor($ui.vlink)
+
+<table width="100%">
+	<tr>
+		<td>
+			<table>
+                <tr>
+                    <td colspan="3" style="padding-top: 20px; padding-bottom: 10px; text-align: left; vertical-align: middle;">
+                        <span style="font-family: $ui.sansSerifFonts; font-size: small; "><b>Template Screen</b></span>
+                    </td>
+                </tr>
+                <tr>
+					<td valign="top">
+						This is a page from the template plugin that was requested at $dateTime.
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>

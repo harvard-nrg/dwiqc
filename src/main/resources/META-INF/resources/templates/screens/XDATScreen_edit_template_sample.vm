@@ -1,0 +1,100 @@
+$page.setTitle("Sample")
+$page.setLinkColor($ui.alink)
+$page.setVlinkColor($ui.vlink)
+<script type="text/javascript">
+window.currentID="$!om.getId()";
+    #if($om.getProject())
+     #if($om.getProject().equals(""))
+window.currentProject="$!project";
+     #else
+window.currentProject="$!om.getProject()";
+     #end
+    #else
+window.currentProject="$!project";
+    #end
+
+window.currentSubject="$!om.getSubjectId()";
+window.currentLabel="$!om.getLabel()";
+</script>
+#if ($data.message)
+<div class="error">$data.message</div>
+#end
+<div id="sampleFormDiv">
+<form ID="sampleForm" name="sampleForm" method="post" action="$link.setAction("ModifySubjectAssessorData")">
+    <input type="hidden" name="project" value="$!{project}">
+    <input type="hidden" name="part_id" value="$!{subjectId}">
+    <input type='hidden' name='template:sample/ID' value='$!item.getProperty("ID")'/>
+    <input type="hidden" name="template:sample/project" value='$!{project}'/>
+    <input type='hidden' name='template:sample/subject_ID' value='$!{subjectId}'/>
+    <input type='hidden' name='template:sample/label' value='$!label'/>
+    <input type="hidden" name="template:sample.date.month" id="template:sample.date.month" value=""/>
+    <input type="hidden" name="template:sample.date.date" id="template:sample.date.date" value=""/>
+    <input type="hidden" name="template:sample.date.year" id="template:sample.date.year" value=""/>
+    <input type="hidden" name="$om.getXSIType()/ID" id="$om.getXSIType()/ID" value="$!om.getId()"/>
+
+    #if($vr)
+    <div class="error">Invalid parameters:<BR>$vr.toHTML()</div>
+    <HR>
+    #end
+
+<table width="100%">
+<tr>
+    <td>
+        <table width="100%">
+            <tr>
+                <td align="left" valign="middle">
+                    <div class="edit_title">Sample</div>
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+<tr>
+    <td>
+        <table width="100%">
+            <tr>
+                <td valign="top" colspan=2>
+                    <table>
+                        <tr>
+                            <td colspan="2">#parse("/screens/EditProjectSpecificFields.vm")</td>
+                        </tr>
+                        <tr>
+                             <td colspan="2">Did the sample pass?</td>
+                         </tr>
+                         <tr>
+                             #formLabel("Pass?")
+                             <td>
+                                 #xdatBooleanRadioYesNoWithoutDefault("template:sample/pass" $item $vr)
+                             </td>
+                         </tr>
+                     </table>
+                 </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+<tr>
+    <td>
+        #xdatEditProps($item $edit_screen)
+    </td>
+</tr>
+<tr>
+    <td colspan=2 align=left>
+        <input type="button" onclick="validateForm();" name="eventSubmit_doInsert" value="Submit"/>
+    </td>
+</tr>
+</table>
+</form>
+</div>
+
+<script type="text/javascript">
+    function validateForm() {
+        var today = new Date();
+        document.getElementById('template:sample.date.month').value = today.getMonth();
+        document.getElementById('template:sample.date.date').value = today.getDate();
+        document.getElementById('template:sample.date.year').value = today.getFullYear();
+
+        document.sampleForm.submit();
+        return true;
+    }
+</script>

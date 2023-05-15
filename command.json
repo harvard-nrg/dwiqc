@@ -1,0 +1,194 @@
+{
+  "name": "dwiqc-session",
+  "label": "dwiqc-session",
+  "description": "Run dwiQC on a MR Session",
+  "version": "1.0.0",
+  "schema-version": "1.0",
+  "image": "neuroinformatics/dwiqc",
+  "type": "docker",
+  "working-directory": "/sw/apps/dwiqc/",
+  "command-line": "-v tandem #SESSION_LABEL# #RUN# --bids-dir /bids #SUBTASKS# #FSLICENSE# --artifacts-dir /artifacts",
+  "override-entrypoint": false,
+  "mounts": [
+    {
+      "name": "sessiondir",
+      "writable": false,
+      "path": "/session"
+    },
+    {
+      "name": "artifacts",
+      "writable": true,
+      "path": "/artifacts"
+    }
+  ],
+  "environment-variables": {},
+  "ports": {},
+  "inputs": [
+    {
+      "name": "run",
+      "label": null,
+      "description": "Run number",
+      "type": "string",
+      "matcher": null,
+      "default-value": "1",
+      "required": true,
+      "replacement-key": "#RUN#",
+      "sensitive": null,
+      "command-line-flag": "--run",
+      "command-line-separator": null,
+      "true-value": null,
+      "false-value": null,
+      "select-values": [],
+      "multiple-delimiter": null
+    },
+    {
+      "name": "session_label",
+      "label": null,
+      "description": "Label of the session",
+      "type": "string",
+      "matcher": null,
+      "default-value": null,
+      "required": true,
+      "replacement-key": "#SESSION_LABEL#",
+      "sensitive": null,
+      "command-line-flag": "--label",
+      "command-line-separator": null,
+      "true-value": null,
+      "false-value": null,
+      "select-values": [],
+      "multiple-delimiter": null
+    },
+    {
+      "name": "subtasks",
+      "label": null,
+      "description": "Limit run to specified tasks 'prequal qsiprep'",
+      "type": "string",
+      "matcher": null,
+      "default-value": "prequal qsiprep",
+      "required": false,
+      "replacement-key": "#SUBTASKS#",
+      "sensitive": null,
+      "command-line-flag": "--sub-tasks",
+      "command-line-separator": null,
+      "true-value": null,
+      "false-value": null,
+      "select-values": [],
+      "multiple-delimiter": null
+    },
+    {
+      "name": "fslicense",
+      "label": null,
+      "description": "FreeSurfer license base64 encoded",
+      "type": "string",
+      "matcher": null,
+      "default-value": null,
+      "required": true,
+      "replacement-key": "#FSLICENSE#",
+      "sensitive": null,
+      "command-line-flag": "--fs-license",
+      "command-line-separator": null,
+      "true-value": null,
+      "false-value": null,
+      "select-values": [],
+      "multiple-delimiter": null
+    }
+  ],
+  "outputs": [
+    {
+      "name": "assessor",
+      "description": "assessor",
+      "required": true,
+      "mount": "artifacts",
+      "path": "assessor/assessment.xml",
+      "glob": ""
+    },
+    {
+      "name": "resources",
+      "description": "resources",
+      "required": true,
+      "mount": "artifacts",
+      "path": "resources",
+      "glob": ""
+    }
+  ],
+  "xnat": [
+    {
+      "name": "dwiqc-session",
+      "label": "dwiqc-session",
+      "description": "Run dwiQC on a MR Session",
+      "contexts": [
+        "xnat:imageSessionData"
+      ],
+      "external-inputs": [
+        {
+          "name": "session",
+          "label": null,
+          "description": "Input session",
+          "type": "Session",
+          "matcher": null,
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "sensitive": null,
+          "provides-value-for-command-input": null,
+          "provides-files-for-command-mount": "sessiondir",
+          "via-setup-command": null,
+          "user-settable": null,
+          "load-children": true
+        }
+      ],
+      "derived-inputs": [
+        {
+          "name": "session-label",
+          "label": null,
+          "description": "The session's label",
+          "type": "string",
+          "matcher": null,
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "sensitive": null,
+          "provides-value-for-command-input": "session_label",
+          "provides-files-for-command-mount": null,
+          "user-settable": null,
+          "load-children": true,
+          "derived-from-wrapper-input": "session",
+          "derived-from-xnat-object-property": "label",
+          "via-setup-command": null,
+          "multiple": false,
+          "parser": null
+        }
+      ],
+      "output-handlers": [
+        {
+          "name": "assessor",
+          "accepts-command-output": "assessor",
+          "via-wrapup-command": null,
+          "as-a-child-of": "session",
+          "type": "Assessor",
+          "label": "dwiqc-assessor",
+          "format": null,
+          "description": null,
+          "content": null,
+          "tags": []
+        },
+        {
+          "name": "resources",
+          "accepts-command-output": "resources",
+          "via-wrapup-command": null,
+          "as-a-child-of": "assessor",
+          "type": "Resource",
+          "label": "dwiqc-resource",
+          "format": null,
+          "description": null,
+          "content": null,
+          "tags": []
+        }
+      ]
+    }
+  ],
+  "container-labels": {},
+  "generic-resources": {},
+  "ulimits": {}
+}
+

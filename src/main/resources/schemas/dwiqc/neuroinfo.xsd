@@ -1,0 +1,78 @@
+<!-- dwiQC -->
+<xs:schema targetNamespace="http://www.neuroinfo.org/neuroinfo"
+           xmlns:neuroinfo="http://www.neuroinfo.org/neuroinfo"
+           xmlns:xnat="http://nrg.wustl.edu/xnat"
+           xmlns:xdat="http://nrg.wustl.edu/xdat"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:import namespace="http://nrg.wustl.edu/xnat" schemaLocation="../xnat/xnat.xsd"/>
+    <xs:import namespace="http://nrg.wustl.edu/xdat" schemaLocation="../xdat/xdat.xsd"/>
+    <xs:element name="dwiQC" type="neuroinfo:dwiqc"/>
+    <xs:complexType name="dwiqc">
+        <xs:complexContent>
+            <xs:extension base="xnat:imageAssessorData">
+                <xs:sequence>
+                    <xs:element name="dwi_scan_id" type="xs:string"/>
+                    <xs:element name="AP_fmap_scan_id" type="xs:string"/>
+                    <xs:element name="PA_fmap_scan_id" type="xs:string"/>
+                    <xs:element name="session_label" type="xs:string"/>
+                    <xs:element name="eddy_quad">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="avg_SNR_b0" type="xs:decimal"/>
+                                <xs:element name="avg_CNR_b500" type="xs:decimal"/>
+                                <xs:element name="avg_CNR_b1000" type="xs:decimal"/>
+                                <xs:element name="avg_CNR_b2000" type="xs:decimal"/>
+                                <xs:element name="avg_CNR_b300" type="xs:decimal"/>
+                                <xs:element name="avg_abs_mot" type="xs:decimal"/>
+                                <xs:element name="avg_rel_mot" type="xs:decimal"/>
+                                <xs:element name="avg_x_transl" type="xs:decimal"/>
+                                <xs:element name="avg_y_transl" type="xs:decimal"/>
+                                <xs:element name="avg_z_transl" type="xs:decimal"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="vnav" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="vnav_min" type="xs:integer" minOccurs="0"/>
+                                <xs:element name="vnav_max" type="xs:integer" minOccurs="0"/>
+                                <xs:element name="vnav_acq_tot" type="xs:integer" minOccurs="0"/>
+                                <xs:element name="vnav_reacq" type="xs:integer" minOccurs="0"/>
+                                <xs:element name="mean_mot_rms_per_min" type="xs:decimal" minOccurs="0"/>
+                                <xs:element name="mean_mot_max_per_min" type="xs:decimal" minOccurs="0"/>
+                                <xs:element name="vnav_failed" type="xs:integer" minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="manual" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="wrap" type="xs:string" minOccurs="0"/>
+                                <xs:element name="cover" type="xs:string" minOccurs="0"/>
+                                <xs:element name="motion_brain" type="xs:string" minOccurs="0"/>
+                                <xs:element name="motion_out" type="xs:string" minOccurs="0"/>
+                                <xs:element name="ghost_brain" type="xs:string" minOccurs="0"/>
+                                <xs:element name="ghost_out" type="xs:string" minOccurs="0"/>
+                                <xs:element name="spike" type="xs:string" minOccurs="0"/>
+                                <xs:element name="art_brain" type="xs:string" minOccurs="0"/>
+                                <xs:element name="art_out" type="xs:string" minOccurs="0"/>
+                                <xs:element name="inhom" type="xs:string" minOccurs="0"/>
+                                <xs:element name="overall" type="xs:string" minOccurs="0"/>
+                                <xs:element name="comments" type="xs:string" minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="imageResource" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="label" type="xs:string"/>
+                                <xs:element name="uri" type="xs:string"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>
