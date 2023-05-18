@@ -16,7 +16,7 @@ import shutil
 from executors.models import Job, JobArray
 from bids import BIDSLayout
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/xnat')
-import __init__ as xnat
+import setup as xnat
 from xnat import Report
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
 import prequal
