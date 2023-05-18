@@ -16,7 +16,7 @@ import shutil
 from executors.models import Job
 
 
-#module('load', 'cuda/9.1.85-fasrc01')
+module('load', 'cuda/9.1.85-fasrc01')
 
 
 logger = logging.getLogger(__name__)

@@ -319,7 +319,7 @@ class Task(tasks.BaseTask):
 			'-B',
 			'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
 			'-B',
-			'/n/helmod/apps/centos7/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
+			'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
 			'-B',
 			'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
 			'-B',
