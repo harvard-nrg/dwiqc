@@ -8,7 +8,7 @@ from bids import BIDSLayout
 import sys
 import json
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
-import setup as tasks
+import setup# as tasks
 import shutil
 from executors.models import Job
 
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 # pull in some parameters from the BaseTask class in the __init__.py directory
 
-class Task(tasks.BaseTask):
+class Task(setup.BaseTask):
 	def __init__(self, sub, ses, run, bids, outdir, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
