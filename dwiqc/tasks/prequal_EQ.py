@@ -102,45 +102,45 @@ class Task(tasks.BaseTask):
 
 			# average absolute motion
 
-			metrics_dict["Average-abs-motion-(mm)"] = data['qc_mot_abs']
+			metrics_dict["Average_abs_motion_mm"] = data['qc_mot_abs']
 
 			# average relative motion
 
-			metrics_dict["Average-rel-motion-(mm)"] = data['qc_mot_rel']
+			metrics_dict["Average_rel_motion_mm"] = data['qc_mot_rel']
 
 			# average x translation		
 
-			metrics_dict["Average-x-translation-(mm)"] = round(data['qc_params_avg'][0], 2)
+			metrics_dict["Average_x_translation_mm"] = round(data['qc_params_avg'][0], 2)
 
 			# average y translation		
 
-			metrics_dict["Average-y-translation-(mm)"] = round(data['qc_params_avg'][1], 2)
+			metrics_dict["Average_y_translation_mm"] = round(data['qc_params_avg'][1], 2)
 
 			# average z translation		
 
-			metrics_dict["Average-z-translation-(mm)"] = round(data['qc_params_avg'][2], 2)
+			metrics_dict["Average_z_translation_mm"] = round(data['qc_params_avg'][2], 2)
 
 			#	****** SNR/CNR ******		
 
 			# average snr (b=0)		
 
-			metrics_dict["Average-SNR-(b=0)"] = round(data['qc_cnr_avg'][0], 2)
+			metrics_dict["Average_SNR_b0"] = round(data['qc_cnr_avg'][0], 2)
 
 			# avg cnr (b=500)		
 
-			metrics_dict["Average-CNR-(b=500)"] = round(data['qc_cnr_avg'][1], 2)
+			metrics_dict["Average_CNR_b500"] = round(data['qc_cnr_avg'][1], 2)
 
 			# avg cnr (b=1000)		
 
-			metrics_dict["Average-CNR-(b=1000)"] = round(data['qc_cnr_avg'][2], 2)
+			metrics_dict["Average_CNR_b1000"] = round(data['qc_cnr_avg'][2], 2)
 
 			# avg cnr (b=2000)		
 
-			metrics_dict["Average-CNR-(b=2000)"] = round(data['qc_cnr_avg'][3], 2)
+			metrics_dict["Average_CNR_b2000"] = round(data['qc_cnr_avg'][3], 2)
 
 			# avg cnr (b=3000)		
 
-			metrics_dict["Average-CNR-(b=3000)"] = round(data['qc_cnr_avg'][4], 2)
+			metrics_dict["Average_CNR_b3000"] = round(data['qc_cnr_avg'][4], 2)
 
 
 
