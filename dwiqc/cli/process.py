@@ -17,7 +17,7 @@ from executors.models import Job, JobArray
 from bids import BIDSLayout
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/xnat')
 import __init__ as xnat
-#from xnat import Report
+from xnat import Report
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
 import prequal
 import qsiprep
@@ -44,13 +44,12 @@ def do(args):
         E = executors.probe(args.partition)
     jarray = JobArray(E)
 
+#   *************** INSERT CODE HERE THAT RUNS XNAT_TAGGER ***************
+
 
     # load data into pybids as layout
 
     layout = BIDSLayout(args.bids_dir)
-
-
-    # create BIDS
 
     # grab the dwi and json files using pybids and os
 
