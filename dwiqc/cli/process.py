@@ -15,20 +15,17 @@ import subprocess as sp
 import shutil
 from executors.models import Job, JobArray
 from bids import BIDSLayout
-sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/xnat')
-import setup
-from setup import Report
-sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
-import prequal
-import qsiprep
-import prequal_EQ
-import qsiprep_EQ
-#import dwiqc.tasks.mriqc as mriqc
-#from anatqc.bids import BIDS
-#from anatqc.xnat import Report
-#import anatqc.tasks.vnav as vnav
-#import anatqc.tasks.morph as morph
+from dwiqc.xnat import Report
+import dwiqc.tasks.prequal as prequal
+import dwiqc.tasks.qsiprep as qsiprep
+import dwiqc.tasks.prequal_EQ as prequal_EQ
+import dwiqc.tasks.qsiprep_EQ as qsiprep_EQ
+#sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/xnat')
 #from anatqc.state import State
+#import setup
+#from setup import Report
+#sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
+
 
 logger = logging.getLogger(__name__)
 

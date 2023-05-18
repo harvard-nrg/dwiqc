@@ -4,10 +4,9 @@
 
 
 import sys
-sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/cli')
-sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/config')
-import get
-import process
+#sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/cli')
+#sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/config')
+import dwiqc.cli as cli
 import logging
 import argparse as ap
 #import dwiqc.cli as cli
@@ -45,7 +44,7 @@ def main():
         help='XNAT password')
     parser_get.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
-    parser_get.set_defaults(func=get.do) #(func=cli.get.do)
+    parser_get.set_defaults(func=cli.get.do)
 
     # process mode
     parser_process = subparsers.add_parser('process', help='process -h')
@@ -85,13 +84,13 @@ def main():
         help='Location for generated assessors and resources')
     parser_process.add_argument('--xnat-upload', action='store_true',
         help='Upload results to XNAT over REST API')
-    parser_process.set_defaults(func=process.do) #(func=cli.process.do)
+    parser_process.set_defaults(func=cli.process.do)
 
     args = parser.parse_args()
 
 
     configure_logging(args.verbose)
-    #logger.info('Welcome to dwiQC version %s', dwiqc.version())
+    logger.info('Welcome to dwiQC version %s', dwiqc.version())
 
     # fire parser_*.set_defaults(func=<function>)
     args.func(args)
