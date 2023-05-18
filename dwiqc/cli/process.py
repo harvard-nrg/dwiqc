@@ -134,12 +134,11 @@ def do(args):
         )
 
 
-# this section will get updated when we get to the xnat phase
 
     # build data to upload to xnat
-#    R = Report(args.bids_dir, args.sub, args.ses, args.run)
-#    logger.info('building xnat artifacts to %s', args.artifacts_dir)
-#    R.build_assessment(args.artifacts_dir)
+    R = Report(args.bids_dir, args.sub, args.ses, args.run)
+    logger.info('building xnat artifacts to %s', args.artifacts_dir)
+    R.build_assessment(args.artifacts_dir)
 
 
 
