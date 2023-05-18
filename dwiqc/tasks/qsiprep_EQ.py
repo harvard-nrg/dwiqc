@@ -6,7 +6,7 @@ import sys
 sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
 from env_modules_python import module
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
-import __init__ as tasks
+import setup as tasks
 import logging
 import subprocess
 import json

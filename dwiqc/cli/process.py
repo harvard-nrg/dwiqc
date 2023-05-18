@@ -15,6 +15,9 @@ import subprocess as sp
 import shutil
 from executors.models import Job, JobArray
 from bids import BIDSLayout
+sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/xnat')
+import __init__ as xnat
+#from xnat import Report
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
 import prequal
 import qsiprep
@@ -49,9 +52,13 @@ def do(args):
 
     # create BIDS
 
-    # grab the dwi and T1w files using pybids and os
+    # grab the dwi and json files using pybids and os
 
-    dwi_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='dwi', run=args.run, return_type='file').pop())
+    dwi_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='dwi', run=args.run, return_type='filename').pop())
+
+    json_file = os.path.basename(layout.get(subject=args.sub, extension='.json', suffix='dwi', run=args.run, return_type='filename').pop())
+
+    basename = os.path.splitext(json_file)[0]
 
     # ⬇️ not sure what to do with these... will come back here.
    
@@ -63,9 +70,7 @@ def do(args):
     prequal_outdir = None
     if 'prequal' in args.sub_tasks:
         logger.debug('building prequal task')
-        chopped_bids = os.path.dirname(args.bids_dir)
-        prequal_outdir = os.path.join(args.bids_dir, 'dwiqc-prequal', 'OUTPUTS')
-        #prequal_outdir = os.path.join(chopped_bids, 'dwiqc-prequal', 'OUTPUTS')
+        prequal_outdir = os.path.join(args.bids_dir, 'derivatives', 'dwiqc-prequal', f'sub-{args.sub}', f'ses-{args.ses}', basename, 'OUTPUTS')
         prequal_task = prequal.Task(
             sub=args.sub,
             ses=args.ses,
@@ -82,8 +87,7 @@ def do(args):
     # qsiprep job
     qsiprep_outdir = None
     if 'qsiprep' in args.sub_tasks:
-        chopped_bids = os.path.dirname(args.bids_dir)
-        qsiprep_outdir = os.path.join(chopped_bids, 'dwiqc-qsiprep', 'qsiprep_output')
+        qsiprep_outdir = os.path.join(args.bids_dir, 'derivatives', 'dwiqc-qsiprep', f'sub-{args.sub}', f'ses-{args.ses}', basename, 'qsiprep_output')
         qsiprep_task = qsiprep.Task(
             sub=args.sub,
             ses=args.ses,
@@ -121,6 +125,22 @@ def do(args):
         if failed > 0:
             sys.exit(1)
 
+    # create artifacts directory
+
+    if not args.artifacts_dir:
+        args.artifacts_dir = os.path.join(
+            args.bids_dir,
+            'xnat-artifacts'
+        )
+
+
+# this section will get updated when we get to the xnat phase
+
+    # build data to upload to xnat
+#    R = Report(args.bids_dir, args.sub, args.ses, args.run)
+#    logger.info('building xnat artifacts to %s', args.artifacts_dir)
+#    R.build_assessment(args.artifacts_dir)
+
 
 
 def prequal_eddy(args, prequal_outdir):
@@ -149,34 +169,7 @@ def qsiprep_eddy(args, qsiprep_outdir):
 
         eq_task.build()   
 
-def copy_eddy_files(args, qsiprep_outdir):
-    if 'qsiprep' in args.sub_tasks:
-        #tempdir = '/n/holyscratch01/LABS/nrg/Lab/dasay/2251028'
-        tempdir=tempfile.gettempdir()
-        shutil.copytree(tempdir, f'{qsiprep_outdir}/qsiprep/eddy_files')
-#        try:
-#            shutil.copytree(tempdir, f'{qsiprep_outdir}/qsiprep/eddy_files')
-#        except:
-#            print('files have already been copied')
-        #os.remove(self._tempdir)
 
-#### this function is primarily for debugging and development purposes
-def check_for_output(args, qsiprep_outdir):
-    if os.path.isfile(f'{qsiprep_outdir}/qsiprep/sub-{args.sub}.html'):
-        print('Qsiprep has already been run on this subject.\nRunning eddy quad.')
-        copy_eddy_files(args, qsiprep_outdir)
-        # write the qsiprep_EQ.py script
-        qsiprep_eddy(args, qsiprep_outdir)
-
-
-
-
-# this section will get updated when we get to the xnat phase
-
-#    # build data to upload to xnat
-#    R = Report(args.bids_dir, args.sub, args.ses, args.run)
-#    logger.info('building xnat artifacts to %s', args.artifacts_dir)
-#    R.build_assessment(args.artifacts_dir)#
 
 #    # upload data to xnat over rest api
 #    if args.xnat_upload:

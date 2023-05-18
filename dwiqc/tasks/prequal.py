@@ -8,7 +8,7 @@ from bids import BIDSLayout
 import sys
 import json
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
-import __init__ as tasks
+import setup as tasks
 import shutil
 from executors.models import Job
 

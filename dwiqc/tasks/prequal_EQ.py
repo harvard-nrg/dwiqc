@@ -7,7 +7,7 @@ import sys
 sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
 from env_modules_python import module
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
-import __init__ as tasks
+import setup as tasks
 import logging
 import subprocess
 import json
@@ -74,13 +74,13 @@ class Task(tasks.BaseTask):
 		-s ../{spec_file} \
 		-v"""
 
-		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
-
 		try:
+			proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
 			proc1.communicate()
 		except ValueError:
 			print('Output directory already exists. Removing and trying again...')
 			os.rmdir("eddy_results.qc")
+			proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
 			proc1.communicate()
 
 		eddy_results_dir = f'{self._outdir}/EDDY/eddy_results.qc'
@@ -98,57 +98,56 @@ class Task(tasks.BaseTask):
 
 		#	****** Volume to Volume Motion ******
 
-			metrics_list = []
+			metrics_dict = {}
 
 			# average absolute motion
 
-			avg_abs_motion = {"Average abs. motion (mm)": data['qc_mot_abs']}
-			metrics_list.append(avg_abs_motion)
+			metrics_dict["Average abs. motion (mm)"] = data['qc_mot_abs']
 
 			# average relative motion
 
-			avg_rel_motion = {"Average rel. motion (mm)": data['qc_mot_rel']}
-			metrics_list.append(avg_rel_motion)		
+			metrics_dict["Average rel. motion (mm)"] = data['qc_mot_rel']
 
 			# average x translation		
 
-			avg_x_translation = {"Average x translation (mm)": round(data['qc_params_avg'][0], 2)}
-			metrics_list.append(avg_x_translation)		
+			metrics_dict["Average x translation (mm)"] = round(data['qc_params_avg'][0], 2)
 
 			# average y translation		
 
-			avg_y_translation = {"Average y translation (mm)": round(data['qc_params_avg'][1], 2)}
-			metrics_list.append(avg_y_translation)		
+			metrics_dict["Average y translation (mm)"] = round(data['qc_params_avg'][1], 2)
 
 			# average z translation		
 
-			avg_z_translation = {"Average z translation (mm)": round(data['qc_params_avg'][2], 2)}
-			metrics_list.append(avg_z_translation)		
+			metrics_dict["Average z translation (mm)"] = round(data['qc_params_avg'][2], 2)
 
 			#	****** SNR/CNR ******		
 
 			# average snr (b=0)		
 
-			avg_snr_b0 = {"Average SNR (b=0)": round(data['qc_cnr_avg'][0], 2)}
-			metrics_list.append(avg_snr_b0)		
+			metrics_dict["Average SNR (b=0)"] = round(data['qc_cnr_avg'][0], 2)
 
 			# avg cnr (b=500)		
 
-			avg_cnr_b500 = {"Average CNR (b=500)": round(data['qc_cnr_avg'][1], 2)}
-			metrics_list.append(avg_cnr_b500)		
+			metrics_dict["Average CNR (b=500)"] = round(data['qc_cnr_avg'][1], 2)
 
 			# avg cnr (b=1000)		
 
-			avg_cnr_b1000 = {"Average CNR (b=1000)": round(data['qc_cnr_avg'][2], 2)}
-			metrics_list.append(avg_cnr_b1000)		
+			metrics_dict["Average CNR (b=1000)"] = round(data['qc_cnr_avg'][2], 2)
 
 			# avg cnr (b=2000)		
 
-			avg_cnr_b2000 = {"Average CNR (b=2000)": round(data['qc_cnr_avg'][3], 2)}
-			metrics_list.append(avg_cnr_b2000)		
+			metrics_dict["Average CNR (b=2000)"] = round(data['qc_cnr_avg'][3], 2)
 
 			# avg cnr (b=3000)		
 
-			avg_cnr_b3000 = {"Average CNR (b=3000)": round(data['qc_cnr_avg'][4], 2)}
-			metrics_list.append(avg_cnr_b3000)
+			metrics_dict["Average CNR (b=3000)"] = round(data['qc_cnr_avg'][4], 2)
+
+
+
+
+		## Write out all these values to json file
+
+
+		with open('eddy_metrics.json', 'w') as outfile:
+			json.dump(metrics_dict, outfile, indent=1)
 

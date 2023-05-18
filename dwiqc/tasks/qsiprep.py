@@ -9,14 +9,14 @@ import sys
 import json
 import nibabel as nib
 sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
-import __init__ as tasks
+import setup as tasks
 sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
 from env_modules_python import module
 import shutil
 from executors.models import Job
 
 
-module('load', 'cuda/9.1.85-fasrc01')
+#module('load', 'cuda/9.1.85-fasrc01')
 
 
 logger = logging.getLogger(__name__)
