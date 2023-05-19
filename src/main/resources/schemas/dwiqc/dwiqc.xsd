@@ -19,29 +19,16 @@
                     <xs:element name="eddy_quad">
                         <xs:complexType>
                             <xs:sequence>
-                                <xs:element name="avg_SNR_b0" type="xs:decimal"/>
-                                <xs:element name="avg_CNR_b500" type="xs:decimal"/>
-                                <xs:element name="avg_CNR_b1000" type="xs:decimal"/>
-                                <xs:element name="avg_CNR_b2000" type="xs:decimal"/>
-                                <xs:element name="avg_CNR_b300" type="xs:decimal"/>
-                                <xs:element name="avg_abs_mot" type="xs:decimal"/>
-                                <xs:element name="avg_rel_mot" type="xs:decimal"/>
-                                <xs:element name="avg_x_transl" type="xs:decimal"/>
-                                <xs:element name="avg_y_transl" type="xs:decimal"/>
-                                <xs:element name="avg_z_transl" type="xs:decimal"/>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                    <xs:element name="vnav" minOccurs="0">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element name="vnav_min" type="xs:integer" minOccurs="0"/>
-                                <xs:element name="vnav_max" type="xs:integer" minOccurs="0"/>
-                                <xs:element name="vnav_acq_tot" type="xs:integer" minOccurs="0"/>
-                                <xs:element name="vnav_reacq" type="xs:integer" minOccurs="0"/>
-                                <xs:element name="mean_mot_rms_per_min" type="xs:decimal" minOccurs="0"/>
-                                <xs:element name="mean_mot_max_per_min" type="xs:decimal" minOccurs="0"/>
-                                <xs:element name="vnav_failed" type="xs:integer" minOccurs="0"/>
+                                <xs:element name="Average_SNR_b0" type="xs:decimal"/>
+                                <xs:element name="Average_CNR_b500" type="xs:decimal"/>
+                                <xs:element name="Average_CNR_b1000" type="xs:decimal"/>
+                                <xs:element name="Average_CNR_b2000" type="xs:decimal"/>
+                                <xs:element name="Average_CNR_b3000" type="xs:decimal"/>
+                                <xs:element name="Average_abs_motion_mm" type="xs:decimal"/>
+                                <xs:element name="Average_rel_motion_mm" type="xs:decimal"/>
+                                <xs:element name="Average_x_translation_mm" type="xs:decimal"/>
+                                <xs:element name="Average_y_translation_mm" type="xs:decimal"/>
+                                <xs:element name="Average_z_translation_mm" type="xs:decimal"/>
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
