@@ -11,6 +11,7 @@ import zipfile
 import logging
 import numpy as np
 from lxml import etree
+from anatqc.bids import BIDS
 from bids import BIDSLayout
 
 logger = logging.getLogger(__name__)
@@ -78,8 +79,14 @@ class Report:
         }
         # read dwi json sidecar for scan number
         dwi_file = self.layout.get(subject=self.sub, session=self.ses, suffix='dwi', extension='.nii.gz').pop()
+        PA_file = self.layout.get(subject=self.sub, session=self.ses, suffix='epi', extension='.nii.gz', direction='PA').pop()
+        AP_file = self.layout.get(subject=self.sub, session=self.ses, suffix='epi', extension='.nii.gz', direction='AP').pop()
         DWI_ds = dwi_file.get_metadata()['DataSource']['application/x-xnat']
+        PA_ds = PA_file.get_metadata()['DataSource']['application/x-xnat']
+        AP_ds = AP_file.get_metadata()['DataSource']['application/x-xnat']
         logger.info('DWI info %s', '|'.join(DWI_ds))
+        logger.info('FMAP PA info %s', '|'.join(PA_ds))
+        logger.info('FMAP AP info %s', '|'.join(AP_ds))
         # assessment id
         aid = '{0}_DWI_{1}_AQC'.format(DWI_ds['experiment'], DWI_ds['scan'])
         logger.info('Assessor ID %s', aid)
@@ -178,7 +185,11 @@ class Report:
         # start building XML
         xnatns = '{%s}' % ns['xnat']
         etree.SubElement(root, xnatns + 'imageSession_ID').text = DWI_ds['experiment_id']
+        etree.SubElement(root, 'PA_fmap_scan_id').text = PA_ds['scan']
+        etree.SubElement(root, 'AP_fmap_scan_id').text = AP_ds['scan']
         etree.SubElement(root, 'dwi_scan_id').text = DWI_ds['scan']
+        etree.SubElement(root, 'session_label').text = DWI_ds['experiment']
+
         # add <eddy_quad> element
         eddy_quad_elm = etree.SubElement(root, 'eddy_quad')
         fname = os.path.join(
@@ -287,3 +298,10 @@ class Report:
 
 class AssessmentError(Exception):
     pass
+
+
+#instance = Report('/n/home_fasse/dasay/mockup_dwiqc_output', 'PE161458', 'PE161458220526', '1')
+
+#instance.build_assessment('/n/home_fasse/dasay/mockup_dwiqc_output/xnat-artifacts')
+
+
