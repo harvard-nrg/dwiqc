@@ -25,7 +25,7 @@ setup(
     },
     include_package_data=True,
     scripts=[
-        'scripts/dwiQC.py'
+        'scripts/dwiqc.py'
     ],
     install_requires=requires
 )
