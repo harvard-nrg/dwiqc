@@ -6,7 +6,6 @@ import yaml
 import yaxil
 import glob
 import math
-import anatqc
 import logging
 import tarfile
 import executors
@@ -20,12 +19,7 @@ import dwiqc.tasks.prequal as prequal
 import dwiqc.tasks.qsiprep as qsiprep
 import dwiqc.tasks.prequal_EQ as prequal_EQ
 import dwiqc.tasks.qsiprep_EQ as qsiprep_EQ
-#sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/xnat')
-#from anatqc.state import State
-#import setup
-#from setup import Report
-#sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
-
+from dwiqc.state import State
 
 logger = logging.getLogger(__name__)
 
@@ -170,5 +164,5 @@ def qsiprep_eddy(args, qsiprep_outdir):
 #    if args.xnat_upload:
 #        logger.info('Uploading artifacts to XNAT')
 #        auth = yaxil.auth2(args.xnat_alias)
-#        yaxil.storerest(auth, args.artifacts_dir, 'anatqc-resource')
+#        yaxil.storerest(auth, args.artifacts_dir, 'dwiqc-resource')
 

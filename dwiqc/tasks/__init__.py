@@ -4,7 +4,7 @@ import errno
 import fcntl
 import logging
 import tempfile as tf
-from anatqc.state import State
+from dwiqc.state import State
 from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)

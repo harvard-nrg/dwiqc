@@ -6,7 +6,8 @@
 import sys
 #sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/cli')
 #sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/config')
-import dwiqc.cli as cli
+import dwiqc
+from dwiqc import cli
 import logging
 import argparse as ap
 #import dwiqc.cli as cli
