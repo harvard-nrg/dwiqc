@@ -5,7 +5,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 requires = [
     'yaxil',
-    'pyaml'
+    'pyaml',
+    'xnattagger',
+    'PyBIDS',
+    'executors',
+    'selfie'
 ]
 
 about = dict()
@@ -25,7 +29,7 @@ setup(
     },
     include_package_data=True,
     scripts=[
-        'scripts/dwiqc.py'
+        'scripts/dwiQC.py'
     ],
     install_requires=requires
 )

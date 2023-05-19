@@ -7,10 +7,9 @@ import sys
 #sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/cli')
 #sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/config')
 import dwiqc
-from dwiqc import cli
+import dwiqc.cli as cli
 import logging
 import argparse as ap
-#import dwiqc.cli as cli
 #import dwiqc.config as config
 
 logger = logging.getLogger(__name__)
