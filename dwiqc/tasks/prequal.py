@@ -7,8 +7,9 @@ import logging
 from bids import BIDSLayout
 import sys
 import json
-import dwiqc
+#sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
 import dwiqc.tasks as tasks
+#import setup# as tasks
 import shutil
 from executors.models import Job
 
@@ -299,6 +300,9 @@ class Task(tasks.BaseTask):
 
 	def build(self):
 		self.add_intended_for()
+		cwd = os.getcwd()
+		os.chdir(self._tempdir)
+		os.chdir(cwd)
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
 		self._command = [
