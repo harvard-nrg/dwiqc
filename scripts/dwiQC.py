@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys
+import dwiqc
 import dwiqc.cli as cli
 import logging
 import argparse as ap
