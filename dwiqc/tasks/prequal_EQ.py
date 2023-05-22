@@ -1,4 +1,3 @@
-
 import shutil
 import os
 import time
@@ -10,9 +9,6 @@ import logging
 import subprocess
 import json
 from executors.models import Job
-
-
-old_out = sys.stdout
 
 
 
@@ -27,35 +23,37 @@ class Task(tasks.BaseTask):
 
 	def build(self):
 
-		log_file = open("eddy_quad.log", "w")		
+		os.chdir(f"{self._outdir}/EDDY")
+
+		# define log file
+		logging.basicConfig(filename=f"{self._outdir}/logs/dwiqc-prequal.log", encoding='utf-8', level=logging.DEBUG)
+
+		logging.info('Loading FSL module: fsl/6.0.6.4-centos7_x64-ncf')
 
 		#load the fsl module
-		module('load','fsl/6.0.4-centos7_64-ncf')
-		#while not os.path.exists(f'{self._outdir}/EDDY'):
-		#	time.sleep(120)
+		module('load','fsl/6.0.6.4-centos7_x64-ncf')
 
-		if os.path.isdir(f'{self._outdir}/EDDY'):
-			os.chdir(f'{self._outdir}/EDDY')
-			log_file = open(f"{self._outdir}/EDDY/eddy_quad.log", "w")	
-			sys.stdout = log_file
+		logging.info('module succesfully loaded!')
 
 		# copy the necessary file to EDDY directory
 
-		#while not os.path.exists('../PREPROCESSED/dwmri.nii.gz'):
-		#	time.sleep(120)
-
-		if os.path.isfile('../PREPROCESSED/dwmri.nii.gz'):
-			shutil.copy('../PREPROCESSED/dwmri.nii.gz', 'eddy_results.nii.gz')
+		logging.info('copying dwmri.nii.gz file to EDDY dir')
+		if os.path.isfile(f'{self._outdir}/PREPROCESSED/dwmri.nii.gz'):
+			shutil.copy(f'{self._outdir}/PREPROCESSED/dwmri.nii.gz', f'{self._outdir}/EDDY/eddy_results.nii.gz')
 
 		else:
-			print("prequal failed... exiting.")
+			logging.error('PREPROCESSED/dwmri.nii.gz doesn\'t exist, which likely means prequal failed. exiting.')
 			sys.exit()
 
 		# grab name of slspec file
-
-		for file in os.listdir(self._outdir):
-			if 'slspec' in file and file.endswith('.txt'):
-				spec_file = file
+		logging.info(f'grabbing slspec file from {self._outdir}')
+		try:
+			for file in os.listdir(self._outdir):
+				if 'slspec' in file and file.endswith('.txt'):
+					spec_file = file
+		except FileNotFoundError:
+			logging.error('spec file not found. exiting.')
+			sys.exit()
 
 
 		eddy_quad = f"""singularity exec \
@@ -66,33 +64,40 @@ class Task(tasks.BaseTask):
 		-idx index.txt \
 		-par acqparams.txt \
 		--mask=eddy_mask.nii.gz \
-		--bvals=../PREPROCESSED/dwmri.bval \
-		--bvecs=../PREPROCESSED/dwmri.bvec \
-		--field ../TOPUP/topup_field.nii.gz \
-		-s ../{spec_file} \
+		--bvals={self._outdir}/PREPROCESSED/dwmri.bval \
+		--bvecs={self._outdir}/PREPROCESSED/dwmri.bvec \
+		--field {self._outdir}/TOPUP/topup_field.nii.gz \
+		-s {self._outdir}/{spec_file} \
 		-v"""
 
-		try:
-			proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
-			proc1.communicate()
-		except ValueError:
-			print('Output directory already exists. Removing and trying again...')
-			os.rmdir("eddy_results.qc")
-			proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
-			proc1.communicate()
+
+		if os.path.isdir('eddy_results.qc'):
+			logging.warning('Output directory already exists. Removing and trying again.')
+			shutil.rmtree('eddy_results.qc')
+
+
+		logging.info('Running eddy_quad...')
+		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
+		proc1.communicate()
+		code = proc1.returncode
+
+		if code == 0:
+			logging.info('eddy quad ran without errors!')
+		else:
+			logging.error('eddy quad threw an error. exiting.')
+			sys.exit()
 
 		eddy_results_dir = f'{self._outdir}/EDDY/eddy_results.qc'
 
 		self.parse_json(eddy_results_dir)
 
-		log_file.close()
-
 
 	def parse_json(self, eddy_dir):
+		logging.info('parsing qc.json file.')
 		with open(f'{eddy_dir}/qc.json', 'r') as file:
 			data = json.load(file)
 
-				## grab the needed metrics
+		## grab the needed metrics
 
 		#	****** Volume to Volume Motion ******
 
@@ -149,3 +154,4 @@ class Task(tasks.BaseTask):
 		with open('eddy_metrics.json', 'w') as outfile:
 			json.dump(metrics_dict, outfile, indent=1)
 
+		logging.info('successfully parsed json and wrote out results to eddy_metrics.json')
