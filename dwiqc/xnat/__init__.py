@@ -11,7 +11,6 @@ import zipfile
 import logging
 import numpy as np
 from lxml import etree
-from anatqc.bids import BIDS
 from bids import BIDSLayout
 
 logger = logging.getLogger(__name__)

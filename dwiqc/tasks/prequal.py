@@ -263,7 +263,10 @@ class Task(tasks.BaseTask):
 	def build(self):
 		self.add_intended_for()
 		cwd = os.getcwd()
+		print(self._tempdir)
 		os.chdir(self._tempdir)
+		print(os.getcwd())
+		sys.exit()
 		os.chdir(cwd)
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
