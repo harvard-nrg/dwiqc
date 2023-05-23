@@ -9,8 +9,7 @@ requires = [
     'xnattagger',
     'PyBIDS',
     'executors',
-    'selfie',
-    'tempfile'
+    'selfie'
 ]
 
 about = dict()
