@@ -1,6 +1,6 @@
 
 #### load necessary libraries
-
+import tempfile
 import subprocess
 import os
 import logging
@@ -262,10 +262,8 @@ class Task(tasks.BaseTask):
 
 	def build(self):
 		self.add_intended_for()
-		#cwd = os.getcwd()
-		#os.chdir(self._tempdir)
-		#os.chdir(cwd)
-		self._tempdir=str(os.system('echo $TMPDIR'))
+		os.system('mkdir -p $TMPDIR')
+		self._tempdir = tempfile.gettempdir()
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
 		self._command = [
