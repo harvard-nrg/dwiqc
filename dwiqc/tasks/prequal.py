@@ -7,9 +7,7 @@ import logging
 from bids import BIDSLayout
 import sys
 import json
-#sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
 import dwiqc.tasks as tasks
-#import setup# as tasks
 import shutil
 from executors.models import Job
 
@@ -258,42 +256,6 @@ class Task(tasks.BaseTask):
 					file_data.update(intended_for)
 					f.seek(0)
 					json.dump(file_data, f, indent = 2)
-
-
-#	def run_eddy_quad(self):
-#		#load the fsl module
-#		module('load', 'fsl/6.0.4-ncf')
-#		os.chdir(f'{self._outdir}/EDDY')#
-
-#		# copy the necessary file to EDDY directory
-#		shutil.copy('../PREPROCESSED/dwmri.nii.gz', 'eddy_results.nii.gz')#
-
-#		# grab name of slspec file#
-
-#		for file in os.listdir('..'):
-#			if 'slspec' in file and file.endswith('.txt'):
-#				spec_file = file#
-
-#		## run eddy quad#
-
-#		eddy_quad = f"""eddy_quad \
-#		eddy_results \
-#		-idx index.txt \
-#		-par acqparams.txt \
-#		--mask=eddy_mask.nii.gz \
-#		--bvals=../PREPROCESSED/dwmri.bval \
-#		--bvecs=../PREPROCESSED/dwmri.bvec \
-#		--field ../TOPUP/topup_field.nii.gz \
-#		-s ../{spec_file} \
-#		-v"""#
-
-#		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
-#		proc1.communicate()#
-
-#		### copy pdf out to OUTPUTS dir#
-
-#		shutil.copy(f'eddy_results.qc/qc.pdf', {self._outdir})
-
 
 
 	# build the prequal sbatch command and create job
