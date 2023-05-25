@@ -6,6 +6,7 @@ import yaml
 import yaxil
 import glob
 import math
+import anatqc
 import logging
 import tarfile
 import executors
@@ -19,7 +20,12 @@ import dwiqc.tasks.prequal as prequal
 import dwiqc.tasks.qsiprep as qsiprep
 import dwiqc.tasks.prequal_EQ as prequal_EQ
 import dwiqc.tasks.qsiprep_EQ as qsiprep_EQ
-from dwiqc.state import State
+#sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/xnat')
+#from anatqc.state import State
+#import setup
+#from setup import Report
+#sys.path.insert(0, '/n/home_fasse/dasay/dwiqc/dwiqc/tasks')
+
 
 logger = logging.getLogger(__name__)
 
@@ -78,12 +84,14 @@ def do(args):
     qsiprep_outdir = None
     if 'qsiprep' in args.sub_tasks:
         qsiprep_outdir = os.path.join(args.bids_dir, 'derivatives', 'dwiqc-qsiprep', f'sub-{args.sub}', f'ses-{args.ses}', basename, 'qsiprep_output')
+        qsiprep_trick = tempfile.TemporaryDirectory(dir='/tmp', suffix='.qsiprep')
+        os.symlink(qsiprep_outdir, f"{qsiprep_trick}/q")
         qsiprep_task = qsiprep.Task(
             sub=args.sub,
             ses=args.ses,
             run=args.run,
             bids=args.bids_dir,
-            outdir=qsiprep_outdir,
+            outdir=f"{qsiprep_trick}/q",
             tempdir=tempfile.gettempdir(),
             pipenv='/sw/apps/qsiprep'
         )
@@ -164,5 +172,5 @@ def qsiprep_eddy(args, qsiprep_outdir):
 #    if args.xnat_upload:
 #        logger.info('Uploading artifacts to XNAT')
 #        auth = yaxil.auth2(args.xnat_alias)
-#        yaxil.storerest(auth, args.artifacts_dir, 'dwiqc-resource')
+#        yaxil.storerest(auth, args.artifacts_dir, 'anatqc-resource')
 
