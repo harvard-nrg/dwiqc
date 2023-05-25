@@ -6,6 +6,7 @@ import logging
 import argparse as ap
 import dwiqc.config as config
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -100,6 +101,6 @@ def configure_logging(verbose):
     )
 
 if __name__ == '__main__':
-    main()
+   main()
 
 

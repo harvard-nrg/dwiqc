@@ -169,6 +169,10 @@ class Report:
             # pull files from qsiprep output
 
             {
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  'qsiprep.pdf'),
+                'dest': os.path.join('qsiprep-pdf', '{0}_qsiprep.pdf'.format(aid))
+            },
+            {
                 'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub + '.html'),
                 'dest': os.path.join('qsiprep-html', '{0}_qsiprep.html'.format(aid))
             },

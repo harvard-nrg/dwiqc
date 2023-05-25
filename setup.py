@@ -9,7 +9,8 @@ requires = [
     'xnattagger',
     'PyBIDS',
     'executors',
-    'selfie'
+    'selfie',
+    'pyppeteer'
 ]
 
 about = dict()
