@@ -10,7 +10,6 @@ requires = [
     'PyBIDS',
     'executors',
     'selfie',
-    'pyppeteer'
 ]
 
 about = dict()
