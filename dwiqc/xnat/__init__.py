@@ -135,6 +135,10 @@ class Report:
                 'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', 'eddy_results.qc', 'qc.pdf'),
                 'dest': os.path.join('eddy_pdf', '{0}_eddy_quad_qc.pdf'.format(aid))
             },
+            {
+                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', 'motion_plot.png'),
+                'dest': os.path.join('motion-plot', '{0}_motion_plot.png'.format(aid))
+            },
 
             # pull images from prequal output
             {
@@ -169,10 +173,6 @@ class Report:
             # pull files from qsiprep output
 
             {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  'qsiprep.pdf'),
-                'dest': os.path.join('qsiprep-pdf', '{0}_qsiprep.pdf'.format(aid))
-            },
-            {
                 'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub + '.html'),
                 'dest': os.path.join('qsiprep-html', '{0}_qsiprep.html'.format(aid))
             },
@@ -183,6 +183,34 @@ class Report:
             {
                 'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_t1_2_mni.svg'),
                 'dest': os.path.join('t1-registration', '{0}_t1_registration.svg'.format(aid))
+            },
+            {
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_seg_brainmask.svg'),
+                'dest': os.path.join('seg-brainmask', '{0}_seg_brainmask.svg'.format(aid))
+            },
+            {
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + self.run + '_dwi_denoise_ses_' + self.ses + '_run-' + self.run + '_dwi_wf_denoising.svg'),
+                'dest': os.path.join('denoise', '{0}_denoise.svg'.format(aid))
+            },
+            {
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + self.run + '_dwi_denoise_ses_' + self.ses + '_run-' + self.run + '_dwi_wf_biascorr.svg'),
+                'dest': os.path.join('bias-corr', '{0}_bias_correction.svg'.format(aid))
+            },
+            {
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + self.run + '_desc-resampled_b0ref.svg'),
+                'dest': os.path.join('b0-ref', '{0}_b0_reference.svg'.format(aid))
+            },
+            {
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + self.run + '_sampling_scheme.gif'),
+                'dest': os.path.join('sampling-scheme', '{0}_sampling_scheme.gif'.format(aid))
+            },
+            {
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + self.run + '_desc-sdc_b0.svg'),
+                'dest': os.path.join('distortion', '{0}_distortion.svg'.format(aid))
+            },
+            {
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + self.run + '_coreg.svg'),
+                'dest': os.path.join('coreg', '{0}_coreg.svg'.format(aid))
             }
         ]
         # start building XML
