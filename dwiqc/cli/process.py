@@ -50,11 +50,8 @@ def do(args):
     json_file = os.path.basename(layout.get(subject=args.sub, extension='.json', suffix='dwi', run=args.run, return_type='filename').pop())
 
     basename = os.path.splitext(json_file)[0]
-
-    # ⬇️ not sure what to do with these... will come back here.
    
     #logger.debug('DWI raw: %s', raw)
-    #logger.debug('T1vnav sourcedata: %s', source)
 
 
     # prequal job
@@ -126,8 +123,6 @@ def do(args):
             'xnat-artifacts'
         )
 
-
-
     # build data to upload to xnat
     R = Report(args.bids_dir, args.sub, args.ses, args.run)
     logger.info('building xnat artifacts to %s', args.artifacts_dir)
@@ -173,6 +168,7 @@ def qsiprep_eddy(args, qsiprep_outdir):
 def copy_qsiprep_output(args, qsiprep_outdir):
     final_qsiprep_outdir = os.path.join(args.bids_dir, 'derivatives', 'dwiqc-qsiprep', f'sub-{args.sub}', f'ses-{args.ses}', basename, 'qsiprep_output')
     shutil.copytree(qsiprep_outdir, final_qsiprep_outdir)
+
 
 
 
