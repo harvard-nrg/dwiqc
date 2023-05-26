@@ -203,13 +203,12 @@ class Task(tasks.BaseTask):
 
 	def build(self):
 		self.create_eddy_params()
-		self.create_nipype()
+		#self.create_nipype()
 		self.check_output_resolution()
 		self._command = [
 			'selfie',
 			'--lock',
 			'--output-file', self._prov,
-			#'qsiprep',
 			'singularity',
 			'run',
 			'--nv',
@@ -234,16 +233,7 @@ class Task(tasks.BaseTask):
 			'--fs-license-file',
 			'/n/helmod/apps/centos7/Core/freesurfer/6.0.0-fasrc01/license.txt',
 			'-w',
-			self._tempdir#,
-			#'&&',
-			#'cp',
-			#'-r',
-			#self._tempdir,
-			#self._bids,
-			#'&&',
-			#'rm',
-			#'-r',
-			#self._tempdir
+			self._tempdir
 		]
 
 		logdir = self.logdir()
