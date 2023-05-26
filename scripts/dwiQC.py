@@ -21,6 +21,7 @@ def main():
     parser.add_argument('--insecure', action='store_true',
         help='Disable SSL certificate verification')
     subparsers = parser.add_subparsers(help='sub-command help')
+    
     # get mode
     parser_get = subparsers.add_parser('get', help='get -h')
     parser_get.add_argument('--label', required=True,
@@ -81,6 +82,43 @@ def main():
         help='Upload results to XNAT over REST API')
     parser_process.set_defaults(func=cli.process.do)
 
+    # tandem mode
+    parser_tandem = subparsers.add_parser('tandem', help='tandem -h')
+    parser_tandem.add_argument('--label', required=True,
+        help='XNAT MR Session name')
+    parser_tandem.add_argument('--project',
+        help='XNAT Project name')
+    parser_tandem.add_argument('--bids-dir', required=True,
+        help='Output BIDS directory')
+    parser_tandem.add_argument('--run', default=1, type=int,
+        help='BIDS run')
+    parser_tandem.add_argument('--partition', default='default',
+        help='Job scheduler partition')
+    parser_tandem.add_argument('--scheduler', default=None,
+        help='Choose a specific job scheduler')
+    parser_tandem.add_argument('--rate-limit', type=int, default=None, 
+        help='Rate limit the number of tasks executed in parallel (1=serial)')
+    parser_tandem.add_argument('--dry-run', action='store_true',
+        help='Do not execute any jobs')
+    parser_tandem.add_argument('--sub-tasks', nargs='+', default=['morph', 'mriqc', 'vnav'],
+        help='Run only certain sub tasks')
+    parser_tandem.add_argument('--fs-license',
+        help='Base64 encoded FreeSurfer license')
+    parser_tandem.add_argument('--mock-fs', action='store_true',
+        help='Extract mocked FreeSurfer data for testing')
+    parser_tandem.add_argument('--xnat-alias',
+        help='YAXIL authentication alias')
+    parser_tandem.add_argument('--xnat-host',
+        help='XNAT host')
+    parser_tandem.add_argument('--xnat-user',
+        help='XNAT username')
+    parser_tandem.add_argument('--xnat-pass',
+        help='XNAT password')
+    parser_tandem.add_argument('--artifacts-dir',
+        help='Location for generated assessors and resources')
+    parser_tandem.add_argument('--xnat-upload', action='store_true',
+        help='Upload results to XNAT over REST API')
+    parser_tandem.set_defaults(func=cli.tandem.do)
     args = parser.parse_args()
 
 
@@ -102,5 +140,6 @@ def configure_logging(verbose):
 
 if __name__ == '__main__':
    main()
+
 
 
