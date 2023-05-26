@@ -137,8 +137,9 @@ def do(args):
     if args.xnat_upload:
         logger.info('Uploading artifacts to XNAT')
         #auth = yaxil.auth2(args.xnat_alias)
+        yaxil.CHECK_CERTIFICATE=False
         auth = yaxil.auth2('ssbc_stage')
-        yaxil.storerest(auth, args.artifacts_dir, 'anatqc-resource')
+        yaxil.storerest(auth, args.artifacts_dir, 'dwiqc-resource')
 
 
 
