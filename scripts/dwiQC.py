@@ -118,7 +118,7 @@ def main():
         help='Location for generated assessors and resources')
     parser_tandem.add_argument('--xnat-upload', action='store_true',
         help='Upload results to XNAT over REST API')
-    parser_tandem.set_defaults(func=cli.tandem.do)
+    #parser_tandem.set_defaults(func=cli.tandem.do)
     args = parser.parse_args()
 
 
