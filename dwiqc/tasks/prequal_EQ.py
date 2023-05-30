@@ -90,6 +90,7 @@ class Task(tasks.BaseTask):
 		eddy_results_dir = f'{self._outdir}/EDDY/eddy_results.qc'
 
 		self.parse_json(eddy_results_dir)
+
 		self.extract_b0_vol()
 
 
@@ -157,9 +158,10 @@ class Task(tasks.BaseTask):
 
 		logging.info('successfully parsed json and wrote out results to eddy_metrics.json')
 
-
-	def extract_b0_vol(self)
+	def extract_b0_vol(self):
 		os.chdir(f"{self._outdir}/PREPROCESSED")
 		extract_command = "fslselectvols -i dwmri.nii.gz -o b0_volume --vols=0"
 		proc1 = subprocess.Popen(extract_command, shell=True, stdout=subprocess.PIPE)
 		proc1.communicate()
+
+
