@@ -33,7 +33,10 @@ class Task(tasks.BaseTask):
 
 	# create an INPUTS dir next to the OUTPUTS dir
 	def copy_inputs(self, inputs_dir):
-		os.makedirs(inputs_dir)
+		try:
+			os.makedirs(inputs_dir)
+		except OSError:
+			os.makedirs(inputs_dir)
 		#layout = BIDSLayout(self._bids) # load the data layout into pybids
 		all_files = self._layout.get(subject=self._sub, session=self._ses, run=self._run, return_type='filename') # get a list of all of the subject's files
 		# copy the all the subject's files into the INPUTS directory
