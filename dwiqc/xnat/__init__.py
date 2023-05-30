@@ -87,7 +87,7 @@ class Report:
         logger.info('FMAP PA info %s', '|'.join(PA_ds))
         logger.info('FMAP AP info %s', '|'.join(AP_ds))
         # assessment id
-        aid = '{0}_DWI_{1}_AQC'.format(DWI_ds['experiment'], DWI_ds['scan'])
+        aid = '{0}_DWI_{1}_DWIQC'.format(DWI_ds['experiment'], DWI_ds['scan'])
         logger.info('Assessor ID %s', aid)
         # root element
         xnatns = '{%s}' % ns['xnat']
@@ -168,6 +168,10 @@ class Report:
             {
                 'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'PDF', 'dtiQA.pdf'),
                 'dest': os.path.join('prequal_pdf', '{0}_prequal_qc.pdf'.format(aid))
+            },
+            {
+                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'PREPROCESSED', 'b0_volume.nii.gz'),
+                'dest': os.path.join('b0-volume', '{0}_b0_volume.nii.gz'.format(aid))
             },
 
             # pull files from qsiprep output
@@ -334,5 +338,6 @@ class AssessmentError(Exception):
 #instance = Report('/n/home_fasse/dasay/mockup_dwiqc_output', 'PE161458', 'PE161458220526', '1')
 
 #instance.build_assessment('/n/home_fasse/dasay/mockup_dwiqc_output/xnat-artifacts')
+
 
 
