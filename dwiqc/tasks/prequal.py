@@ -35,7 +35,7 @@ class Task(tasks.BaseTask):
 	def copy_inputs(self, inputs_dir):
 		try:
 			os.makedirs(inputs_dir)
-		except OSError:
+		except FileExistsError:
 			os.makedirs(inputs_dir)
 		#layout = BIDSLayout(self._bids) # load the data layout into pybids
 		all_files = self._layout.get(subject=self._sub, session=self._ses, run=self._run, return_type='filename') # get a list of all of the subject's files
