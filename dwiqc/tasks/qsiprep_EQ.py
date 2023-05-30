@@ -88,27 +88,35 @@ class Task(tasks.BaseTask):
 		print('copy success #6/6')
 
 
-		for file in os.listdir(self._bids):
-			if 'slspec' in file and file.endswith('.txt'):
-				spec_file = file
+
+#		for file in os.listdir(self._bids):
+#			if 'slspec' in file and file.endswith('.txt'):
+#				spec_file = file
+
+
+		### comment out eddy_quad command-- not going to use it for now.
 
   		## run eddy_quad command
 
-		eddy_quad = f"""eddy_quad \
-		eddy_corrected \
-		-idx eddy_index.txt \
-		-par eddy_acqp.txt \
-		--mask=topup_imain_corrected_avg_mask.nii.gz \
-		--bvals={self._sub}.bval \
-		--bvecs=eddy_corrected.eddy_rotated_bvecs \
-		--field fieldmap_HZ.nii.gz \
-		-s {self._bids}/{spec_file} \
-		-v"""
+#		eddy_quad = f"""eddy_quad \
+#		eddy_corrected \
+#		-idx eddy_index.txt \
+#		-par eddy_acqp.txt \
+#		--mask=topup_imain_corrected_avg_mask.nii.gz \
+#		--bvals={self._sub}.bval \
+#		--bvecs=eddy_corrected.eddy_rotated_bvecs \
+#		--field fieldmap_HZ.nii.gz \
+#		-s {self._bids}/{spec_file} \
+#		-v"""
 
-		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
-		proc1.communicate()
+#		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
+#		proc1.communicate()
 
-		log_file.close()
+#		log_file.close()
+
+
+
+
 
 
 

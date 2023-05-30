@@ -181,7 +181,7 @@ class Report:
                 'dest': os.path.join('qsiprep-html', '{0}_qsiprep.html'.format(aid))
             },
             {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + self.run + '_carpetplot.svg'),
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_carpetplot.svg'),
                 'dest': os.path.join('carpet-plot', '{0}_carpetplot.svg'.format(aid))
             },
             {
@@ -193,27 +193,27 @@ class Report:
                 'dest': os.path.join('seg-brainmask', '{0}_seg_brainmask.svg'.format(aid))
             },
             {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + self.run + '_dwi_denoise_ses_' + self.ses + '_run-' + self.run + '_dwi_wf_denoising.svg'),
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_dwi_denoise_ses_' + self.ses + '_run-' + str(self.run) + '_dwi_wf_denoising.svg'),
                 'dest': os.path.join('denoise', '{0}_denoise.svg'.format(aid))
             },
             {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + self.run + '_dwi_denoise_ses_' + self.ses + '_run-' + self.run + '_dwi_wf_biascorr.svg'),
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_dwi_denoise_ses_' + self.ses + '_run-' + str(self.run) + '_dwi_wf_biascorr.svg'),
                 'dest': os.path.join('bias-corr', '{0}_bias_correction.svg'.format(aid))
             },
             {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + self.run + '_desc-resampled_b0ref.svg'),
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_desc-resampled_b0ref.svg'),
                 'dest': os.path.join('b0-ref', '{0}_b0_reference.svg'.format(aid))
             },
             {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + self.run + '_sampling_scheme.gif'),
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_sampling_scheme.gif'),
                 'dest': os.path.join('sampling-scheme', '{0}_sampling_scheme.gif'.format(aid))
             },
             {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + self.run + '_desc-sdc_b0.svg'),
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_desc-sdc_b0.svg'),
                 'dest': os.path.join('distortion', '{0}_distortion.svg'.format(aid))
             },
             {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + self.run + '_coreg.svg'),
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_coreg.svg'),
                 'dest': os.path.join('coreg', '{0}_coreg.svg'.format(aid))
             }
         ]
@@ -333,11 +333,4 @@ class Report:
 
 class AssessmentError(Exception):
     pass
-
-
-#instance = Report('/n/home_fasse/dasay/mockup_dwiqc_output', 'PE161458', 'PE161458220526', '1')
-
-#instance.build_assessment('/n/home_fasse/dasay/mockup_dwiqc_output/xnat-artifacts')
-
-
 
