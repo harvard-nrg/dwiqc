@@ -10,10 +10,14 @@ import json
 import dwiqc.tasks as tasks
 import shutil
 from executors.models import Job
+sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
+from env_modules_python import module
 
 
 logger = logging.getLogger(__name__)
 
+
+module('load', 'cuda/9.1.85-fasrc01')
 
 # pull in some parameters from the BaseTask class in the __init__.py directory
 
@@ -333,6 +337,7 @@ class Task(tasks.BaseTask):
 
 class DWISpecError(Exception):
 	pass
+
 
 
 
