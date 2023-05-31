@@ -129,6 +129,7 @@ class Task(tasks.BaseTask):
 				file.write(ABCD_values)
 			os.makedirs(self._outdir)
 			shutil.copy(f"{inputs_dir}/slspec_ABCD_dMRI.txt", self._outdir)
+			self._spec = "ABCD"
 
 
 
@@ -170,6 +171,7 @@ class Task(tasks.BaseTask):
 
 			os.makedirs(self._outdir)
 			shutil.copy(f"{inputs_dir}/slspec_UKBio_dMRI.txt", self._outdir)
+			self._spec = "UKBio"
 		
 
 		else:
@@ -273,54 +275,108 @@ class Task(tasks.BaseTask):
 		self._tempdir = tempfile.gettempdir()
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
-		self._command = [
-			'selfie',
-			'--lock',
-			'--output-file', self._prov,
-			'singularity',
-			'run',
-			'-e',
-			'--contain',
-			'--nv',
-			'-B',
-			f'{inputs_dir}:/INPUTS/',
-			'-B',
-			f'{self._outdir}:/OUTPUTS',
-			'-B',
-			f'{self._tempdir}:/tmp',
-			'-B',
-			'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-			'-B',
-			'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
-			'-B',
-			'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
-			'-B',
-			'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
-			'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
-			'--save_component_pngs',
-			'j',
-			'--eddy_cuda',
-			'9.1',
-			'--num_threads',
-			'2',
-			'--denoise',
-			'off',
-			'--degibbs',
-			'off',
-			'--rician',
-			'off',
-			'--prenormalize',
-			'on',
-			'--correct_bias',
-			'on',
-			'--topup_first_b0s_only',
-			'--subject',
-			self._sub,
-			'--project',
-			'SSBC',
-			'--session',
-			self._ses
-		]
+		if self._spec == "ABCD":
+			self._command = [
+				'selfie',
+				'--lock',
+				'--output-file', self._prov,
+				'singularity',
+				'run',
+				'-e',
+				'--contain',
+				'--nv',
+				'-B',
+				f'{inputs_dir}:/INPUTS/',
+				'-B',
+				f'{self._outdir}:/OUTPUTS',
+				'-B',
+				f'{self._tempdir}:/tmp',
+				'-B',
+				'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
+				'-B',
+				'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
+				'-B',
+				'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
+				'-B',
+				'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
+				'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
+				'--save_component_pngs',
+				'j',
+				'--eddy_cuda',
+				'9.1',
+				'--num_threads',
+				'2',
+				'--denoise',
+				'off',
+				'--degibbs',
+				'off',
+				'--rician',
+				'off',
+				'--prenormalize',
+				'on',
+				'--correct_bias',
+				'on',
+				'--topup_first_b0s_only',
+				'--subject',
+				self._sub,
+				'--project',
+				'SSBC',
+				'--session',
+				self._ses
+			]
+
+		elif self._spec == "UKBio":
+
+			self._command = [
+				'selfie',
+				'--lock',
+				'--output-file', self._prov,
+				'singularity',
+				'run',
+				'-e',
+				'--contain',
+				'--nv',
+				'-B',
+				f'{inputs_dir}:/INPUTS/',
+				'-B',
+				f'{self._outdir}:/OUTPUTS',
+				'-B',
+				f'{self._tempdir}:/tmp',
+				'-B',
+				'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
+				'-B',
+				'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
+				'-B',
+				'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
+				'-B',
+				'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
+				'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
+				'--save_component_pngs',
+				'j',
+				'--eddy_cuda',
+				'9.1',
+				'--num_threads',
+				'2',
+				'--denoise',
+				'off',
+				'--degibbs',
+				'off',
+				'--rician',
+				'off',
+				'--prenormalize',
+				'on',
+				'--correct_bias',
+				'on',
+				'--topup_first_b0s_only',
+				'--nonzero_shells',
+				'350,650,1350,2000',
+				'--subject',
+				self._sub,
+				'--project',
+				'SSBC',
+				'--session',
+				self._ses
+			]	
 
 		logdir = self.logdir()
 		logfile = os.path.join(logdir, 'dwiqc-prequal.log')

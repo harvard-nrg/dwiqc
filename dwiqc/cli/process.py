@@ -6,7 +6,6 @@ import yaml
 import yaxil
 import glob
 import math
-import anatqc
 import logging
 import tarfile
 import executors
