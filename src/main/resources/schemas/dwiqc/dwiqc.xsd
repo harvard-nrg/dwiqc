@@ -36,14 +36,11 @@
                         <xs:complexType>
                             <xs:sequence>
                                 <xs:element name="wrap" type="xs:string" minOccurs="0"/>
+                                <xs:element name="motion" type="xs:string" minOccurs="0"/>
                                 <xs:element name="cover" type="xs:string" minOccurs="0"/>
-                                <xs:element name="motion_brain" type="xs:string" minOccurs="0"/>
-                                <xs:element name="motion_out" type="xs:string" minOccurs="0"/>
                                 <xs:element name="ghost_brain" type="xs:string" minOccurs="0"/>
                                 <xs:element name="ghost_out" type="xs:string" minOccurs="0"/>
                                 <xs:element name="spike" type="xs:string" minOccurs="0"/>
-                                <xs:element name="art_brain" type="xs:string" minOccurs="0"/>
-                                <xs:element name="art_out" type="xs:string" minOccurs="0"/>
                                 <xs:element name="inhom" type="xs:string" minOccurs="0"/>
                                 <xs:element name="overall" type="xs:string" minOccurs="0"/>
                                 <xs:element name="comments" type="xs:string" minOccurs="0"/>

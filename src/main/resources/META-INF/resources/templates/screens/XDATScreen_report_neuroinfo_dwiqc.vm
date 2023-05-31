@@ -10,35 +10,37 @@
     $d.format($number)
 #end
 
-#set($qsiprep_html = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/qsiprep_html/$!{aid}_qsiprep.html"))
-#set(b0_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b0_avg/$!{aid}_Preprocessed_b0.png")))
-#set(b500_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b500_avg/$!{aid}_Preprocessed_b500.png")))
-#set(b1000_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b1000_avg/$!{aid}_Preprocessed_b1000.png")))
-#set(b2000_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b2000_avg/$!{aid}_Preprocessed_b2000.png")))
-#set(b3000_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b3000_avg/$!{aid}_Preprocessed_b3000.png")))
-#set(FA_map = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/FA_map/$!{aid}_FA_map.png")))
-#set(MD_map = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/MD_map/$!{aid}_MD_map.png")))
-#set(avg_abs_mot = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/avg_abs_mot/$!{aid}_avg_abs_mot.png")) )
-#set(avg_rel_mot = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/avg_rel_mot/$!{aid}_avg_rel_mot.png")))
-#set(avg_x_transl = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/avg_x_transl/$!{aid}_avg_x_transl.png")))
-#set(avg_y_transl = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/avg_y_transl/$!{aid}_avg_y_transl.png")))
-#set(avg_z_transl = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/avg_z_transl/$!{aid}_avg_z_transl.png")))
-#set(prequal_pdf = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/prequal_pdf/$!{aid}_prequal_qc.pdf")))
-#set(eddy_pdf = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/eddy_pdf/$!{aid}_eddy_quad_qc.pdf")))
 
-
+#set($b0_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b0_avg/$!{aid}_preprocessed_b0.png"))
+#set($b500_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b500_avg/$!{aid}_preprocessed_b500.png"))
+#set($b1000_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b1000_avg/$!{aid}_preprocessed_b1000.png"))
+#set($b2000_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b2000_avg/$!{aid}_preprocessed_b2000.png"))
+#set($b3000_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b3000_avg/$!{aid}_preprocessed_b3000.png"))
+#set($FA_map = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/FA_map/$!{aid}_FA.png"))
+#set($MD_map = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/MD_map/$!{aid}_MD.png"))
+#set($eddy_outlier_slices = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/eddy_outliers/$!{aid}_eddy_outlier_slices.png"))
+#set($translations = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/translations/$!{aid}_translations.png"))
+#set($rotations = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/rotations/$!{aid}_rotations.png"))
+#set($displacements = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/displacements/$!{aid}_displacements.png"))
+#set($prequal_pdf = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/prequal_pdf/$!{aid}_prequal_qc.pdf"))
+#set($eddy_pdf = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/eddy_pdf/$!{aid}_eddy_quad_qc.pdf"))
+#set($qsiprep_html = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/qsiprep-html/$!{aid}_qsiprep.html"))
+#set($qsiprep_pdf = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/qsiprep-pdf/$!{aid}_qsiprep.pdf"))
+#set($carpet_plot = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/carpet-plot/$!{aid}_carpetplot.svg"))
+#set($t1_registration = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/t1-registration/$!{aid}_t1_registration.svg"))
+#set($motion_plot = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/motion-plot/$!{aid}_motion_plot.png"))
+#set($brain_mask = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/seg-brainmask/$!{aid}_seg_brainmask.svg"))
+#set($denoise = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/denoise/$!{aid}_denoise.svg"))
+#set($b0_volume = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b0-volume/$!{aid}_b0_volume.nii.gz"))
 
 
 #set($manual_wrap = $!item.getProperty("manual/wrap"))
-#set($manual_cover= $!item.getProperty("manual/cover"))
-#set($manual_motion_brain = $!item.getProperty("manual/motion_brain"))
-#set($manual_motion_out = $!item.getProperty("manual/motion_out"))
+#set($manual_motion = $!item.getProperty("manual/motion"))
+#set($manual_cover = $!item.getProperty("manual/cover"))
+#set($manual_inhom = $!item.getProperty("manual/inhom"))
 #set($manual_ghost_brain = $!item.getProperty("manual/ghost_brain"))
 #set($manual_ghost_out = $!item.getProperty("manual/ghost_out"))
 #set($manual_spike = $!item.getProperty("manual/spike"))
-#set($manual_art_brain = $!item.getProperty("manual/art_brain"))
-#set($manual_art_out = $!item.getProperty("manual/art_out"))
-#set($manual_inhom = $!item.getProperty("manual/inhom"))
 #set($manual_overall = $!item.getProperty("manual/overall"))
 #set($manual_comments = $!item.getProperty("manual/comments"))
 
@@ -87,35 +89,32 @@
         break;
     }
 
-    switch("$!{manual_motion_brain}") {
+    switch("$!{manual_motion}") {
       case "None": 
-        $( "#motion_brain-none" ).attr("checked", "checked");
+        $( "#motion-none" ).attr("checked", "checked");
         break;
       case "Mild":
-        $( "#motion_brain-mild" ).attr("checked", "checked");
+        $( "#motion-mild" ).attr("checked", "checked");
         break;
       case "Moderate":
-        $( "#motion_brain-moderate" ).attr("checked", "checked");
+        $( "#motion-moderate" ).attr("checked", "checked");
         break;
       case "Severe":
-        $( "#motion_brain-severe" ).attr("checked", "checked");
+        $( "#motion-severe" ).attr("checked", "checked");
         break;
       default:
         break;
     }
 
-    switch("$!{manual_motion_out}") {
-      case "None":
-        $( "#motion_out-none" ).attr("checked", "checked");
-        break;
-      case "Mild":
-        $( "#motion_out-mild" ).attr("checked", "checked");
+    switch("$!{manual_inhom}") {
+      case "None": 
+        $( "#inhom-none" ).attr("checked", "checked");
         break;
       case "Moderate":
-        $( "#motion_out-moderate" ).attr("checked", "checked");
+        $( "#inhom-moderate" ).attr("checked", "checked");
         break;
       case "Severe":
-        $( "#motion_out-severe" ).attr("checked", "checked");
+        $( "#inhom-severe" ).attr("checked", "checked");
         break;
       default:
         break;
@@ -172,57 +171,6 @@
         break;
     }
 
-    switch("$!{manual_art_brain}") {
-      case "None": 
-        $( "#art_brain-none" ).attr("checked", "checked");
-        break;
-      case "Mild":
-        $( "#art_brain-mild" ).attr("checked", "checked");
-        break;
-      case "Moderate":
-        $( "#art_brain-moderate" ).attr("checked", "checked");
-        break;
-      case "Severe":
-        $( "#art_brain-severe" ).attr("checked", "checked");
-        break;
-      default:
-        break;
-    }
-
-    switch("$!{manual_art_out}") {
-      case "None": 
-        $( "#art_out-none" ).attr("checked", "checked");
-        break;
-      case "Mild":
-        $( "#art_out-mild" ).attr("checked", "checked");
-        break;
-      case "Moderate":
-        $( "#art_out-moderate" ).attr("checked", "checked");
-        break;
-      case "Severe":
-        $( "#art_out-severe" ).attr("checked", "checked");
-        break;
-      default:
-        break;
-    }
-
-    switch("$!{manual_inhom}") {
-      case "None": 
-        $( "#inhom-none" ).attr("checked", "checked");
-        break;
-      case "Expected":
-        $( "#inhom-expected" ).attr("checked", "checked");
-        break;
-      case "Moderate":
-        $( "#inhom-moderate" ).attr("checked", "checked");
-        break;
-      case "Severe":
-        $( "#inhom-severe" ).attr("checked", "checked");
-        break;
-      default:
-        break;
-    }
-
     switch("$!{manual_overall}") {
       case "PASS": 
         $( "#overall-pass" ).attr("checked", "checked");
@@ -243,13 +191,10 @@
     $( "#manualqc_save").click( function(event) {
       var wrap = $( "input[name='wrap']:checked" ).val();
       var cover = $( "input[name='cover']:checked" ).val();
-      var motion_brain = $( "input[name='motion_brain']:checked" ).val();
-      var motion_out = $( "input[name='motion_out']:checked" ).val();
+      var motion = $( "input[name='motion']:checked" ).val();
       var ghost_brain = $( "input[name='ghost_brain']:checked" ).val();
       var ghost_out = $( "input[name='ghost_out']:checked" ).val();
       var spike = $( "input[name='spike']:checked" ).val();
-      var art_brain = $( "input[name='art_brain']:checked" ).val();
-      var art_out = $( "input[name='art_out']:checked" ).val();
       var inhom = $( "input[name='inhom']:checked" ).val();
       var overall = $( "input[name='overall']:checked" ).val();
       var comments = $( "#comments" ).val();
@@ -257,13 +202,10 @@
       var data = {
         "neuroinfo:dwiqc/manual/wrap": wrap,
         "neuroinfo:dwiqc/manual/cover": cover,
-        "neuroinfo:dwiqc/manual/motion_brain": motion_brain,
-        "neuroinfo:dwiqc/manual/motion_out": motion_out,
+        "neuroinfo:dwiqc/manual/motion": motion,
         "neuroinfo:dwiqc/manual/ghost_brain": ghost_brain,
         "neuroinfo:dwiqc/manual/ghost_out": ghost_out,
         "neuroinfo:dwiqc/manual/spike": spike,
-        "neuroinfo:dwiqc/manual/art_brain": art_brain,
-        "neuroinfo:dwiqc/manual/art_out": art_out,
         "neuroinfo:dwiqc/manual/inhom": inhom,
         "neuroinfo:dwiqc/manual/overall": overall,
         "neuroinfo:dwiqc/manual/comments": comments,
@@ -352,26 +294,30 @@
   .sidebox td { 
     padding-left: 3px;
     padding-right: 3px;
+    width: 50%
   }
 
   .sidebox tr:hover {
     background-color: #cccccc;
   }
 
-  .morph-bar {
+  .prequal-bar {
     border-right: 2px solid #cc00cc;
     padding-right: 4px;
   }
   
-  .mriqc-bar {
+  .eddy_quad-bar {
     border-right: 2px solid #00e6bf;
     padding-right: 4px;
   }
 
   .tile-img {
-    height: 230px;
+    width: 380px;
   }
-
+  .tile-img-mask { 
+    width: 380px;
+    vertical-align: top;
+  }
   .ui-menu { width: 65px; }
   .ui-tabs-panel {
     height: 683px;
@@ -405,83 +351,60 @@
           <th colspan="2">Summary</th>
           <tr><td>MR Session</td><td align="right"><a href="/data/experiments/$!mr_id?format=html">$!mr_label</a></td></tr>
           <tr><td>Date Processed</td><td align="right">$!item.getStringProperty("${dtype}/date")</td></tr>
-          <tr><td>T1w scan</td><td align="right">$!item.getStringProperty("${dtype}/t1w_scan_id")</td></tr>
-          #if ($vnav_scan != 'n/a')
-          <tr><td>vNav scan</td><td align="right">$!item.getStringProperty("${dtype}/vnav_scan_id")</td></tr>
-          #end
+          <tr><td>PA Fmap Scan</td><td align="right">$!item.getStringProperty("${dtype}/PA_fmap_scan_id")</td></tr>
+          <tr><td>AP Fmap Scan</td><td align="right">$!item.getStringProperty("${dtype}/AP_fmap_scan_id")</td></tr>
+          <tr><td>DWI Scan</td><td align="right">$!item.getStringProperty("${dtype}/dwi_scan_id")</td></tr>
         </table>
         <br />
-        <!-- QC metrics table -->
         <table class="sidebox">
-          <th colspan="2">QC Metrics</th>
+          <th colspan="2">SNR/CNR Metrics</th>
           <tr style="background: #f5f5f5; border-bottom: 1px solid #bfbfbf">
-            <td style="padding: 3px">FreeSurfer <span style="font-weight: bold; color: #cc00cc">&mdash;</span></td>
-            <td style="padding: 3px">MRIQC <span style="font-weight: bold; color: #00e6bf">&mdash;</span></td>
+            <td style="padding: 3px" colspan="3">Eddy Quad <span style="font-weight: bold; color: #00e6bf">&mdash;</span></td>
+           <!-- <td style="padding: 3px">Prequal <span style="font-weight: bold; color: #cc00cc">&mdash;</span></td>-->
           </tr>
-          <tr><td>SNR Tot:</td><td class="mriqc-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("mriqc/snr_total"))</td></tr>
-          <tr><td>EFC:</td><td class="mriqc-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("mriqc/efc"))</td></tr>
-          <tr><td>FWHM Avg:</td><td class="mriqc-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("mriqc/fwhm_avg"))</td></tr>
-          <tr><td>GM SNR:</td><td class="mriqc-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("mriqc/snr_gm"))</td></tr>
-          <tr><td>WM SNR:</td><td class="morph-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("morph/wm_anat_snr"))</td></tr>
-          <tr><td>CNR:</td><td class="morph-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("morph/mri_cnr_tot"))</td></tr>
+          <tr><td>B0 SNR:</td><td class="eddy_quad-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_SNR_b0"))</td></tr>
+          <tr><td>B500 CNR:</td><td class="eddy_quad-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_CNR_b500"))</td></tr>
+          <tr><td>B1000 CNR:</td><td class="eddy_quad-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_CNR_b1000"))</td></tr>
+          <tr><td>B2000 CNR:</td><td class="eddy_quad-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_CNR_b2000"))</td></tr>
+          <tr><td>B3000 CNR:</td><td class="eddy_quad-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_CNR_b3000"))</td></tr>
         </table>
-        <!-- hemispheres -->
-        <table class="sidebox" style="border-top:0px">
-          <th style="padding:2px; font-weight: normal" colspan="3">Hemispheres</th>
+        <!-- motion metrics -->
+        <table class="sidebox">
+          <th colspan="3">Motion Metrics</th>
           <tr style="background: #f5f5f5; border-bottom: 1px solid #bfbfbf">
-            <td style="padding: 3px">Metric</td>
-            <td style="padding: 3px" align="right">Left</td>
-            <td style="padding: 3px" align="right">Right</td>
           </tr>
           <tr>
-            <td>Euler Holes</td>
-            <td align="right">$!item.getProperty("morph/lh_euler_holes")</td>
-            <td align="right" class="morph-bar">$!item.getProperty("morph/rh_euler_holes")</td>
+            <td colspan="2">Avg Abs Motion:</td>
+            <td colspan="2" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_abs_motion_mm"))</td>
           </tr>
           <tr>
-            <td>CNR</td>
-            <td align="right">$!item.getProperty("morph/lh_cnr")</td>
-            <td align="right" class="morph-bar">$!item.getProperty("morph/rh_cnr")</td>
+            <td colspan="2">Avg Rel Motion:</td>
+            <td colspan="2" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_rel_motion_mm"))</td>
           </tr>
           <tr>
-            <td>G/W CNR</td>
-            <td align="right">$!item.getProperty("morph/lh_gm_wm_cnr")</td>
-            <td align="right" class="morph-bar">$!item.getProperty("morph/rh_gm_wm_cnr")</td>
+            <td colspan="2">Avg X Translation:</td>
+            <td colspan="2" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_x_translation_mm"))</td>
           </tr>
           <tr>
-            <td>G/CSF CNR</td>
-            <td align="right">$!item.getProperty("morph/lh_gm_csf_cnr")</td>
-            <td align="right" class="morph-bar">$!item.getProperty("morph/rh_gm_csf_cnr")</td>
+            <td colspan="2">Avg Y Translation:</td>
+            <td colspan="2" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_y_translation_mm"))</td>
           </tr>
-        </table>
-        #if ($vnav_scan != 'n/a')
-        <table class="sidebox" style="border-top:0px">
-          <th style="padding:2px; font-weight: normal" colspan="2">vNav</th>
-          <tr><td>Settings</td><td align="right">$!item.getProperty("vnav/vnav_min") &#8594; $!item.getProperty("vnav/vnav_max")</td></tr>
-          <tr><td>Motion Score RMS</td><td align="right">#numberFormat($floatFormat3 $!item.getProperty("vnav/mean_mot_rms_per_min"))</td></tr>
-          <tr><td>Motion Score Max</td><td align="right">#numberFormat($floatFormat3 $!item.getProperty("vnav/mean_mot_max_per_min"))</td></tr>
-          <tr><td>vNav Acq</td><td align="right">$!item.getProperty("vnav/vnav_acq_tot")</td></tr>
-          <tr><td>vNav Reacq</td><td align="right">$!item.getProperty("vnav/vnav_reacq")</td></tr>
-          #if ($moco_fail == 1)
-            <tr><td>Failed</td><td align="right">yes</td></tr>
-          #else
-            <tr><td>Failed</td><td align="right">no</td></tr>
-          #end
+          <tr>
+            <td colspan="2">Avg Z Translation:</td>
+            <td colspan="2" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_z_translation_mm"))</td>
+          </tr>
         </table>
         <br />
-        #end
         <table class="sidebox">
           <th colspan="2">Files</th>
-          <tr><td></td><td><a href="#" data-featherlight="$!{t1w_axial}">T1w axial</a></td></tr>
-          <tr><td></td><td><a href="#" data-featherlight="$!{surface_axial}">Surfaces axial</a></td></tr>
-          <tr><td></td><td><a href="#" data-featherlight="$!{aseg_axial}">Segmentation axial</a></td></tr>
-          <tr><td></td><td><a href="#" data-featherlight="$!{brainmask_axial}">Brainmask axial</a></td></tr>
-          #if ($vnav_scan != 'n/a')
-          <tr><td></td><td><a href="#" data-featherlight="$!{vnav_rms}">vNav Motion Scores RMS</a></td></tr>
-          #end
-          <tr><td></td><td><a href="#" data-featherlight="$!{aparc_lat}">Cortical Laterality</a></td></tr>
-          <tr><td></td><td><a href="#" data-featherlight="$!{aseg_lat}">Subcortical Laterality</a></td></tr>
-          <tr><td></td><td><a target="_blank" href="$!{mriqc_html}">MRIQC Report</a></td></tr>
+          <tr><td><a href="#" data-featherlight="$!{b0_avg}">B0 Average</a></td><td><a href="#" data-featherlight="$!{motion_plot}">Motion Plot</a></td></tr>
+          <tr><td><a href="#" data-featherlight="$!{b500_avg}">B500 Average</a></td><td><a href="#" data-featherlight="<object type='image/svg+xml' data='$!{brain_mask}' style='width:65vw'></object>">Brain Mask</a></td></tr>
+          <tr><td><a href="#" data-featherlight="$!{b1000_avg}">B1000 Average</a></td><td><a href="#" data-featherlight="<object type='image/svg+xml' data='$!{denoise}' style='width:65vw'></object>">Denoise</a></td></tr>
+          <tr><td><a href="#" data-featherlight="$!{b2000_avg}">B2000 Average</a></td><td><a href="#" data-featherlight="$!{carpet_plot}">Carpet Plot</a></td></tr>
+          <tr><td><a href="#" data-featherlight="$!{b3000_avg}">B3000 Average</a></td><td width="200"><a href="#" data-featherlight="<object type='image/svg+xml' data='$!{t1_registration}' style='width:65vw'></object>">T1 Registration</a></td></tr>
+          <tr><td><a href="#" data-featherlight="$!{FA_map}">FA Map</a></td><td><a href="$!{prequal_pdf}" target="_blank">Prequal Report</a></td></tr>
+          <tr><td><a href="#" data-featherlight="$!{MD_map}">MD Map</a></td><td><a href="$!{eddy_pdf}" target="_blank">Eddy Quad Report</a></td></tr>
+          <tr><td><a href="#" data-featherlight="$!{eddy_outlier_slices}">Eddy Outlier Slices</a></td><td><a href="$!{qsiprep_pdf}" target="_blank">Qsiprep Report</a></td></tr>
         </table>
       </div>
     </td>
@@ -490,421 +413,97 @@
       <div id="tabs">
         <ul>
           <li><a href="#images-tab">Images</a></li>
-          <li><a href="#mriqc-report-tab">MRIQC Report</a></li>
-          <li><a href="#mriqc-iqms-tab">MRIQC IQMs</a></li>
+          <li><a href="#prequal-report-tab">Prequal Report</a></li>
+          <li><a href="#eddy-quad-report-tab">Eddy Quad Report</a></li>
+          <li><a href="#qsiprep-report-tab">Qsiprep Report</a></li>
           <li><a href="#manualqc-tab">Manual QC</a></li>
           <li><a href="#files-tab">All Stored Files</a></li>
         </ul>
         <!-- begin images-tab -->
         <div id="images-tab" style="padding:0px; margin:2px">
-          <table id="dwiqc-images-table" cellspacing="10">
+          <table id="anatqc-images-table" cellspacing="10">
             <tr>
               <td>
                 <table class="image-box">
                   <tr>
-                    <td align="left">T1w</td>
+                    <td align="left">FA Map</td>
                   </tr>
                   <tr>
-                    <td colspan="2"><a href="#" data-featherlight="$!{t1w_axial}"><img class="tile-img" src="$!{t1w_axial}"></img></a></td>
+                    <td colspan="2"><a href="#" data-featherlight="$!{FA_map}"><img class="tile-img" src="$!{FA_map}"></img></a></td>
                   </tr>
                 </table>
               </td>
               <td>
                 <table class="image-box">
                   <tr>
-                    <td align="left">WM/Pial Surface</td>
+                    <td align="left">MD Map</td>
                   </tr>
                   <tr>
-                    <td colspan="2"><a href="#" data-featherlight="$!{surface_axial}"><img class="tile-img" src="$!{surface_axial}"></img></a></td>
+                    <td colspan="2"><a href="#" data-featherlight="$!{MD_map}"><img class="tile-img" src="$!{MD_map}"></img></a></td>
                   </tr>
                 </table>
               </td>
             </tr>
             <tr>
-              <td>
+              <td valign="top">
                 <table class="image-box">
                   <tr>
-                    <td align="left">Segmentation</td>
+                    <td align="left">Motion Plot</td>
                   </tr>
                   <tr>
-                    <td colspan="2"><a href="#" data-featherlight="$!{aseg_axial}"><img class="tile-img" src="$!{aseg_axial}"></img></a></td>
+                    <td colspan="2"><a href="#" data-featherlight="$!{motion_plot}"><img class="tile-img" src="$!{motion_plot}"></img></a></td>
                   </tr>
                 </table>
               </td>
-              #if ($vnav_scan != 'n/a')
-              <td>
+              <td valign="top">
                 <table class="image-box">
                   <tr>
-                    <td align="left">vNAV Motion Scores (RMS)</td>
+                    <td align="left">Brain Mask</td>
                   </tr>
                   <tr>
-                    <td colspan="2"><a href="#" data-featherlight="$!{vnav_rms}"><img class="tile-img" src="$!{vnav_rms}"></img></a></td>
+                    <td colspan="2"><a href="#" data-featherlight="<object type='image/svg+xml' data='$!{brain_mask}' style='width:65vw'></object>"><img class="tile-img-mask" src="$!{brain_mask}"></img></a></td>
+                  </tr>
+                  <tr style="height: 25px;"></tr>
+                  <tr>
+                    <td align="left">Outlier Slices</td>
+                  </tr>
+                  <tr>
+                    <td colspan="2"><a href="#" data-featherlight="$!{eddy_outlier_slices}"><img class="tile-img-mask" src="$!{eddy_outlier_slices}"></img></a></td>
+                  </tr>
+                  <tr style="height: 25px;"></tr>
+                  <tr>
+                    <td align="left">Framewise Displacement</td>
+                  </tr>
+                  <tr>
+                    <td colspan="1"><a href="#" data-featherlight="$!{carpet_plot}"><img class="tile-img" src="$!{carpet_plot}"></img></a></td>
                   </tr>
                 </table>
               </td>
-              #end
-            </tr>
+             </tr>
           </table>
         </div>
         <!-- end images-tab -->
-        <!-- begin mriqc-report-tab -->
-        <div id="mriqc-report-tab" style="padding: 0px; margin:2px; overflow:hidden">
+        <!-- begin prequal-report-tab -->
+        <div id="prequal-report-tab" style="padding: 0px; margin:2px;">
           <div style="width: 100%">
-            <iframe src="$!{mriqc_html}" style="width: 100%; height: 810px" frameBorder="0"></iframe>
+            <iframe src="$!{prequal_pdf}" style="width: 100%; height: 900px" frameBorder="0"></iframe>
           </div>
         </div>
-        <!-- end mriqc-report-tab -->
-        <!-- begin mriqc-iqms-tab -->
-        <div id="mriqc-iqms-tab" style="padding: 0px; margin:2px">
-          <table class="big-table">
-            <tr>
-              <th align="left">#</th>
-              <th align="left">Metric</th>
-              <th align="left">Value</th>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>cjv</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/cjv"))</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>cnr</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/cnr"))</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>efc</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/efc"))</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>fber</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/fber"))</td>
-            </tr>
-            <tr>
-              <td>5</td>
-              <td>fwhm_avg</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/fwhm_avg"))</td>
-            </tr>
-            <tr>
-              <td>6</td>
-              <td>fwhm_x</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/fwhm_x"))</td>
-            </tr>
-            <tr>
-              <td>7</td>
-              <td>fwhm_y</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/fwhm_y"))</td>
-            </tr>
-            <tr>
-              <td>8</td>
-              <td>fwhm_z</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/fwhm_z"))</td>
-            </tr>
-            <tr>
-              <td>9</td>
-              <td>icvs_csf</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/icvs_csf"))</td>
-            </tr>
-            <tr>
-              <td>10</td>
-              <td>icvs_gm</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/icvs_gm"))</td>
-            </tr>
-            <tr>
-              <td>11</td>
-              <td>icvs_wm</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/icvs_wm"))</td>
-            </tr>
-            <tr>
-              <td>12</td>
-              <td>inu_med</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/inu_med"))</td>
-            </tr>
-            <tr>
-              <td>13</td>
-              <td>inu_range</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/inu_range"))</td>
-            </tr>
-            <tr>
-              <td>14</td>
-              <td>qi_1</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/qi_1"))</td>
-            </tr>
-            <tr>
-              <td>15</tid>
-              <td>qi_2</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/qi_2"))</td>
-            </tr>
-            <tr>
-              <td>16</td>
-              <td>rpve_csf</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/rpve_csf"))</td>
-            </tr>
-            <tr>
-              <td>17</td>
-              <td>rpve_gm</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/rpve_gm"))</td>
-            </tr>
-            <tr>
-              <td>18</td>
-              <td>rpve_wm</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/rpve_wm"))</td>
-            </tr>
-            <tr>
-              <td>19</td>
-              <td>size_x</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/size_x"))</td>
-            </tr>
-            <tr>
-              <td>20</td>
-              <td>size_y</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/size_y"))</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>size_z</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/size_z"))</td>
-            </tr>
-            <tr>
-              <td>22</td>
-              <td>snr_csf</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/snr_csf"))</td>
-            </tr>
-            <tr>
-              <td>23</td>
-              <td>snr_gm</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/snr_gm"))</td>
-            </tr>
-            <tr>
-              <td>24</td>
-              <td>snr_total</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/snr_total"))</td>
-            </tr>
-            <tr>
-              <td>25</td>
-              <td>snr_wm</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/snr_wm"))</td>
-            </tr>
-            <tr>
-              <td>26</td>
-              <td>snrd_csf</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/snrd_csf"))</td>
-            </tr>
-            <tr>
-              <td>27</td>
-              <td>snrd_gm</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/snrd_gm"))</td>
-            </tr>
-            <tr>
-              <td>28</td>
-              <td>snrd_total</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/snrd_total"))</td>
-            </tr>
-            <tr>
-              <td>29</td>
-              <td>snrd_wm</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/snrd_wm"))</td>
-            </tr>
-            <tr>
-              <td>30</td>
-              <td>spacing_x</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/spacing_x"))</td>
-            </tr>
-            <tr>
-              <td>31</td>
-              <td>spacing_y</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/spacing_y"))</td>
-            </tr>
-            <tr>
-              <td>32</td>
-              <td>spacing_z</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/spacing_z"))</td>
-            </tr>
-            <tr>
-              <td>33</td>
-              <td>summary_bg_k</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_bg_k"))</td>
-            </tr>
-            <tr>
-              <td>34</td>
-              <td>summary_bg_mad</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_bg_mad"))</td>
-            </tr>
-            <tr>
-              <td>35</td>
-              <td>summary_bg_mean</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_bg_mean"))</td>
-            </tr>
-            <tr>
-              <td>36</td>
-              <td>summary_bg_median</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_bg_median"))</td>
-            </tr>
-            <tr>
-              <td>37</td>
-              <td>summary_bg_n</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_bg_n"))</td>
-            </tr>
-            <tr>
-              <td>38</td>
-              <td>summary_bg_p05</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_bg_p05"))</td>
-            </tr>
-            <tr>
-              <td>39</td>
-              <td>summary_bg_p95</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_bg_p95"))</td>
-            </tr>
-            <tr>
-              <td>40</td>
-              <td>summary_bg_stdv</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_bg_stdv"))</td>
-            </tr>
-            <tr>
-              <td>41</td>
-              <td>summary_csf_k</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_csf_k"))</td>
-            </tr>
-            <tr>
-              <td>42</td>
-              <td>summary_csf_mad</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_csf_mad"))</td>
-            </tr>
-            <tr>
-              <td>43</td>
-              <td>summary_csf_mean</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_csf_mean"))</td>
-            </tr>
-            <tr>
-              <td>44</td>
-              <td>summary_csf_median</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_csf_median"))</td>
-            </tr>
-            <tr>
-              <td>45</td>
-              <td>summary_csf_n</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_csf_n"))</td>
-            </tr>
-            <tr>
-              <td>46</td>
-              <td>summary_csf_p05</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_csf_p05"))</td>
-            </tr>
-            <tr>
-              <td>47</td>
-              <td>summary_csf_p95</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_csf_p95"))</td>
-            </tr>
-            <tr>
-              <td>48</td>
-              <td>summary_csf_stdv</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_csf_stdv"))</td>
-            </tr>
-            <tr>
-              <td>49</td>
-              <td>summary_gm_k</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_gm_k"))</td>
-            </tr>
-            <tr>
-              <td>50</td>
-              <td>summary_gm_mad</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_gm_mad"))</td>
-            </tr>
-            <tr>
-              <td>51</td>
-              <td>summary_gm_mean</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_gm_mean"))</td>
-            </tr>
-            <tr>
-              <td>52</td>
-              <td>summary_gm_median</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_gm_median"))</td>
-            </tr>
-            <tr>
-              <td>53</td>
-              <td>summary_gm_n</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_gm_n"))</td>
-            </tr>
-            <tr>
-              <td>54</td>
-              <td>summary_gm_p05</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_gm_p05"))</td>
-            </tr>
-            <tr>
-              <td>55</td>
-              <td>summary_gm_p95</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_gm_p95"))</td>
-            </tr>
-            <tr>
-              <td>56</td>
-              <td>summary_gm_stdv</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_gm_stdv"))</td>
-            </tr>
-            <tr>
-              <td>57</td>
-              <td>summary_wm_k</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_wm_k"))</td>
-            </tr>
-            <tr>
-              <td>58</td>
-              <td>summary_wm_mad</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_wm_mad"))</td>
-            </tr>
-            <tr>
-              <td>59</td>
-              <td>summary_wm_mean</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_wm_mean"))</td>
-            </tr>
-            <tr>
-              <td>60</td>
-              <td>summary_wm_median</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_wm_median"))</td>
-            </tr>
-            <tr>
-              <td>61</td>
-              <td>summary_wm_n</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_wm_n"))</td>
-            </tr>
-            <tr>
-              <td>62</td>
-              <td>summary_wm_p05</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_wm_p05"))</td>
-            </tr>
-            <tr>
-              <td>63</td>
-              <td>summary_wm_p95</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_wm_p95"))</td>
-            </tr>
-            <tr>
-              <td>64</td>
-              <td>summary_wm_stdv</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/summary_wm_stdv"))</td>
-            </tr>
-            <tr>
-              <td>65</td>
-              <td>tpm_overlap_csf</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/tpm_overlap_csf"))</td>
-            </tr>
-            <tr>
-              <td>66</td>
-              <td>tpm_overlap_gm</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/tpm_overlap_gm"))</td>
-            </tr>
-            <tr>
-              <td>67</td>
-              <td>tpm_overlap_wm</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/tpm_overlap_wm"))</td>
-            </tr>
-            <tr>
-              <td>68</td>
-              <td>wm2max</td>
-              <td>#numberFormat($floatFormat3 $!item.getProperty("mriqc/wm2max"))</td>
-            </tr>
-          </table>
+        <!-- end prequal-report-tab -->
+        <!-- begin eddy-quad-report-tab -->
+        <div id="eddy-quad-report-tab" style="padding: 0px; margin:2px overflow:auto;">
+          <div style="width: 100%">
+            <iframe src="$!{eddy_pdf}" style="width: 100%; height: 900px" frameBorder="0"></iframe>
+          </div>
         </div>
-        <!-- end mriqc-iqms-tab -->
+        <!-- end eddy-quad-report-tab -->
+        <!-- begin qsiprep-report-tab -->
+        <div id="qsiprep-report-tab" style="padding: 0px; margin:2px overflow:auto;">
+          <div style="width: 100%">
+            <iframe src="$!{qsiprep_pdf}" style="width: 100%; height: 900px" frameBorder="0"></iframe>
+          </div>
+        </div>
+        <!-- end qsiprep-report-tab -->
         <!-- begin manualqc-tab -->
         <div id="manualqc-tab" style="padding:0px; margin:0px">
           <table>
@@ -962,43 +561,19 @@
                 <hr style="border: 5px solid #e4efff"/>
                 <table>
                   <tr>
-                    <td><input type="radio" name="motion_brain" id="motion_brain-none" value="None"></td>
+                    <td><input type="radio" name="motion" id="motion-none" value="None"></td>
                     <td>None</td>
                   </tr>
                   <tr>
-                    <td><input type="radio" name="motion_brain" id="motion_brain-mild" value="Mild"></td>
+                    <td><input type="radio" name="motion" id="motion-mild" value="Mild"></td>
                     <td>Mild</td>
                   </tr>
                   <tr>
-                    <td><input type="radio" name="motion_brain" id="motion_brain-moderate" value="Moderate"></td>
+                    <td><input type="radio" name="motion" id="motion-moderate" value="Moderate"></td>
                     <td>Moderate</td>
                   </tr>
                   <tr>
-                    <td><input type="radio" name="motion_brain" id="motion_brain-severe" value="Severe"></td>
-                    <td>Severe</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <h2>Motion Ringing/Striping/Blurring - Outside of Brain</h2>
-                <hr style="border: 5px solid #e4efff"/>
-                <table>
-                  <tr>
-                    <td><input type="radio" name="motion_out" id="motion_out-none" value="None"></td>
-                    <td>None</td>
-                  </tr>
-                  <tr>
-                    <td><input type="radio" name="motion_out" id="motion_out-mild" value="Mild"></td>
-                    <td>Mild</td>
-                  </tr>
-                  <tr>
-                    <td><input type="radio" name="motion_out" id="motion_out-moderate" value="Moderate"></td>
-                    <td>Moderate</td>
-                  </tr>
-                  <tr>
-                    <td><input type="radio" name="motion_out" id="motion_out-severe" value="Severe"></td>
+                    <td><input type="radio" name="motion" id="motion-severe" value="Severe"></td>
                     <td>Severe</td>
                   </tr>
                 </table>
@@ -1078,64 +653,12 @@
             </tr>
             <tr>
               <td>
-                <h2>Other Artifact/Signal Loss - Affects Brain</h2>
-                <hr style="border: 5px solid #e4efff"/>
-                <table>
-                  <tr>
-                    <td><input type="radio" name="art_brain" id="art_brain-none" value="None"></td>
-                    <td>None</td>
-                  </tr>
-                  <tr>
-                    <td><input type="radio" name="art_brain" id="art_brain-mild" value="Mild"></td>
-                    <td>Mild</td>
-                  </tr>
-                  <tr>
-                    <td><input type="radio" name="art_brain" id="art_brain-moderate" value="Moderate"></td>
-                    <td>Moderate</td>
-                  </tr>
-                  <tr>
-                    <td><input type="radio" name="art_brain" id="art_brain-severe" value="Severe"></td>
-                    <td>Severe</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <h2>Other Artifact/Signal Loss - Outside of Brain</h2>
-                <hr style="border: 5px solid #e4efff"/>
-                <table>
-                  <tr>
-                    <td><input type="radio" name="art_out" id="art_out-none" value="None"></td>
-                    <td>None</td>
-                  </tr>
-                  <tr>
-                    <td><input type="radio" name="art_out" id="art_out-mild" value="Mild"></td>
-                    <td>Mild</td>
-                  </tr>
-                  <tr>
-                    <td><input type="radio" name="art_out" id="art_out-moderate" value="Moderate"></td>
-                    <td>Moderate</td>
-                  </tr>
-                  <tr>
-                    <td><input type="radio" name="art_out" id="art_out-severe" value="Severe"></td>
-                    <td>Severe</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <h2>Unexpected Inhomogeneity</h2>
+                <h2>b0 Volume Unexpected Inhomogeneity</h2>
                 <hr style="border: 5px solid #e4efff"/>
                 <table>
                   <tr>
                     <td><input type="radio" name="inhom" id="inhom-none" value="None"></td>
                     <td>None</td>
-                  </tr>
-                  <tr>
-                    <td><input type="radio" name="inhom" id="inhom-expected" value="Expected"></td>
-                    <td>Expected</td>
                   </tr>
                   <tr>
                     <td><input type="radio" name="inhom" id="inhom-moderate" value="Moderate"></td>
@@ -1191,83 +714,144 @@
             </tr>
             <tr>
               <td>1</td>
-              #set($name = "${aid}_T1w_axial.png")
-              <td><a download="$!{name}" href="$!{t1w_axial}">$!{name}</a></td>
-              <td>T1w axial image</td>
+              #set($name = "${aid}_preprocessed_b0.png")
+              <td><a download="$!{name}" href="$!{b0_avg}">$!{name}</a></td>
+              <td>b0 Preprocessed</td>
               <td>image/png</td>
             </tr>
             <tr>
               <td>2</td>
-              #set($name = "${aid}_aseg_axial.png")
-              <td><a download="$!{name}" href="$!{aseg_axial}">$!{name}</a></td>
-              <td>Segmentation axial image</td>
+              #set($name = "${aid}_preprocessed_b500.png")
+              <td><a download="$!{name}" href="$!{b500_avg}">$!{name}</a></td>
+              <td>b500 Preprocessed</td>
               <td>image/png</td>
             </tr>
             <tr>
               <td>3</td>
-              #set($name = "${aid}_brainmask_axial.png")
-              <td><a download="$!{name}" href="$!{brainmask_axial}">$!{name}</a></td>
-              <td>Brainmask axial image</td>
+              #set($name = "${aid}_preprocessed_b1000.png")
+              <td><a download="$!{name}" href="$!{b1000_avg}">$!{name}</a></td>
+              <td>b1000 Preprocessed</td>
               <td>image/png</td>
             </tr>
             <tr>
               <td>4</td>
-              #set($name = "${aid}_surface_axial.png")
-              <td><a download="$!{name}" href="$!{surface_axial}">$!{name}</a></td>
-              <td>Surfaces axial image</td>
+              #set($name = "${aid}_preprocessed_b2000.png")
+              <td><a download="$!{name}" href="$!{b2000_avg}">$!{name}</a></td>
+              <td>b2000 Preprocessed</td>
               <td>image/png</td>
             </tr>
             <tr>
               <td>5</td>
-              #set($name = "${aid}_aparc_laterality.png")
-              <td><a download="$!{name}" href="$!{aparc_lat}">$!{name}</a></td>
-              <td>Cortical laterality plot</td>
+              #set($name = "${aid}_preprocessed_b3000.png")
+              <td><a download="$!{name}" href="$!{b3000_avg}">$!{name}</a></td>
+              <td>b3000 Preprocessed</td>
               <td>image/png</td>
             </tr>
             <tr>
               <td>6</td>
-              #set($name = "${aid}_aseg_laterality.png")
-              <td><a download="$!{name}" href="$!{aseg_lat}">$!{name}</a></td>
-              <td>Subcortical laterality plot</td>
+              #set($name = "${aid}_FA.png")
+              <td><a download="$!{name}" href="$!{FA_map}">$!{name}</a></td>
+              <td>FA Map</td>
               <td>image/png</td>
             </tr>
             <tr>
               <td>7</td>
-              #set($name = "${aid}_mriqc.html")
-              <td><a download="$!{name}" href="$!{mriqc_html}">$!{name}</a></td>
-              <td>MRIQC Report</td>
-              <td>text/html</td>
+              #set($name = "${aid}_MD.png")
+              <td><a download="$!{name}" href="$!{MD_map}">$!{name}</a></td>
+              <td>MD Map</td>
+              <td>image/png</td>
             </tr>
             <tr>
               <td>8</td>
-              #set($name = "${aid}_freesurfer.tar.gz")
-              <td><a download="$!{name}" href="$!{fs_data}">$!{name}</a></td>
-              <td>FreeSurfer results</td>
-              <td>application/gzip</td>
+              #set($name = "${aid}_eddy_outlier_slices.png")
+              <td><a download="$!{name}" href="$!{eddy_outlier_slices}">$!{name}</a></td>
+              <td>Eddy Outlier Slices</td>
+              <td>image/png</td>
             </tr>
-            #if ($vnav_scan != 'n/a')
             <tr>
               <td>9</td>
-              #set($name = "${aid}_vNav_Motion.json")
-              <td><a download="$!{name}" href="$!{vnav_motion_json}">$!{name}</a></td>
-              <td>vNav Report</td>
-              <td>text/json</td>
+              #set($name = "${aid}_translations.png")
+              <td><a download="$!{name}" href="$!{translations}">$!{name}</a></td>
+              <td>Motion Translations</td>
+              <td>image/png</td>
             </tr>
             <tr>
               <td>10</td>
-              #set($name = "${aid}_vNavMotionScoresMax.png")
-              <td><a download="$!{name}" href="$!{vnav_max}">$!{name}</a></td>
-              <td>vNav Motion Scores Max</td>
-              <td>text/png</td>
+              #set($name = "${aid}_rotations.png")
+              <td><a download="$!{name}" href="$!{rotations}">$!{name}</a></td>
+              <td>Motion Rotations</td>
+              <td>image/png</td>
             </tr>
             <tr>
               <td>11</td>
-              #set($name = "${aid}_vNavMotionScoresRMS.png")
-              <td><a download="$!{name}" href="$!{vnav_rms}">$!{name}</a></td>
-              <td>vNav Motion Scores RMS</td>
-              <td>text/png</td>
+              #set($name = "${aid}_displacements.png")
+              <td><a download="$!{name}" href="$!{displacements}">$!{name}</a></td>
+              <td>Motion Displacements</td>
+              <td>image/png</td>
             </tr>
-            #end
+            <tr>
+              <td>12</td>
+              #set($name = "${aid}_prequal_qc.pdf")
+              <td><a download="$!{name}" href="$!{prequal_pdf}">$!{name}</a></td>
+              <td>Prequal Report</td>
+              <td>report/pdf</td>
+            </tr>
+            <tr>
+              <td>13</td>
+              #set($name = "${aid}_eddy_quad_qc.pdf")
+              <td><a download="$!{name}" href="$!{eddy_pdf}">$!{name}</a></td>
+              <td>Eddy Quad Report</td>
+              <td>report/pdf</td>
+            </tr>
+            <tr>
+              <td>14</td>
+              #set($name = "${aid}_qsiprep.html")
+              <td><a download="$!{name}" href="$!{qsiprep_html}">$!{name}</a></td>
+              <td>Qsiprep html Report</td>
+              <td>report/html</td>
+            </tr>
+            <tr>
+              <td>15</td>
+              #set($name = "${aid}_qsiprep.pdf")
+              <td><a download="$!{name}" href="$!{qsiprep_pdf}">$!{name}</a></td>
+              <td>Qsiprep pdf Report</td>
+              <td>report/pdf</td>
+            </tr>
+            <tr>
+              <td>16</td>
+              #set($name = "${aid}_carpetplot.svg")
+              <td><a download="$!{name}" href="$!{carpet_plot}">$!{name}</a></td>
+              <td>Framewise Displacement Plot</td>
+              <td>image/svg</td>
+            </tr>
+            <tr>
+              <td>17</td>
+              #set($name = "${aid}_t1_registration.svg")
+              <td><a download="$!{name}" href="$!{t1_registration}">$!{name}</a></td>
+              <td>T1 Registration</td>
+              <td>image/svg</td>
+            </tr>
+            <tr>
+              <td>18</td>
+              #set($name = "${aid}_motion_plot.png")
+              <td><a download="$!{name}" href="$!{motion_plot}">$!{name}</a></td>
+              <td>Motion Plot</td>
+              <td>image/png</td>
+            </tr>
+            <tr>
+              <td>19</td>
+              #set($name = "${aid}_seg_brainmask.svg")
+              <td><a download="$!{name}" href="$!{brain_mask}">$!{name}</a></td>
+              <td>Brain Mask</td>
+              <td>image/svg</td>
+            </tr>
+            <tr>
+              <td>20</td>
+              #set($name = "${aid}_b0-volume.nii.gz")
+              <td><a download="$!{name}" href="$!{b0_volume}">$!{name}</a></td>
+              <td>b0 Volume</td>
+              <td>file/nii.gz</td>
+            </tr>
           </table>
         </div>
         <!-- end files-tab -->
