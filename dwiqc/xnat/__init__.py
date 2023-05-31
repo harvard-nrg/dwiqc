@@ -231,7 +231,6 @@ class Report:
             self.dirs['prequal'],
             'OUTPUTS',
             'EDDY',
-            'eddy_results.qc',
             'eddy_metrics.json'
         )
         floatfmt = '{:.5f}'.format
@@ -333,4 +332,11 @@ class Report:
 
 class AssessmentError(Exception):
     pass
+
+
+#instance = Report('/n/home_fasse/dasay/mockup_dwiqc_output', 'PE161458', 'PE161458220526', '1')
+
+#instance.build_assessment('/n/home_fasse/dasay/mockup_dwiqc_output/xnat-artifacts')
+
+
 

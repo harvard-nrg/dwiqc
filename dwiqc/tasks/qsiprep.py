@@ -233,7 +233,9 @@ class Task(tasks.BaseTask):
 			'--fs-license-file',
 			'/n/helmod/apps/centos7/Core/freesurfer/6.0.0-fasrc01/license.txt',
 			'-w',
-			self._tempdir
+			self._tempdir,
+			'-B',
+			'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda'
 		]
 
 		logdir = self.logdir()
@@ -248,6 +250,7 @@ class Task(tasks.BaseTask):
 			output=logfile,
 			error=logfile
 		)
+
 
 
 
