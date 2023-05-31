@@ -19,6 +19,11 @@ import dwiqc.tasks.prequal as prequal
 import dwiqc.tasks.qsiprep as qsiprep
 import dwiqc.tasks.prequal_EQ as prequal_EQ
 import dwiqc.tasks.qsiprep_EQ as qsiprep_EQ
+import dwiqc.broswer as browser
+sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
+from env_modules_python import module
+
+module('load', 'chromium.org/chromium/102.0.5005.115-ncf')
 
 
 logger = logging.getLogger(__name__)
@@ -102,6 +107,7 @@ def do(args):
         complete = len(jarray.complete)
         prequal_eddy(args, prequal_outdir)
         #qsiprep_eddy(args, qsiprep_outdir)
+        browser.snapshot(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html", f"{qsiprep_outdir}/qsiprep/qsiprep.pdf")
         if failed:
             logger.info('%s/%s jobs failed', failed, numjobs)
             for pid,job in iter(jarray.failed.items()):
