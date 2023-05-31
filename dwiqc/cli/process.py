@@ -19,7 +19,7 @@ import dwiqc.tasks.prequal as prequal
 import dwiqc.tasks.qsiprep as qsiprep
 import dwiqc.tasks.prequal_EQ as prequal_EQ
 import dwiqc.tasks.qsiprep_EQ as qsiprep_EQ
-import dwiqc.broswer as browser
+import dwiqc.browser as browser
 sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
 from env_modules_python import module
 
