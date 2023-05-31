@@ -193,7 +193,7 @@ class Task(tasks.BaseTask):
 			"estimate_move_by_susceptibility": True,
 			"mporder": mporder,
 			"slice_order": f"{self._bids}/{spec_file}",
-			"args": "--ol_nstd=4 --ol_type=gw"
+			"args": "--ol_nstd=5 --ol_type=gw"
 		}
 
 		with open(f"{self._bids}/eddy_params_s2v_mbs.json", "w") as f:
