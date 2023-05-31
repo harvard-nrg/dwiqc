@@ -212,6 +212,8 @@ class Task(tasks.BaseTask):
 			'singularity',
 			'run',
 			'--nv',
+			'-B',
+			'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
 			'/n/sw/ncf/apps/qsiprep/0.14.0/qsiprep.sif',			
 			self._bids,
 			self._outdir,
@@ -233,9 +235,7 @@ class Task(tasks.BaseTask):
 			'--fs-license-file',
 			'/n/helmod/apps/centos7/Core/freesurfer/6.0.0-fasrc01/license.txt',
 			'-w',
-			self._tempdir,
-			'-B',
-			'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda'
+			self._tempdir
 		]
 
 		logdir = self.logdir()

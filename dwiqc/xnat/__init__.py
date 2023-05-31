@@ -193,11 +193,11 @@ class Report:
                 'dest': os.path.join('seg-brainmask', '{0}_seg_brainmask.svg'.format(aid))
             },
             {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_dwi_denoise_ses_' + self.ses + '_run-' + str(self.run) + '_dwi_wf_denoising.svg'),
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_dwi_denoise_ses_' + self.ses + '_run_' + str(self.run) + '_dwi_wf_denoising.svg'),
                 'dest': os.path.join('denoise', '{0}_denoise.svg'.format(aid))
             },
             {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_dwi_denoise_ses_' + self.ses + '_run-' + str(self.run) + '_dwi_wf_biascorr.svg'),
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_dwi_denoise_ses_' + self.ses + '_run_' + str(self.run) + '_dwi_wf_biascorr.svg'),
                 'dest': os.path.join('bias-corr', '{0}_bias_correction.svg'.format(aid))
             },
             {
