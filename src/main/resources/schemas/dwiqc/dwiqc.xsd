@@ -19,16 +19,27 @@
                     <xs:element name="eddy_quad">
                         <xs:complexType>
                             <xs:sequence>
-                                <xs:element name="Average_SNR_b0" type="xs:decimal"/>
-                                <xs:element name="Average_CNR_b500" type="xs:decimal"/>
-                                <xs:element name="Average_CNR_b1000" type="xs:decimal"/>
-                                <xs:element name="Average_CNR_b2000" type="xs:decimal"/>
-                                <xs:element name="Average_CNR_b3000" type="xs:decimal"/>
                                 <xs:element name="Average_abs_motion_mm" type="xs:decimal"/>
                                 <xs:element name="Average_rel_motion_mm" type="xs:decimal"/>
                                 <xs:element name="Average_x_translation_mm" type="xs:decimal"/>
                                 <xs:element name="Average_y_translation_mm" type="xs:decimal"/>
                                 <xs:element name="Average_z_translation_mm" type="xs:decimal"/>
+                                <xs:element name="Average_SNR_b0" type="xs:decimal"/>
+                                <xs:element name="shell_cnr">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element name='cnr'>
+                                                <xs:complexType>
+                                                    <xs:simpleContent>
+                                                        <xs:extension base="xs:decimal">
+                                                            <xs:attribute name="shell" type="xs:integer"/>
+                                                        </xs:extension>
+                                                    </xs:simpleContent>
+                                                </xs:complexType>
+                                            </xs:element>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
