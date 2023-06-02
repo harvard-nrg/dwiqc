@@ -1,8 +1,8 @@
 import re
+from glob import glob
 import os
 import io
 import sys
-import glob
 import yaml
 import json
 import lxml
@@ -15,11 +15,7 @@ from bids import BIDSLayout
 
 logger = logging.getLogger(__name__)
 
-EDDY_METRICS = [
-    'Average_SNR_b0', 'Average_CNR_b500','Average_CNR_b1000', 'Average_CNR_b2000', 
-    'Average_CNR_b3000', 'Average_abs_motion_mm', 'Average_rel_motion_mm', 'Average_x_translation_mm',
-    'Average_y_translation_mm', 'Average_z_translation_mm'
-]
+
 
 
 class Report:
@@ -107,30 +103,10 @@ class Report:
             self.sub = 'sub-' + self.sub
 
         # compile a list of files to be added to xnat:out section
-
+	
         # pull images from eddy_quad output
 
         resources = [
-            {
-                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', 'eddy_results.qc', 'avg_b0.png'),
-                'dest': os.path.join('b0_avg', '{0}_preprocessed_b0.png'.format(aid))
-            },
-            {
-                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', 'eddy_results.qc', 'avg_b500.png'),
-                'dest': os.path.join('b500_avg', '{0}_preprocessed_b500.png'.format(aid))
-            },
-            {
-                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', 'eddy_results.qc', 'avg_b1000.png'),
-                'dest': os.path.join('b1000_avg', '{0}_preprocessed_b1000.png'.format(aid))
-            },
-            {
-                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', 'eddy_results.qc', 'avg_b2000.png'),
-                'dest': os.path.join('b2000_avg', '{0}_preprocessed_b2000.png'.format(aid))
-            },
-            {
-                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', 'eddy_results.qc', 'avg_b3000.png'),
-                'dest': os.path.join('b3000_avg', '{0}_preprocessed_b3000.png'.format(aid))
-            },
             {
                 'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', 'eddy_results.qc', 'qc.pdf'),
                 'dest': os.path.join('eddy_pdf', '{0}_eddy_quad_qc.pdf'.format(aid))
@@ -221,6 +197,21 @@ class Report:
                 'dest': os.path.join('coreg', '{0}_coreg.svg'.format(aid))
             }
         ]
+
+        # get all the b-shell values from eddy-quad
+        shells = list()
+        qcdir = os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', 'eddy_results.qc')
+        for filename in os.listdir(qcdir):
+            fullfile = os.path.join(qcdir, filename)
+            match = re.match('avg_b(\d+).png', filename)
+            if not match:
+                continue
+            shells.append(int(match.group(1)))
+            shell_dict = {
+                'source': fullfile,
+                'dest': os.path.join('bval-avg', '{0}_{1}'.format(aid, filename))
+            }
+            resources.append(shell_dict)
         # start building XML
         xnatns = '{%s}' % ns['xnat']
         etree.SubElement(root, xnatns + 'imageSession_ID').text = DWI_ds['experiment_id']
@@ -228,6 +219,12 @@ class Report:
         etree.SubElement(root, 'AP_fmap_scan_id').text = AP_ds['scan']
         etree.SubElement(root, 'dwi_scan_id').text = DWI_ds['scan']
         etree.SubElement(root, 'session_label').text = DWI_ds['experiment']
+
+
+        EDDY_METRICS = [
+            'Average_SNR_b0', 'Average_abs_motion_mm', 'Average_rel_motion_mm', 'Average_x_translation_mm',
+            'Average_y_translation_mm', 'Average_z_translation_mm'
+            ]
 
         # add <eddy_quad> element
         eddy_quad_elm = etree.SubElement(root, 'eddy_quad')
@@ -237,6 +234,7 @@ class Report:
             'EDDY',
             'eddy_metrics.json'
         )
+
         floatfmt = '{:.5f}'.format
         with open(fname) as fo:
             eddy = json.load(fo)
@@ -245,58 +243,19 @@ class Report:
             if isinstance(value, float):
                 value = floatfmt(value)
             etree.SubElement(eddy_quad_elm, metric).text = str(value)
-        # add <morph> element
-#        morph_elm = etree.SubElement(root, 'morph')
-#        # -- add mri_cnr data
-#        fname = os.path.join(self.dirs['morph'], 'morphometrics', 'stats', 'mri_cnr.json')
-#        with open(fname) as fo:
-#            mri_cnr = json.load(fo)
-#        etree.SubElement(morph_elm, 'mri_cnr_tot').text = floatfmt(mri_cnr['tot_cnr'])
-#        # add wm_anat_snr data
-#        fname = os.path.join(self.dirs['morph'], 'morphometrics', 'stats', 'wm_anat_snr.json')
-#        with open(fname) as fo:
-#            wm_anat_snr = json.load(fo)
-#        etree.SubElement(morph_elm, 'wm_anat_snr').text = floatfmt(wm_anat_snr['snr'])
-#        # add lh euler holes, cnr, gray/white, gray/csf
-#        fname = os.path.join(self.dirs['morph'], 'morphometrics', 'stats', 'lh.mris_euler_number.json')
-#        with open(fname) as fo:
-#            lh_euler = json.load(fo)
-#        etree.SubElement(morph_elm, 'lh_euler_holes').text = str(lh_euler['holes'])
-#        etree.SubElement(morph_elm, 'lh_cnr').text = floatfmt(mri_cnr['lh_cnr'])
-#        etree.SubElement(morph_elm, 'lh_gm_wm_cnr').text = floatfmt(mri_cnr['lh_gm_wm_cnr'])
-#        etree.SubElement(morph_elm, 'lh_gm_csf_cnr').text = floatfmt(mri_cnr['lh_gm_csf_cnr'])
-#        # add rh euler holes, cnr, gray/white, gray/csf
-#        fname = os.path.join(self.dirs['morph'], 'morphometrics', 'stats', 'rh.mris_euler_number.json')
-#        with open(fname) as fo:
-#            rh_euler = json.load(fo)
-#        etree.SubElement(morph_elm, 'rh_euler_holes').text = str(rh_euler['holes'])
-#        etree.SubElement(morph_elm, 'rh_cnr').text = floatfmt(mri_cnr['rh_cnr'])
-#        etree.SubElement(morph_elm, 'rh_gm_wm_cnr').text = floatfmt(mri_cnr['rh_gm_wm_cnr'])
-#        etree.SubElement(morph_elm, 'rh_gm_csf_cnr').text = floatfmt(mri_cnr['rh_gm_csf_cnr'])
-#        # add <vnav> element
-#        if self.dirs['vnav']:
-#            vnav_elm = etree.SubElement(root, 'vnav')
-#            # count the number of vNav transforms
-#            fname = os.path.join(self.dirs['vnav'], 'vNav_Motion.json')
-#            with open(fname) as fo:
-#                vnav = json.load(fo)
-#            n_vnav_acq = len(vnav['Transforms'])
-#            rms_per_min = vnav['MeanMotionScoreRMSPerMin']
-#            max_per_min = vnav['MeanMotionScoreMaxPerMin']
-#            moco_fail = '0'
-#            if vnav['Failed']:
-#                moco_fail = vnav['Failed']['Acquisition']
-#            T1w_protocol = self.protocol('morph')
-#            vnav_min = PROTOCOL_SETTINGS[T1w_protocol]['min']
-#            vnav_max = PROTOCOL_SETTINGS[T1w_protocol]['max']
-#            logger.info('vNav min=%s, max=%s (%s)', vnav_min, vnav_max, T1w_protocol)
-#            etree.SubElement(vnav_elm, 'vnav_min').text = str(vnav_min)
-#            etree.SubElement(vnav_elm, 'vnav_max').text = str(vnav_max)
-#            etree.SubElement(vnav_elm, 'vnav_acq_tot').text = str(n_vnav_acq)
-#            etree.SubElement(vnav_elm, 'vnav_reacq').text = str(n_vnav_acq - vnav_min)
-#            etree.SubElement(vnav_elm, 'mean_mot_rms_per_min').text = floatfmt(rms_per_min)
-#            etree.SubElement(vnav_elm, 'mean_mot_max_per_min').text = floatfmt(max_per_min)
-#            etree.SubElement(vnav_elm, 'vnav_failed').text = str(moco_fail)
+
+        shells = sorted(shells)
+        shells.pop(0)
+
+        shell_elm = etree.SubElement(eddy_quad_elm, 'shell_cnr')
+        for shell in shells:
+            metric = f"Average_CNR_b{shell}"
+            value = eddy[metric]
+            if isinstance(value, float):
+                value = floatfmt(value)
+            s = etree.SubElement(shell_elm, 'cnr')
+            s.text = str(value)
+            s.attrib['shell'] = str(shell)
 
         # write assessor to output mount location.
         xmlstr = etree.tostring(root, pretty_print=True, xml_declaration=True, encoding='UTF-8')
