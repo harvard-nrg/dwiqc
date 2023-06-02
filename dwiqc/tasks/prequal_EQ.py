@@ -99,6 +99,11 @@ class Task(tasks.BaseTask):
 		with open(f'{eddy_dir}/qc.json', 'r') as file:
 			data = json.load(file)
 
+			shells = []
+
+			for shell in data['data_unique_bvals']:
+				shells.append(shell)
+
 		## grab the needed metrics
 
 		#	****** Volume to Volume Motion ******
@@ -131,21 +136,11 @@ class Task(tasks.BaseTask):
 
 			metrics_dict["Average_SNR_b0"] = round(data['qc_cnr_avg'][0], 2)
 
-			# avg cnr (b=500)		
+			# grab all shell values from qc.json file
 
-			metrics_dict["Average_CNR_b500"] = round(data['qc_cnr_avg'][1], 2)
+			for idx, shell in enumerate(shells, start=1):
+				metrics_dict[f"Average_CNR_b{shell}"] = round(data['qc_cnr_avg'][idx], 2)
 
-			# avg cnr (b=1000)		
-
-			metrics_dict["Average_CNR_b1000"] = round(data['qc_cnr_avg'][2], 2)
-
-			# avg cnr (b=2000)		
-
-			metrics_dict["Average_CNR_b2000"] = round(data['qc_cnr_avg'][3], 2)
-
-			# avg cnr (b=3000)		
-
-			metrics_dict["Average_CNR_b3000"] = round(data['qc_cnr_avg'][4], 2)
 
 
 
