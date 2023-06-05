@@ -10,6 +10,7 @@ requires = [
     'PyBIDS',
     'executors',
     'selfie',
+    'lxml'
 ]
 
 about = dict()
