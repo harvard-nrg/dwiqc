@@ -4,11 +4,11 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 
 requires = [
-    'yaxil',
+    'yaxil>=0.9.1',
     'pyaml',
     'xnattagger',
     'PyBIDS',
-    'executors',
+    'executors==0.6a1',
     'selfie',
     'lxml'
 ]
