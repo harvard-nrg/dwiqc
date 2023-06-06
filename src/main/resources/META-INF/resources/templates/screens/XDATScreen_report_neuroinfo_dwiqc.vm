@@ -10,12 +10,11 @@
     $d.format($number)
 #end
 
-
-#set($b0_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b0_avg/$!{aid}_preprocessed_b0.png"))
-#set($b500_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b500_avg/$!{aid}_preprocessed_b500.png"))
-#set($b1000_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b1000_avg/$!{aid}_preprocessed_b1000.png"))
-#set($b2000_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b2000_avg/$!{aid}_preprocessed_b2000.png"))
-#set($b3000_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b3000_avg/$!{aid}_preprocessed_b3000.png"))
+#set($b0_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/bval-avg/$!{aid}_avg_b0.png"))
+#set($b500_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/bval-avg/$!{aid}_avg_b500.png"))
+#set($b1000_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/bval-avg/$!{aid}_avg_b1000.png"))
+#set($b2000_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/bval-avg/$!{aid}_avg_b2000.png"))
+#set($b3000_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/bval-avg/$!{aid}_avg_b3000.png"))
 #set($FA_map = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/FA_map/$!{aid}_FA.png"))
 #set($MD_map = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/MD_map/$!{aid}_MD.png"))
 #set($eddy_outlier_slices = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/eddy_outliers/$!{aid}_eddy_outlier_slices.png"))
@@ -323,6 +322,9 @@
     height: 683px;
     overflow-y: auto;
   }
+  .image-cell {
+    background-color: black;
+  }
 </style>
 
 <!-- border container -->
@@ -363,10 +365,11 @@
            <!-- <td style="padding: 3px">Prequal <span style="font-weight: bold; color: #cc00cc">&mdash;</span></td>-->
           </tr>
           <tr><td>B0 SNR:</td><td class="eddy_quad-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_SNR_b0"))</td></tr>
-          <tr><td>B500 CNR:</td><td class="eddy_quad-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_CNR_b500"))</td></tr>
-          <tr><td>B1000 CNR:</td><td class="eddy_quad-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_CNR_b1000"))</td></tr>
-          <tr><td>B2000 CNR:</td><td class="eddy_quad-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_CNR_b2000"))</td></tr>
-          <tr><td>B3000 CNR:</td><td class="eddy_quad-bar" align="right">#numberFormat($floatFormat3 $!item.getProperty("eddy_quad/Average_CNR_b3000"))</td></tr>
+          #foreach($node in $!item.getChildItems("eddy_quad/shell_cnr/cnr"))
+             #set($shell = $node.getProperty("shell"))
+             #set($cnr = $node.getProperty("cnr"))
+             <tr><td>B$!{shell} CNR:</td><td class="eddy_quad-bar" align="right">#numberFormat($floatFormat3 $!{cnr})</td></tr>
+          #end
         </table>
         <!-- motion metrics -->
         <table class="sidebox">
@@ -397,14 +400,12 @@
         <br />
         <table class="sidebox">
           <th colspan="2">Files</th>
-          <tr><td><a href="#" data-featherlight="$!{b0_avg}">B0 Average</a></td><td><a href="#" data-featherlight="$!{motion_plot}">Motion Plot</a></td></tr>
-          <tr><td><a href="#" data-featherlight="$!{b500_avg}">B500 Average</a></td><td><a href="#" data-featherlight="<object type='image/svg+xml' data='$!{brain_mask}' style='width:65vw'></object>">Brain Mask</a></td></tr>
-          <tr><td><a href="#" data-featherlight="$!{b1000_avg}">B1000 Average</a></td><td><a href="#" data-featherlight="<object type='image/svg+xml' data='$!{denoise}' style='width:65vw'></object>">Denoise</a></td></tr>
-          <tr><td><a href="#" data-featherlight="$!{b2000_avg}">B2000 Average</a></td><td><a href="#" data-featherlight="$!{carpet_plot}">Carpet Plot</a></td></tr>
-          <tr><td><a href="#" data-featherlight="$!{b3000_avg}">B3000 Average</a></td><td width="200"><a href="#" data-featherlight="<object type='image/svg+xml' data='$!{t1_registration}' style='width:65vw'></object>">T1 Registration</a></td></tr>
+          <tr><td><a href="#" data-featherlight="<object data='$!{b0_avg}' style='width:50vw'></object>">B0 Average</a></td><td><a href="#" data-featherlight="<object type='image/svg+xml' data='$!{denoise}' style='width:65vw'></object>">Denoise</a></td></tr>
+          <tr><td><a href="#" data-featherlight="<object type='image/svg+xml' data='$!{brain_mask}' style='width:65vw'></object>">Brain Mask</a></td><td><a href="#" data-featherlight="$!{motion_plot}">Motion Plot</a></td></tr> 
           <tr><td><a href="#" data-featherlight="$!{FA_map}">FA Map</a></td><td><a href="$!{prequal_pdf}" target="_blank">Prequal Report</a></td></tr>
           <tr><td><a href="#" data-featherlight="$!{MD_map}">MD Map</a></td><td><a href="$!{eddy_pdf}" target="_blank">Eddy Quad Report</a></td></tr>
           <tr><td><a href="#" data-featherlight="$!{eddy_outlier_slices}">Eddy Outlier Slices</a></td><td><a href="$!{qsiprep_pdf}" target="_blank">Qsiprep Report</a></td></tr>
+          <tr><td><a href="#" data-featherlight="<object type='image/svg+xml' data='$!{t1_registration}' style='width:65vw'></object>">T1 Registration</a></td><td><a href="#" data-featherlight="$!{carpet_plot}">Carpet Plot</a></td></tr>
         </table>
       </div>
     </td>
@@ -421,7 +422,7 @@
         </ul>
         <!-- begin images-tab -->
         <div id="images-tab" style="padding:0px; margin:2px">
-          <table id="anatqc-images-table" cellspacing="10">
+          <table id="dwiqc-images-table" cellspacing="10">
             <tr>
               <td>
                 <table class="image-box">
@@ -470,16 +471,37 @@
                   <tr>
                     <td colspan="2"><a href="#" data-featherlight="$!{eddy_outlier_slices}"><img class="tile-img-mask" src="$!{eddy_outlier_slices}"></img></a></td>
                   </tr>
-                  <tr style="height: 25px;"></tr>
+                </table>
+              </td>
+            </tr> 
+            <tr> 
+             <td>
+               <table class="image-box">
+                 <tr>
+                   <td align="left">Average Image For Each Shell</td>
+                 </tr>
+                   <td colspan="2" class="image-cell">
+                     <a href="#" data-featherlight="<object data='$!{b0_avg}' style='width:50vw'></object>"><img class="tile-img" src="$!{b0_avg}"></img></a>
+                     #foreach($node in $!item.getChildItems("eddy_quad/shell_cnr/cnr"))
+                       #set($shell = $node.getProperty("shell"))
+                       #set($cnr = $node.getProperty("cnr"))
+                       #set($b_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/bval-avg/$!{aid}_avg_b$!{shell}.png"))
+                       <a href="#" data-featherlight="<object data='$!{b_avg}' style='width:50vw'></object>"><img class="tile-img-mask" src="$!{b_avg}"></img></a>
+                     #end
+                   </td> 
+               </table>
+              <td valign="top">
+                <table class="image-box">
                   <tr>
                     <td align="left">Framewise Displacement</td>
                   </tr>
                   <tr>
-                    <td colspan="1"><a href="#" data-featherlight="$!{carpet_plot}"><img class="tile-img" src="$!{carpet_plot}"></img></a></td>
+                    <td colspan="2"><a href="#" data-featherlight="$!{carpet_plot}"><img class="tile-img" src="$!{carpet_plot}"></img></a></td>
                   </tr>
                 </table>
               </td>
-             </tr>
+             </td>
+           </tr>
           </table>
         </div>
         <!-- end images-tab -->
@@ -546,6 +568,13 @@
                   </tr>
                   <tr>
                     <td><input type="radio" name="cover" id="cover-moderate" value="Moderate"></td>
+                    <td>Moderate - clips a few slices brain</td>
+                  </tr>
+                  <tr>
+                    <td><input type="radio" name="cover" id="cover-moderate" value="Moderate"></td>
+                    <td>Moderate - clips a few slices brain</td>
+                  </tr>
+                  <tr>
                     <td>Moderate - clips a few slices brain</td>
                   </tr>
                   <tr>
@@ -807,22 +836,9 @@
               <td>14</td>
               #set($name = "${aid}_qsiprep.html")
               <td><a download="$!{name}" href="$!{qsiprep_html}">$!{name}</a></td>
-              <td>Qsiprep html Report</td>
-              <td>report/html</td>
-            </tr>
-            <tr>
-              <td>15</td>
-              #set($name = "${aid}_qsiprep.pdf")
               <td><a download="$!{name}" href="$!{qsiprep_pdf}">$!{name}</a></td>
               <td>Qsiprep pdf Report</td>
               <td>report/pdf</td>
-            </tr>
-            <tr>
-              <td>16</td>
-              #set($name = "${aid}_carpetplot.svg")
-              <td><a download="$!{name}" href="$!{carpet_plot}">$!{name}</a></td>
-              <td>Framewise Displacement Plot</td>
-              <td>image/svg</td>
             </tr>
             <tr>
               <td>17</td>
