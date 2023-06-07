@@ -157,7 +157,7 @@ class Report:
                 'dest': os.path.join('qsiprep-pdf', '{0}_qsiprep.pdf'.format(aid))
             },
             {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub + '.html'),
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub + '-imbedded_images.html'),
                 'dest': os.path.join('qsiprep-html', '{0}_qsiprep.html'.format(aid))
             },
             {
@@ -295,4 +295,5 @@ class Report:
 
 class AssessmentError(Exception):
     pass
+
 
