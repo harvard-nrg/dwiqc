@@ -4,7 +4,9 @@ import subprocess
 from lxml import etree, html
 from pathlib import Path
 import mimetypes
+import os
 logger = logging.getLogger(__name__)
+
 
 def snapshot(url, saveto):
 	proc1 = f'chromium.sif --no-sandbox --headless --print-to-pdf={saveto} {url}'
@@ -35,4 +37,5 @@ def imbed_images(infile, outfile=None):
     logger.info(f'writing {outfile}')
     with open(outfile, 'wb') as fo:
         fo.write(etree.tostring(root))
+
 
