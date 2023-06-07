@@ -92,6 +92,8 @@ def main():
         help='Output BIDS directory')
     parser_tandem.add_argument('--run', default=1, type=int,
         help='BIDS run')
+    parser_process.add_argument('--output-resolution',
+        help='Resolution of output data. Defaut is resolution of input data.')
     parser_tandem.add_argument('--partition', default='default',
         help='Job scheduler partition')
     parser_tandem.add_argument('--scheduler', default=None,
@@ -100,12 +102,10 @@ def main():
         help='Rate limit the number of tasks executed in parallel (1=serial)')
     parser_tandem.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
-    parser_tandem.add_argument('--sub-tasks', nargs='+', default=['morph', 'mriqc', 'vnav'],
+    parser_tandem.add_argument('--sub-tasks', nargs='+', default=['prequal', 'qsiprep'],
         help='Run only certain sub tasks')
     parser_tandem.add_argument('--fs-license',
         help='Base64 encoded FreeSurfer license')
-    parser_tandem.add_argument('--mock-fs', action='store_true',
-        help='Extract mocked FreeSurfer data for testing')
     parser_tandem.add_argument('--xnat-alias',
         help='YAXIL authentication alias')
     parser_tandem.add_argument('--xnat-host',
@@ -118,7 +118,7 @@ def main():
         help='Location for generated assessors and resources')
     parser_tandem.add_argument('--xnat-upload', action='store_true',
         help='Upload results to XNAT over REST API')
-    #parser_tandem.set_defaults(func=cli.tandem.do)
+    parser_tandem.set_defaults(func=cli.tandem.do)
     args = parser.parse_args()
 
 
@@ -140,6 +140,7 @@ def configure_logging(verbose):
 
 if __name__ == '__main__':
    main()
+
 
 
 

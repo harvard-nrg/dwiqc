@@ -108,6 +108,7 @@ def do(args):
         prequal_eddy(args, prequal_outdir)
         #qsiprep_eddy(args, qsiprep_outdir)
         browser.snapshot(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html", f"{qsiprep_outdir}/qsiprep/qsiprep.pdf")
+        browser.imbed_images(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html")
         if failed:
             logger.info('%s/%s jobs failed', failed, numjobs)
             for pid,job in iter(jarray.failed.items()):
@@ -173,6 +174,7 @@ def qsiprep_eddy(args, qsiprep_outdir):
 def copy_qsiprep_output(args, qsiprep_outdir):
     final_qsiprep_outdir = os.path.join(args.bids_dir, 'derivatives', 'dwiqc-qsiprep', f'sub-{args.sub}', f'ses-{args.ses}', basename, 'qsiprep_output')
     shutil.copytree(qsiprep_outdir, final_qsiprep_outdir)
+
 
 
 
