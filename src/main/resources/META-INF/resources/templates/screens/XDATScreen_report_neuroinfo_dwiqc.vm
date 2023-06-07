@@ -273,7 +273,15 @@
   .big-table tr:hover {
     background-color: #cccccc;
   }
-
+  .file-table {
+    counter-reset: row-num;
+  }
+  .file-table {
+    counter-increment: row-num;
+  }
+  .file-table tr td:first-child::before {
+    content: counter(row-num) ". ";
+  }
   .sidebox {
     border-collapse: collapse;
     width: 100%;
@@ -741,128 +749,135 @@
               <th align="left">Description</th>
               <th align="left">Type</th>
             </tr>
+            #set($count = 0)
+            #set($count = $count + 1)
             <tr>
-              <td>1</td>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_preprocessed_b0.png")
               <td><a download="$!{name}" href="$!{b0_avg}">$!{name}</a></td>
               <td>b0 Preprocessed</td>
               <td>image/png</td>
             </tr>
-            <tr>
-              <td>2</td>
-              #set($name = "${aid}_preprocessed_b500.png")
-              <td><a download="$!{name}" href="$!{b500_avg}">$!{name}</a></td>
-              <td>b500 Preprocessed</td>
+            #foreach($node in $!item.getChildItems("eddy_quad/shell_cnr/cnr"))
+              #set($shell = $node.getProperty("shell"))
+              #set($cnr = $node.getProperty("cnr"))
+              #set($b_avg = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/bval-avg/$!{aid}_avg_b$!{shell}.png"))
+              #set($name = "${aid}_preprocessed_b$!{shell}")
+              <tr>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
+              <td><a download="$!{name}" href="$!{b_avg}">$!{name}</a></td>
+              <td>b$shell Preprocessed</td>
               <td>image/png</td>
-            </tr>
+              </tr>
+            #end
             <tr>
-              <td>3</td>
-              #set($name = "${aid}_preprocessed_b1000.png")
-              <td><a download="$!{name}" href="$!{b1000_avg}">$!{name}</a></td>
-              <td>b1000 Preprocessed</td>
-              <td>image/png</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              #set($name = "${aid}_preprocessed_b2000.png")
-              <td><a download="$!{name}" href="$!{b2000_avg}">$!{name}</a></td>
-              <td>b2000 Preprocessed</td>
-              <td>image/png</td>
-            </tr>
-            <tr>
-              <td>5</td>
-              #set($name = "${aid}_preprocessed_b3000.png")
-              <td><a download="$!{name}" href="$!{b3000_avg}">$!{name}</a></td>
-              <td>b3000 Preprocessed</td>
-              <td>image/png</td>
-            </tr>
-            <tr>
-              <td>6</td>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_FA.png")
               <td><a download="$!{name}" href="$!{FA_map}">$!{name}</a></td>
               <td>FA Map</td>
               <td>image/png</td>
             </tr>
             <tr>
-              <td>7</td>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_MD.png")
               <td><a download="$!{name}" href="$!{MD_map}">$!{name}</a></td>
               <td>MD Map</td>
               <td>image/png</td>
             </tr>
             <tr>
-              <td>8</td>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_eddy_outlier_slices.png")
               <td><a download="$!{name}" href="$!{eddy_outlier_slices}">$!{name}</a></td>
               <td>Eddy Outlier Slices</td>
               <td>image/png</td>
             </tr>
             <tr>
-              <td>9</td>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_translations.png")
               <td><a download="$!{name}" href="$!{translations}">$!{name}</a></td>
               <td>Motion Translations</td>
               <td>image/png</td>
             </tr>
             <tr>
-              <td>10</td>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_rotations.png")
               <td><a download="$!{name}" href="$!{rotations}">$!{name}</a></td>
               <td>Motion Rotations</td>
               <td>image/png</td>
             </tr>
             <tr>
-              <td>11</td>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_displacements.png")
               <td><a download="$!{name}" href="$!{displacements}">$!{name}</a></td>
               <td>Motion Displacements</td>
               <td>image/png</td>
             </tr>
             <tr>
-              <td>12</td>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_prequal_qc.pdf")
               <td><a download="$!{name}" href="$!{prequal_pdf}">$!{name}</a></td>
               <td>Prequal Report</td>
               <td>report/pdf</td>
             </tr>
             <tr>
-              <td>13</td>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_eddy_quad_qc.pdf")
               <td><a download="$!{name}" href="$!{eddy_pdf}">$!{name}</a></td>
               <td>Eddy Quad Report</td>
               <td>report/pdf</td>
             </tr>
             <tr>
-              <td>14</td>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_qsiprep.html")
               <td><a download="$!{name}" href="$!{qsiprep_html}">$!{name}</a></td>
+              <td>Qsiprep HTML Report</td>
+              <td>report/html</td>
+            </tr>
+            <tr>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
+              #set($name = "${aid}_qsiprep.pdf")
               <td><a download="$!{name}" href="$!{qsiprep_pdf}">$!{name}</a></td>
-              <td>Qsiprep pdf Report</td>
+              <td>Qsiprep PDF Report</td>
               <td>report/pdf</td>
             </tr>
             <tr>
-              <td>17</td>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_t1_registration.svg")
               <td><a download="$!{name}" href="$!{t1_registration}">$!{name}</a></td>
               <td>T1 Registration</td>
               <td>image/svg</td>
             </tr>
             <tr>
-              <td>18</td>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_motion_plot.png")
               <td><a download="$!{name}" href="$!{motion_plot}">$!{name}</a></td>
               <td>Motion Plot</td>
               <td>image/png</td>
             </tr>
             <tr>
-              <td>19</td>
+              <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_seg_brainmask.svg")
               <td><a download="$!{name}" href="$!{brain_mask}">$!{name}</a></td>
               <td>Brain Mask</td>
               <td>image/svg</td>
             </tr>
             <tr>
-              <td>20</td>
+              <td>$!{count}</td>
               #set($name = "${aid}_b0-volume.nii.gz")
               <td><a download="$!{name}" href="$!{b0_volume}">$!{name}</a></td>
               <td>b0 Volume</td>
