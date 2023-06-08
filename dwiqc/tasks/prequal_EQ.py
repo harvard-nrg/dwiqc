@@ -39,7 +39,7 @@ class Task(tasks.BaseTask):
 
 		logging.info('copying dwmri.nii.gz file to EDDY dir')
 		if os.path.isfile(f'{self._outdir}/PREPROCESSED/dwmri.nii.gz'):
-			shutil.copy(f'{self._outdir}/PREPROCESSED/dwmri.nii.gz', f'{self._outdir}/EDDY/eddy_results.nii.gz')
+			shutil.copy(f'{self._outdir}/PREPROCESSED/dwmri.nii.gz', f'{self._outdir}/EDDY/{self._sub}_{self._ses}.nii.gz')
 
 		else:
 			logging.error('PREPROCESSED/dwmri.nii.gz doesn\'t exist, which likely means prequal failed. exiting.')
@@ -60,7 +60,7 @@ class Task(tasks.BaseTask):
 		-B /n/home_fasse/dasay/eddy_quad_mofication/quad_mot.py:/APPS/fsl/fslpython/envs/fslpython/lib/python3.7/site-packages/eddy_qc/QUAD/quad_mot.py \
 		/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif \
 		/APPS/fsl/bin/eddy_quad \
-		eddy_results \
+		{self._sub}_{self._ses} \
 		-idx index.txt \
 		-par acqparams.txt \
 		--mask=eddy_mask.nii.gz \
@@ -71,9 +71,9 @@ class Task(tasks.BaseTask):
 		-v"""
 
 
-		if os.path.isdir('eddy_results.qc'):
+		if os.path.isdir(f'{self._sub}_{self._ses}.qc'):
 			logging.warning('Output directory already exists. Removing and trying again.')
-			shutil.rmtree('eddy_results.qc')
+			shutil.rmtree(f'{self._sub}_{self._ses}.qc')
 
 
 		logging.info('Running eddy_quad...')
@@ -87,7 +87,7 @@ class Task(tasks.BaseTask):
 			logging.error('eddy quad threw an error. exiting.')
 			sys.exit()
 
-		eddy_results_dir = f'{self._outdir}/EDDY/eddy_results.qc'
+		eddy_results_dir = f'{self._outdir}/EDDY/{self._sub}_{self._ses}.qc'
 
 		self.parse_json(eddy_results_dir)
 
@@ -158,5 +158,6 @@ class Task(tasks.BaseTask):
 		extract_command = "fslselectvols -i dwmri.nii.gz -o b0_volume --vols=0"
 		proc1 = subprocess.Popen(extract_command, shell=True, stdout=subprocess.PIPE)
 		proc1.communicate()
+
 
 
