@@ -40,7 +40,7 @@ def do(args):
 
     # config file under anatqc/config/anatqc.yaml
 
-    # query T1w and vNav scans from XNAT
+    # query DWI, T1 and fieldmap scans from XNAT
     with yaxil.session(auth) as ses:
         scans = col.defaultdict(dict)
         for scan in ses.scans(label=args.label, project=args.project):
@@ -102,3 +102,4 @@ def match(note, patterns):
         if m:
             return m
     return None
+
