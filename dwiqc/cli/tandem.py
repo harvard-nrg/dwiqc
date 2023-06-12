@@ -94,8 +94,8 @@ def do(args):
         args.run = int(run)
         bids_ses_label = yaxil.bids.legal.sub('', args.label)
         bids_sub_label = yaxil.bids.legal.sub('', subject_label)
-        args.sub = 'sub-' + bids_sub_label
-        args.ses = 'ses-' + bids_ses_label
+        args.sub = bids_sub_label
+        args.ses = bids_ses_label
         logger.debug('sub=%s, ses=%s', args.sub, args.ses)
         process.do(args)
 
