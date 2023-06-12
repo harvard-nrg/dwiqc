@@ -69,6 +69,8 @@ def do(args):
                 run = re.sub('[^0-9]', '', run or '1')
                 scans[run]['anat'] = scan['id']
 
+    subject_label = scan['subject_label']
+
 
     logger.info(json.dumps(scans, indent=2))
 
@@ -104,4 +106,5 @@ def match(note, patterns):
         if m:
             return m
     return None
+
 
