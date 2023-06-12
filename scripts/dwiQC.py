@@ -60,7 +60,7 @@ def main():
         help='BIDS run')
     parser_process.add_argument('--bids-dir', required=True,
         help='BIDS root directory')
-    parser_process.add_argument('--output-resolution',
+    parser_process.add_argument('--output-resolution-process',
         help='Resolution of output data. Defaut is resolution of input data.')
     parser_process.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
@@ -140,6 +140,7 @@ def configure_logging(verbose):
 
 if __name__ == '__main__':
    main()
+
 
 
 
