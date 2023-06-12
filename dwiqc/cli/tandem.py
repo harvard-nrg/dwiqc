@@ -12,6 +12,8 @@ from xnattagger import Tagger
 from bids import BIDSLayout
 import dwiqc.cli.get as get
 import dwiqc.cli.process as process
+import collections as col
+import yaxil.bids
 
 
 logger = logging.getLogger(__name__)
