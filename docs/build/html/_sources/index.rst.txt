@@ -9,7 +9,7 @@ Welcome to DWIQC's documentation!
 .. _QSIPREP: https://doi.org/10.1038/s41592-021-01185-5 
 .. _XNAT: https://doi.org/10.1385/NI:5:1:11
 
-DWIQC is a diffusion MRI quality control pipeline built on the `Prequal`_ and `QSIPREP`_ software packages. Working closely with neuroimaging experts, we designed an ergonomic user interface for the `XNAT`_ informatics and data management platform that allows users to quickly assess image quality and use those insights to get ahead of issues within the data acquisition workflow.
+DWIQC is a diffusion MRI quality control pipeline built on the `Prequal` and `QSIPREP` software packages. Working closely with neuroimaging experts, we designed an ergonomic user interface for the `_XNAT` informatics and data management platform that allows users to quickly assess image quality and use those insights to get ahead of issues within the data acquisition workflow.
 
 
 .. image:: images/logo.png

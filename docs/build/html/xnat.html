@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XNAT user documentation &mdash; DWIQC  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Developer documentation" href="developers.html" />
+    <link rel="prev" title="Welcome to DWIQC’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            DWIQC
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">XNAT user documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tagging-your-scans">Tagging your scans</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-pipeline">Running the pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#run">run</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#subtasks">subtasks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fslicense">fslicense</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#understanding-the-report-page">Understanding the report page</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#left-pane">Left pane</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qc-metrics">QC Metrics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hemispheres">Hemispheres</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">vNav</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#files">Files</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#tabs">Tabs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#images">Images</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mriqc-report-tab">MRIQC Report tab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mriqc-iqms">MRIQC IQMs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#all-stored-files">All Stored Files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Developer documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DWIQC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">XNAT user documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/xnat.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="xnat-user-documentation">
+<h1>XNAT user documentation<a class="headerlink" href="#xnat-user-documentation" title="Permalink to this heading"></a></h1>
+<section id="tagging-your-scans">
+<h2>Tagging your scans<a class="headerlink" href="#tagging-your-scans" title="Permalink to this heading"></a></h2>
+<p>For AnatQC to discover <a class="reference external" href="https://tinyurl.com/hhru8ytz">T1w</a> and <a class="reference external" href="https://doi.org/10.1002/mrm.23228">vNav</a> scans to process, you need to add notes to those scans in <a class="reference external" href="https://doi.org/10.1385/NI:5:1:11">XNAT</a>. You can add notes using the <code class="docutils literal notranslate"><span class="pre">Edit</span></code> button located within the <code class="docutils literal notranslate"><span class="pre">Actions</span></code> box on the MR Session report page</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Type</p></th>
+<th class="head"><p>Example series</p></th>
+<th class="head"><p>Note</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://tinyurl.com/hhru8ytz">T1w</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ABCD_T1w_MPR_vNav</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">#T1w_001,</span> <span class="pre">#T1w_002,</span> <span class="pre">...,</span> <span class="pre">#T1w_N</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://doi.org/10.1002/mrm.23228">vNav</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ABCD_T1w_MPR_vNav_setter</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">#T1w_move_001,</span> <span class="pre">#T1w_move_002,</span> <span class="pre">...,</span> <span class="pre">#T1w_move_N</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>The image below displays an MR Session report page with populated notes</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that if a <code class="docutils literal notranslate"><span class="pre">T1w</span></code> scan has a corresponding <code class="docutils literal notranslate"><span class="pre">vNav</span></code> scan, they should be assigned matching numbers. For example, <code class="docutils literal notranslate"><span class="pre">#T1w_move_001</span></code> would correspond to <code class="docutils literal notranslate"><span class="pre">#T1w_001</span></code>.</p>
+</div>
+<img alt="images/xnat-scan-notes.png" src="images/xnat-scan-notes.png" />
+</section>
+<section id="running-the-pipeline">
+<h2>Running the pipeline<a class="headerlink" href="#running-the-pipeline" title="Permalink to this heading"></a></h2>
+<p>To run the AnatQC pipeline, use the <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">Containers</span> <span class="pre">&gt;</span> <span class="pre">anatqc-session</span></code> button located within the <code class="docutils literal notranslate"><span class="pre">Actions</span></code> box on the MR Session report page</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you don’t see the <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">Containers</span></code> menu, please refer to <a class="reference external" href="developers.html#setting-up-the-container">Setting up the container</a>.</p>
+</div>
+<img alt="images/xnat-run-button.png" src="images/xnat-run-button.png" />
+<p>This should bring up a small form with several configurable settings. Continue reading for a description of each setting</p>
+<img alt="images/xnat-container-form.png" src="images/xnat-container-form.png" />
+<section id="run">
+<h3>run<a class="headerlink" href="#run" title="Permalink to this heading"></a></h3>
+<p>This should be set to the integer value of the scan you want to process. If there’s a corresponding <code class="docutils literal notranslate"><span class="pre">move</span></code> scan, that scan will also be processed</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>T1w scan</p></th>
+<th class="head"><p>run</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">#T1w_001</span></code></p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">#T1w_002</span></code></p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">#T1w_999</span></code></p></td>
+<td><p>999</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="subtasks">
+<h3>subtasks<a class="headerlink" href="#subtasks" title="Permalink to this heading"></a></h3>
+<p>Under most circumstances you’ll want to leave this field set to its default value</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">morph</span> <span class="n">mriqc</span> <span class="n">vnav</span>
+</pre></div>
+</div>
+</section>
+<section id="fslicense">
+<h3>fslicense<a class="headerlink" href="#fslicense" title="Permalink to this heading"></a></h3>
+<p>This field should be set to a base64 encoded <a class="reference external" href="https://surfer.nmr.mgh.harvard.edu/registration.html">FreeSurfer license</a>. If you have a license file on a Linux or macOS machine, you can use the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> command</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openssl</span> <span class="n">base64</span> <span class="o">&lt;</span> <span class="n">license</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<p>or you can use the <code class="docutils literal notranslate"><span class="pre">base64</span></code> command, if that utility is installed</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">base64</span> <span class="n">license</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="understanding-the-report-page">
+<h2>Understanding the report page<a class="headerlink" href="#understanding-the-report-page" title="Permalink to this heading"></a></h2>
+<p>The following section will break down each section of the AnatQC report page.</p>
+<img alt="images/xnat-aqc-home.png" src="images/xnat-aqc-home.png" />
+<section id="left-pane">
+<h3>Left pane<a class="headerlink" href="#left-pane" title="Permalink to this heading"></a></h3>
+<p>The left pane is broken up into several distinct sections. Each section will be described below.</p>
+<section id="summary">
+<h4>Summary<a class="headerlink" href="#summary" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">Summary</span></code> pane orients the user to what MR Session they’re currently looking at and various processing details</p>
+<img alt="images/xnat-aqc-left-summary.png" src="images/xnat-aqc-left-summary.png" />
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>MR Session</p></td>
+<td><p>MR Session label</p></td>
+</tr>
+<tr class="row-odd"><td><p>Date Processed</p></td>
+<td><p>Processing date</p></td>
+</tr>
+<tr class="row-even"><td><p>T1w scan</p></td>
+<td><p>T1-weighted scan used</p></td>
+</tr>
+<tr class="row-odd"><td><p>vNav scan</p></td>
+<td><p>vNav setter scan used (if present)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="qc-metrics">
+<h4>QC Metrics<a class="headerlink" href="#qc-metrics" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">QC</span> <span class="pre">Metrics</span></code> pane displays quality control metrics computed <em>over the entire volume</em></p>
+<img alt="images/xnat-aqc-left-qcmetrics.png" src="images/xnat-aqc-left-qcmetrics.png" />
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Metric</p></th>
+<th class="head"><p>From</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://mriqc.readthedocs.io/en/latest/iqms/t1w.html">SNR Tot</a></p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1371/journal.pone.0184661">MRIQC</a></p></td>
+<td><p>Signal-to-noise ratio</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://mriqc.readthedocs.io/en/latest/iqms/t1w.html">EFC</a></p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1371/journal.pone.0184661">MRIQC</a></p></td>
+<td><p><a class="reference external" href="http://dx.doi.org/10.1109/42.650886">Entropy Focus Criterion</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://mriqc.readthedocs.io/en/latest/iqms/t1w.html">FWHM Avg</a></p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1371/journal.pone.0184661">MRIQC</a></p></td>
+<td><p>FWHM of spatial distribution of voxel intensities</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://mriqc.readthedocs.io/en/latest/iqms/t1w.html">GM SNR</a></p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1371/journal.pone.0184661">MRIQC</a></p></td>
+<td><p>Gray matter signal-to-noise ratio</p></td>
+</tr>
+<tr class="row-even"><td><p>WM SNR</p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1016/j.neuroimage.2012.01.021">FreeSurfer</a></p></td>
+<td><p>White matter signal-to-noise ratio</p></td>
+</tr>
+<tr class="row-odd"><td><p>CNR</p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1016/j.neuroimage.2012.01.021">FreeSurfer</a></p></td>
+<td><p>Contrast-to-noise ratio</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="hemispheres">
+<h4>Hemispheres<a class="headerlink" href="#hemispheres" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">Hemispheres</span></code> pane displays quality control metrics computed <em>over each hemisphere</em></p>
+<img alt="images/xnat-aqc-left-hemis.png" src="images/xnat-aqc-left-hemis.png" />
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Metric</p></th>
+<th class="head"><p>From</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://surfer.nmr.mgh.harvard.edu/fswiki/mris_euler_number">Euler Holes</a></p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1016/j.neuroimage.2012.01.021">FreeSurfer</a></p></td>
+<td><p>Estimate of the number of surface defects</p></td>
+</tr>
+<tr class="row-odd"><td><p>CNR</p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1016/j.neuroimage.2012.01.021">FreeSurfer</a></p></td>
+<td><p>Global contrast-to-noise ratio</p></td>
+</tr>
+<tr class="row-even"><td><p>G/W CNR</p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1016/j.neuroimage.2012.01.021">FreeSurfer</a></p></td>
+<td><p>Gray and white matter contrast-to-noise ratio</p></td>
+</tr>
+<tr class="row-odd"><td><p>G/CSF CNR</p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1016/j.neuroimage.2012.01.021">FreeSurfer</a></p></td>
+<td><p>Gray matter and cerebrospinal fluid contrast-to-noise ratio</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="id1">
+<h4>vNav<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">vNav</span></code> pane displays vNav specific quality control metrics, but <em>only</em> if a vNav scan was processed</p>
+<img alt="images/xnat-aqc-left-vnav.png" src="images/xnat-aqc-left-vnav.png" />
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Metric</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Settings</p></td>
+<td><p>Minimum and maximum number of navigators allowed</p></td>
+</tr>
+<tr class="row-odd"><td><p>Motion Score RMS</p></td>
+<td><p>Root mean square of motion scores</p></td>
+</tr>
+<tr class="row-even"><td><p>Motion Score Max</p></td>
+<td><p>Maximum motion score</p></td>
+</tr>
+<tr class="row-odd"><td><p>vNav Acq</p></td>
+<td><p>Total number of navigators collected</p></td>
+</tr>
+<tr class="row-even"><td><p>Failed</p></td>
+<td><p>vNav failure detected</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="files">
+<h4>Files<a class="headerlink" href="#files" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">Files</span></code> pane contains the most commonly requested files. Clicking on any of these files will display that file in the browser</p>
+<img alt="images/xnat-aqc-left-files.png" src="images/xnat-aqc-left-files.png" />
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>T1w axial</p></td>
+<td><p>T1-weighted image, axial plane</p></td>
+</tr>
+<tr class="row-odd"><td><p>Surfaces axial</p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1016/j.neuroimage.2012.01.021">FreeSurfer</a> surface boundaries, axial plane</p></td>
+</tr>
+<tr class="row-even"><td><p>Segmentation axial</p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1016/j.neuroimage.2012.01.021">FreeSurfer</a> segmentations, axial plane</p></td>
+</tr>
+<tr class="row-odd"><td><p>Brainmask axial</p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1016/j.neuroimage.2012.01.021">FreeSurfer</a> brain mask, axial plane</p></td>
+</tr>
+<tr class="row-even"><td><p>vNav Motion Scores RMS</p></td>
+<td><p>vNav motion scores RMS plot</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cortical Laterality</p></td>
+<td><p>Cortical region volume laterality plot</p></td>
+</tr>
+<tr class="row-even"><td><p>Subcortical Laterality</p></td>
+<td><p>Subcortical region volume laterality plot</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://doi.org/10.1371/journal.pone.0184661">MRIQC</a> Report</p></td>
+<td><p><a class="reference external" href="https://doi.org/10.1371/journal.pone.0184661">MRIQC</a> HTML report</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="tabs">
+<h3>Tabs<a class="headerlink" href="#tabs" title="Permalink to this heading"></a></h3>
+<p>To the right of the <a class="reference external" href="#left-pane">left pane</a> you’ll find a tab container. The following section explains the contents of each tab.</p>
+<section id="images">
+<h4>Images<a class="headerlink" href="#images" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">Images</span></code> tab displays a zoomed out view of the T1-weighted image, <a class="reference external" href="https://doi.org/10.1016/j.neuroimage.2012.01.021">FreeSurfer</a> surface boundaries, <a class="reference external" href="https://doi.org/10.1016/j.neuroimage.2012.01.021">FreeSurfer</a> segmentations, and vNav RMS motion scores</p>
+<img alt="images/xnat-aqc-images-tab.png" src="images/xnat-aqc-images-tab.png" />
+<p>Clicking on an image within the <code class="docutils literal notranslate"><span class="pre">Images</span></code> tab will display a larger version of that image in the browser</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>AnatQC automatically crops and centers each brain slice for improved visibility. For this reason, slices will often appear larger than their native size.</p>
+</div>
+<img alt="images/xnat-aqc-surf.png" src="images/xnat-aqc-surf.png" />
+</section>
+<section id="mriqc-report-tab">
+<h4>MRIQC Report tab<a class="headerlink" href="#mriqc-report-tab" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">MRIQC</span> <span class="pre">Report</span></code> tab displays the complete MRIQC HTML report</p>
+<img alt="images/xnat-aqc-mriqc-tab.png" src="images/xnat-aqc-mriqc-tab.png" />
+</section>
+<section id="mriqc-iqms">
+<h4>MRIQC IQMs<a class="headerlink" href="#mriqc-iqms" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">MRIQC</span> <span class="pre">IQMs</span></code> tab displays all of the MRIQC <a class="reference external" href="https://mriqc.readthedocs.io/en/latest/iqms/t1w.html">Image Quality Metrics</a>.
+These metrics can also be found within the MRIQC HTML Report</p>
+<img alt="images/xnat-aqc-iqms-tab.png" src="images/xnat-aqc-iqms-tab.png" />
+</section>
+<section id="all-stored-files">
+<h4>All Stored Files<a class="headerlink" href="#all-stored-files" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">All</span> <span class="pre">Stored</span> <span class="pre">Files</span></code> tab contains a list of <em>every file</em> stored by AnatQC</p>
+<img alt="images/xnat-aqc-files-tab.png" src="images/xnat-aqc-files-tab.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Clicking on a file within the <code class="docutils literal notranslate"><span class="pre">All</span> <span class="pre">Stored</span> <span class="pre">Files</span></code> tab will download that file.</p>
+</div>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">*_AQC_T1w_axial.png</span></code></p></td>
+<td><p>T1-weighted image, axial plane</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">*_AQC_aseg_axial.png</span></code></p></td>
+<td><p>FreeSurfer segmentations, axial plane</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">*_AQC_brainmask_axial.png</span></code></p></td>
+<td><p>FreeSurfer brain mask image, axial plane</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">*_AQC_surface_axial.png</span></code></p></td>
+<td><p>FreeSurfer surface boundaries, axial plane</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">*_AQC_aparc_laterality.png</span></code></p></td>
+<td><p>FreeSurfer parcellation laterality plot</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">*_AQC_aseg_laterality.png</span></code></p></td>
+<td><p>FreeSurfer segmentation laterality plot</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">*_AQC_mriqc.html</span></code></p></td>
+<td><p>MRIQC HTML report</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">*_AQC_freesurfer.tar.gz</span></code></p></td>
+<td><p>FreeSurfer results</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">*_AQC_vNav_Motion.json</span></code></p></td>
+<td><p>vNav processing output</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">*_AQC_vNavMotionScoresMax.png</span></code></p></td>
+<td><p>vNav motion max plot</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">*_AQC_vNavMotionScoresRMS.png</span></code></p></td>
+<td><p>vNav motion RMS plot</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to DWIQC’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="developers.html" class="btn btn-neutral float-right" title="Developer documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, info@neuroinfo.org.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
