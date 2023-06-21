@@ -56,6 +56,15 @@ class Task(tasks.BaseTask):
 			sys.exit()
 
 
+		# rename all the eddy_results files to be {self._sub}_{self._ses}
+
+		for file in os.listdir():
+			if file.startswith("eddy_results"):
+				new_name = file.replace("eddy_results", f"{self._sub}_{self._ses}")
+				os.rename(file, new_name)
+
+
+
 		eddy_quad = f"""singularity exec \
 		-B /n/home_fasse/dasay/eddy_quad_mofication/quad_mot.py:/APPS/fsl/fslpython/envs/fslpython/lib/python3.7/site-packages/eddy_qc/QUAD/quad_mot.py \
 		/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif \
