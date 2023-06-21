@@ -17,16 +17,17 @@ XNAT user documentation
 
 Tagging your scans
 ------------------
-For AnatQC to discover `T1w`_ and `vNav`_ scans to process, you need to add notes to those scans in `XNAT`_. You can add notes using the ``Edit`` button located within the ``Actions`` box on the MR Session report page
+For DWIQC to discover Diffusion and Fieldmap scans to process, you need to add notes to those scans in `XNAT`_. You can add notes using the ``Edit`` button located within the ``Actions`` box on the MR Session report page.
 
 ========= ============================ ==================================================
 Type      Example series               Note
 ========= ============================ ==================================================
-`T1w`_    ``ABCD_T1w_MPR_vNav``        ``#T1w_001, #T1w_002, ..., #T1w_N``
-`vNav`_   ``ABCD_T1w_MPR_vNav_setter`` ``#T1w_move_001, #T1w_move_002, ..., #T1w_move_N``
+DWI     ``UKbioDiff_ABCDseq_ABCDdvs``    ``#DWI_MAIN_001, #DWI_MAIN_002, ..., #DWI_MAIN_N``
+PA_FMAP ``UKbioDiff_ABCDseq_DistMap_PA`` ``#DWI_FMAP_PA_001, #DWI_FMAP_PA_002, ..., #DWI_FMAP_PA_N``
+AP_FMAP ``UKbioDiff_ABCDseq_DistMap_AP`` ``#DWI_FMAP_AP_001, #DWI_FMAP_AP_002, ..., #DWI_FMAP_AP_N``
 ========= ============================ ==================================================
 
-The image below displays an MR Session report page with populated notes
+The image below displays an MR Session report page with populated notes.
 
 .. note::
    Note that if a ``T1w`` scan has a corresponding ``vNav`` scan, they should be assigned matching numbers. For example, ``#T1w_move_001`` would correspond to ``#T1w_001``.
@@ -150,7 +151,7 @@ Failed           vNav failure detected
 
 Files
 """""
-The ``Files`` pane contains the most commonly requested files. Clicking on any of these files will display that file in the browser
+The ``Files`` pane contains the most commonly requested files. Clicking on any of these files will display that file in the browser.
 
 .. image:: images/xnat-aqc-left-files.png
 
@@ -173,35 +174,40 @@ To the right of the `left pane <#left-pane>`_ you'll find a tab container. The f
 
 Images
 """"""
-The ``Images`` tab displays a zoomed out view of the T1-weighted image, `FreeSurfer`_ surface boundaries, `FreeSurfer`_ segmentations, and vNav RMS motion scores
+The ``Images`` tab displays a zoomed out view of the FA and MD image maps, motion plots, brain mask, motion outlier slices, average shell images and a maximum framewise displacement plot
 
-.. image:: images/xnat-aqc-images-tab.png
+.. image:: images/logo.png
 
 Clicking on an image within the ``Images`` tab will display a larger version of that image in the browser
 
 .. note:: 
-   AnatQC automatically crops and centers each brain slice for improved visibility. For this reason, slices will often appear larger than their native size.
+   DWIQC automatically crops and centers each brain slice for improved visibility. For this reason, slices will often appear larger than their native size.
 
 .. image:: images/xnat-aqc-surf.png
 
-MRIQC Report tab
+Prequal Report tab
 """"""""""""""""
-The ``MRIQC Report`` tab displays the complete MRIQC HTML report
+The ``Prequal Report`` tab displays the complete MRIQC HTML report
 
-.. image:: images/xnat-aqc-mriqc-tab.png
+.. image:: images/prequal-tab.png
 
-MRIQC IQMs
+Eddy Quad Report Tab
 """"""""""
-The ``MRIQC IQMs`` tab displays all of the MRIQC `Image Quality Metrics`_. 
-These metrics can also be found within the MRIQC HTML Report
+The ``Eddy Quad Report`` tab displays key metrics and figures from the FSL Eddy command 
 
-.. image:: images/xnat-aqc-iqms-tab.png
+.. image:: images/eddy-quad-tab.png
+
+Qsiprep Report Tab
+""""""""""
+The ``Qsiprep Report`` tab displays the complete Qsiprep HTML report
+
+.. image:: images/qsiprep-tab.png
 
 All Stored Files
 """"""""""""""""
-The ``All Stored Files`` tab contains a list of *every file* stored by AnatQC
+The ``All Stored Files`` tab contains a list of *every file* stored by DWIQC
 
-.. image:: images/xnat-aqc-files-tab.png
+.. image:: images/all-stored-files-tab.png
 
 .. note::
    Clicking on a file within the ``All Stored Files`` tab will download that file.
