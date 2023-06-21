@@ -36,7 +36,7 @@ class Task(tasks.BaseTask):
 		try:
 			os.makedirs(inputs_dir)
 		except FileExistsError:
-			os.makedirs(inputs_dir)
+			continue
 		#layout = BIDSLayout(self._bids) # load the data layout into pybids
 		all_files = self._layout.get(subject=self._sub, session=self._ses, run=self._run, return_type='filename') # get a list of all of the subject's files
 		# copy the all the subject's files into the INPUTS directory
@@ -271,7 +271,6 @@ class Task(tasks.BaseTask):
 
 	def build(self):
 		self.add_intended_for()
-		os.system('mkdir -p $TMPDIR')
 		self._tempdir = tempfile.gettempdir()
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
@@ -396,6 +395,7 @@ class Task(tasks.BaseTask):
 
 class DWISpecError(Exception):
 	pass
+
 
 
 

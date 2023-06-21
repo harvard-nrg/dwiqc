@@ -57,6 +57,8 @@ def do(args):
    
     #logger.debug('DWI raw: %s', raw)
 
+    os.system('mkdir -p $TMPDIR')
+
 
     # prequal job
     prequal_outdir = None
@@ -174,6 +176,7 @@ def qsiprep_eddy(args, qsiprep_outdir):
 def copy_qsiprep_output(args, qsiprep_outdir):
     final_qsiprep_outdir = os.path.join(args.bids_dir, 'derivatives', 'dwiqc-qsiprep', f'sub-{args.sub}', f'ses-{args.ses}', basename, 'qsiprep_output')
     shutil.copytree(qsiprep_outdir, final_qsiprep_outdir)
+
 
 
 
