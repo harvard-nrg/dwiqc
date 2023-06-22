@@ -115,55 +115,50 @@ B0 SNR      Eddy Quad (Prequal/FSL) Signal-to-noise ratio for B0 Shell
 BN CNR      Eddy Quad (Prequal/FSL) Contrast-to-noise ratio for each shell
 =========== ======================= =================================================
 
+.. note::
+      Anywhere you see "Eddy Quad (Prequal/FSL)" means that FSL's Eddy Quad tool was run on Prequal output.
+
 Motion Metrics
 """""""""""
 The ``Motion Metrics`` pane displays motion metrics computed over dwi scan(s).
 
 .. image:: images/xnat-acq-left-motion.png
 
-============== ============= ===========================================================
-Metric         From          Description
-============== ============= ===========================================================
-Avg Abs Motion `FreeSurfer`_ Estimate of the number of surface defects
-CNR            `FreeSurfer`_ Global contrast-to-noise ratio
-G/W CNR        `FreeSurfer`_ Gray and white matter contrast-to-noise ratio
-G/CSF CNR      `FreeSurfer`_ Gray matter and cerebrospinal fluid contrast-to-noise ratio
-============== ============= ===========================================================
-
-vNav
-""""
-The ``vNav`` pane displays vNav specific quality control metrics, but *only* if a vNav scan was processed
-
-.. image:: images/xnat-aqc-left-vnav.png
-
-================ ==================================================
-Metric           Description
-================ ==================================================
-Settings         Minimum and maximum number of navigators allowed
-Motion Score RMS Root mean square of motion scores
-Motion Score Max Maximum motion score
-vNav Acq         Total number of navigators collected
-Failed           vNav failure detected
-================ ==================================================
+================= ======================= ===========================================================
+Metric            From                    Description
+================= ======================= ===========================================================
+Avg Abs Motion    Eddy Quad (Prequal/FSL) Estimated amount of all motion in any direction
+Avg Rel Motion    Eddy Quad (Prequal/FSL) Estimated amount of motion relative to start of scan(s)
+Avg X Translation Eddy Quad (Prequal/FSL) Estimated X translation direction motion
+Avg Y Translation Eddy Quad (Prequal/FSL) Estimated Y translation direction motion
+Avg Z Translation Eddy Quad (Prequal/FSL) Estimated Z translation direction motion
+================= ======================= ===========================================================
 
 Files
 """""
 The ``Files`` pane contains the most commonly requested files. Clicking on any of these files will display that file in the browser.
 
-.. image:: images/xnat-aqc-left-files.png
+.. image:: images/xnat-acq-left-files.png
 
-======================= =================================================
-File                    Description
-======================= =================================================
-T1w axial               T1-weighted image, axial plane
-Surfaces axial          `FreeSurfer`_ surface boundaries, axial plane
-Segmentation axial      `FreeSurfer`_ segmentations, axial plane
-Brainmask axial         `FreeSurfer`_ brain mask, axial plane
-vNav Motion Scores RMS  vNav motion scores RMS plot
-Cortical Laterality     Cortical region volume laterality plot
-Subcortical Laterality  Subcortical region volume laterality plot
-`MRIQC`_ Report         `MRIQC`_ HTML report
-======================= =================================================
+======================= ======================= ======================================================
+File                    From                    Description
+======================= ======================= ======================================================
+B0 Average              Eddy Quad (Prequal/FSL) BO Shell Average Image
+Brain Mask              Qsiprep                 Gray Matter, White Matter and Pial Boundaries
+FA Map                  Prequal                 Fractional Anisotropy Map
+MD Map                  Prequal                 Mean Diffusivity Map
+Eddy Outlier Sices      Prequal                 Plot of Slices with Motion Outliers
+T1 Registration         Qsiprep                 GIF of T1w image to Template Registration
+Denoise                 Qsiprep                 GIF of DWI Image Pre and Post Denoising
+Motion Plot             Eddy Quad (Prequal/FSL) Translational and rotational motion, displacement
+Prequal Report          Prequal                 Prequal PDF Report
+Eddy Quad Report        Eddy Quad (Prequal/FSL) Eddy Quad PDF Report
+Qsiprep Report          Qsiprep                 Qsiprep HTML Report
+Carpet Plot             Qsiprep                 Maximum Framewise Displacement Plot
+======================= ======================= ======================================================
+
+.. note:: 
+      Clicking on any of the ``Report`` files will open the complete report in a new tab in your browser for viewing. You can also download them from the new tab.
 
 Tabs
 ^^^^
@@ -184,7 +179,7 @@ Clicking on an image within the ``Images`` tab will display a larger version of 
 
 Prequal Report tab
 """"""""""""""""
-The ``Prequal Report`` tab displays the complete MRIQC HTML report
+The ``Prequal Report`` tab displays the complete Prequal PDF report.
 
 .. image:: images/prequal-tab.png
 
