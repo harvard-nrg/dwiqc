@@ -200,7 +200,8 @@ class Report:
 
         # get all the b-shell values from eddy-quad
         shells = list()
-        qcdir = os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{self.sub}_{self.ses}.qc')
+        no_prefix_sub = f"{self.sub[3:]}"
+        qcdir = os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{no_prefix_sub}_{self.ses}.qc')
         for filename in os.listdir(qcdir):
             fullfile = os.path.join(qcdir, filename)
             match = re.match('avg_b(\d+).png', filename)

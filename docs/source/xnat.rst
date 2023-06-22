@@ -166,16 +166,13 @@ To the right of the `left pane <#left-pane>`_ you'll find a tab container. The f
 
 Images
 """"""
-The ``Images`` tab displays a zoomed out view of the FA and MD image maps, motion plots, brain mask, motion outlier slices, average shell images and a maximum framewise displacement plot
+The ``Images`` tab displays a zoomed out view of the FA and MD image maps, motion plots, brain mask, motion outlier slices, average shell images and a maximum framewise displacement plot.
 
 .. image:: images/logo.png
 
-Clicking on an image within the ``Images`` tab will display a larger version of that image in the browser
+Clicking on an image within the ``Images`` tab will display a larger version of that image in the browser.
 
-.. note:: 
-   DWIQC automatically crops and centers each brain slice for improved visibility. For this reason, slices will often appear larger than their native size.
-
-.. image:: images/xnat-aqc-surf.png
+.. image:: images/motion-plot.png
 
 Prequal Report tab
 """"""""""""""""
@@ -185,19 +182,19 @@ The ``Prequal Report`` tab displays the complete Prequal PDF report.
 
 Eddy Quad Report Tab
 """"""""""
-The ``Eddy Quad Report`` tab displays key metrics and figures from the FSL Eddy command 
+The ``Eddy Quad Report`` tab displays key metrics and figures from the FSL Eddy command. 
 
 .. image:: images/eddy-quad-tab.png
 
 Qsiprep Report Tab
 """"""""""
-The ``Qsiprep Report`` tab displays the complete Qsiprep HTML report
+The ``Qsiprep Report`` tab displays the complete Qsiprep HTML report.
 
 .. image:: images/qsiprep-tab.png
 
 All Stored Files
 """"""""""""""""
-The ``All Stored Files`` tab contains a list of *every file* stored by DWIQC
+The ``All Stored Files`` tab contains a list of *every file* stored by DWIQC.
 
 .. image:: images/all-stored-files-tab.png
 
@@ -207,15 +204,11 @@ The ``All Stored Files`` tab contains a list of *every file* stored by DWIQC
 ================================= ==========================================
 File                              Description
 ================================= ==========================================
-``*_AQC_T1w_axial.png``           T1-weighted image, axial plane
-``*_AQC_aseg_axial.png``          FreeSurfer segmentations, axial plane
-``*_AQC_brainmask_axial.png``     FreeSurfer brain mask image, axial plane
-``*_AQC_surface_axial.png``       FreeSurfer surface boundaries, axial plane
-``*_AQC_aparc_laterality.png``    FreeSurfer parcellation laterality plot
-``*_AQC_aseg_laterality.png``     FreeSurfer segmentation laterality plot
-``*_AQC_mriqc.html``              MRIQC HTML report
-``*_AQC_freesurfer.tar.gz``       FreeSurfer results
-``*_AQC_vNav_Motion.json``        vNav processing output
-``*_AQC_vNavMotionScoresMax.png`` vNav motion max plot
-``*_AQC_vNavMotionScoresRMS.png`` vNav motion RMS plot
+B0 Image                          B0 Volume/Shell
+BN Images                         Images from Each Shell
+FA Map                            Fractional Anisotropy Map
+MD Map                            Mead Diffusivity Map
+Eddy Outlier Slices               Plot of Slices with Motion Outliers
+Motion Translations               
+T1 Registration                   GIF of T1w image to Template Registration
 ================================= ==========================================
