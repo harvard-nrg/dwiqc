@@ -108,7 +108,7 @@ class Report:
 
         resources = [
             {
-                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{self._sub}_{self._ses}', 'qc.pdf'),
+                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{self.sub}_{self.ses}', 'qc.pdf'),
                 'dest': os.path.join('eddy_pdf', '{0}_eddy_quad_qc.pdf'.format(aid))
             },
             {
@@ -200,7 +200,7 @@ class Report:
 
         # get all the b-shell values from eddy-quad
         shells = list()
-        qcdir = os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{self._sub}_{self._ses}.qc')
+        qcdir = os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{self.sub}_{self.ses}.qc')
         for filename in os.listdir(qcdir):
             fullfile = os.path.join(qcdir, filename)
             match = re.match('avg_b(\d+).png', filename)
@@ -295,6 +295,7 @@ class Report:
 
 class AssessmentError(Exception):
     pass
+
 
 
 
