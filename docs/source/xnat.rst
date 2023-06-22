@@ -19,24 +19,24 @@ Tagging your scans
 ------------------
 For DWIQC to discover Diffusion and Fieldmap scans to process, you need to add notes to those scans in `XNAT`_. You can add notes using the ``Edit`` button located within the ``Actions`` box on the MR Session report page.
 
-========= ============================ ==================================================
-Type      Example series               Note
-========= ============================ ==================================================
-DWI     ``UKbioDiff_ABCDseq_ABCDdvs``    ``#DWI_MAIN_001, #DWI_MAIN_002, ..., #DWI_MAIN_N``
-PA_FMAP ``UKbioDiff_ABCDseq_DistMap_PA`` ``#DWI_FMAP_PA_001, #DWI_FMAP_PA_002, ..., #DWI_FMAP_PA_N``
-AP_FMAP ``UKbioDiff_ABCDseq_DistMap_AP`` ``#DWI_FMAP_AP_001, #DWI_FMAP_AP_002, ..., #DWI_FMAP_AP_N``
-========= ============================ ==================================================
+========= ================================  ===========================================================
+Type      Example series                    Note
+========= ================================  ===========================================================
+DWI       ``UKbioDiff_ABCDseq_ABCDdvs``     ``#DWI_MAIN_001, #DWI_MAIN_002, ..., #DWI_MAIN_N``
+PA_FMAP   ``UKbioDiff_ABCDseq_DistMap_PA``  ``#DWI_PA_001, #DWI_PA_002, ..., #DWI_PA_N``
+AP_FMAP   ``UKbioDiff_ABCDseq_DistMap_AP``  ``#DWI_AP_001, #DWI_AP_002, ..., #DWI_AP_N``
+========= ================================  ===========================================================
 
 The image below displays an MR Session report page with populated notes.
 
 .. note::
-   Note that if a ``T1w`` scan has a corresponding ``vNav`` scan, they should be assigned matching numbers. For example, ``#T1w_move_001`` would correspond to ``#T1w_001``.
+   Note that if a ``DWI`` scan has corresponding ``PA`` and ``AP`` scans, they should be assigned matching numbers. For example, ``#DWI_MAIN_001`` would correspond to ``#DWI_PA_001`` and ``#DWI_AP_001``.
 
 .. image:: images/xnat-scan-notes.png
 
 Running the pipeline
 --------------------
-To run the AnatQC pipeline, use the ``Run Containers > anatqc-session`` button located within the ``Actions`` box on the MR Session report page
+To run the DWIQC pipeline, use the ``Run Containers > dwiqc-session`` button located within the ``Actions`` box on the MR Session report page
 
 .. note::
    If you don't see the ``Run Containers`` menu, please refer to `Setting up the container <developers.html#setting-up-the-container>`_.
@@ -52,19 +52,19 @@ run
 ^^^
 This should be set to the integer value of the scan you want to process. If there's a corresponding ``move`` scan, that scan will also be processed
 
-============== =======
-T1w scan       run
-============== =======
-``#T1w_001``   1
-``#T1w_002``   2
-``#T1w_999``   999
-============== =======
+================= =======
+DWI scan          run
+================= =======
+``#DWI_MAIN_001`` 1
+``#DWI_MAIN_002`` 2
+``#DWI_MAIN_999`` 999
+================= =======
 
 subtasks
 ^^^^^^^^
 Under most circumstances you'll want to leave this field set to its default value ::
 
-    morph mriqc vnav
+    prequal qsiprep
 
 fslicense
 ^^^^^^^^^
@@ -78,9 +78,9 @@ or you can use the ``base64`` command, if that utility is installed ::
 
 Understanding the report page
 -----------------------------
-The following section will break down each section of the AnatQC report page.
+The following section will break down each section of the DWIQC report page.
 
-.. image:: images/xnat-aqc-home.png
+.. image:: images/logo.png
 
 Left pane
 ^^^^^^^^^
@@ -88,46 +88,43 @@ The left pane is broken up into several distinct sections. Each section will be 
 
 Summary
 """""""
-The ``Summary`` pane orients the user to what MR Session they're currently looking at and various processing details
+The ``Summary`` pane orients the user to what MR Session they're currently looking at and various processing details.
 
-.. image:: images/xnat-aqc-left-summary.png
+.. image:: images/xnat-acq-left-summary.png
 
 ============== ==================================
 Key            Description
 ============== ==================================
 MR Session     MR Session label
 Date Processed Processing date
-T1w scan       T1-weighted scan used
-vNav scan      vNav setter scan used (if present)
+PA Fmap Scan   PA Fieldmap used
+AP Fmap Scan   AP Fieldmap used
+DWI Scan       DWI scan used
 ============== ==================================
 
-QC Metrics
+SNR/CNR Metrics
 """"""""""
-The ``QC Metrics`` pane displays quality control metrics computed *over the entire volume*
+The ``SNR/CNR Metrics`` pane displays SNR/CNR metrics computed *for each individual shell*
 
-.. image:: images/xnat-aqc-left-qcmetrics.png
+.. image:: images/xnat-acq-left-snr-metrics.png
 
-=========== ============= =================================================
-Metric      From          Description                              
-=========== ============= =================================================
-`SNR Tot`_  `MRIQC`_      Signal-to-noise ratio
-`EFC`_      `MRIQC`_      `Entropy Focus Criterion`_
-`FWHM Avg`_ `MRIQC`_      FWHM of spatial distribution of voxel intensities
-`GM SNR`_   `MRIQC`_      Gray matter signal-to-noise ratio
-WM SNR      `FreeSurfer`_ White matter signal-to-noise ratio
-CNR         `FreeSurfer`_ Contrast-to-noise ratio
-=========== ============= =================================================
+=========== ======================= =================================================
+Metric      From                    Description                              
+=========== ======================= =================================================
+B0 SNR      Eddy Quad (Prequal/FSL) Signal-to-noise ratio for B0 Shell
+BN CNR      Eddy Quad (Prequal/FSL) Contrast-to-noise ratio for each shell
+=========== ======================= =================================================
 
-Hemispheres
+Motion Metrics
 """""""""""
-The ``Hemispheres`` pane displays quality control metrics computed *over each hemisphere*
+The ``Motion Metrics`` pane displays motion metrics computed over dwi scan(s).
 
-.. image:: images/xnat-aqc-left-hemis.png
+.. image:: images/xnat-acq-left-motion.png
 
 ============== ============= ===========================================================
 Metric         From          Description
 ============== ============= ===========================================================
-`Euler Holes`_ `FreeSurfer`_ Estimate of the number of surface defects
+Avg Abs Motion `FreeSurfer`_ Estimate of the number of surface defects
 CNR            `FreeSurfer`_ Global contrast-to-noise ratio
 G/W CNR        `FreeSurfer`_ Gray and white matter contrast-to-noise ratio
 G/CSF CNR      `FreeSurfer`_ Gray matter and cerebrospinal fluid contrast-to-noise ratio
