@@ -102,13 +102,15 @@ class Report:
         if not self.sub.startswith('sub-'):
             self.sub = 'sub-' + self.sub
 
+        no_prefix_sub = f"{self.sub[4:]}"
+
         # compile a list of files to be added to xnat:out section
 	
         # pull images from eddy_quad output
 
         resources = [
             {
-                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{self.sub}_{self.ses}', 'qc.pdf'),
+                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{no_prefix_sub}_{self.ses}', 'qc.pdf'),
                 'dest': os.path.join('eddy_pdf', '{0}_eddy_quad_qc.pdf'.format(aid))
             },
             {
@@ -200,7 +202,6 @@ class Report:
 
         # get all the b-shell values from eddy-quad
         shells = list()
-        no_prefix_sub = f"{self.sub[4:]}"
         qcdir = os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{no_prefix_sub}_{self.ses}.qc')
         for filename in os.listdir(qcdir):
             fullfile = os.path.join(qcdir, filename)
@@ -296,7 +297,6 @@ class Report:
 
 class AssessmentError(Exception):
     pass
-
 
 
 
