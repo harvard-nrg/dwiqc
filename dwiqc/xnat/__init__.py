@@ -110,7 +110,7 @@ class Report:
 
         resources = [
             {
-                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{no_prefix_sub}_{self.ses}', 'qc.pdf'),
+                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{no_prefix_sub}_{self.ses}.qc', 'qc.pdf'),
                 'dest': os.path.join('eddy_pdf', '{0}_eddy_quad_qc.pdf'.format(aid))
             },
             {
@@ -297,6 +297,7 @@ class Report:
 
 class AssessmentError(Exception):
     pass
+
 
 
 

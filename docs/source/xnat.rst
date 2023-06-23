@@ -201,14 +201,23 @@ The ``All Stored Files`` tab contains a list of *every file* stored by DWIQC.
 .. note::
    Clicking on a file within the ``All Stored Files`` tab will download that file.
 
-================================= ==========================================
+================================= =================================================
 File                              Description
-================================= ==========================================
+================================= =================================================
 B0 Image                          B0 Volume/Shell
 BN Images                         Images from Each Shell
 FA Map                            Fractional Anisotropy Map
 MD Map                            Mead Diffusivity Map
 Eddy Outlier Slices               Plot of Slices with Motion Outliers
-Motion Translations               
+Motion Translations               Plot of motion translations across DWI scan
+Motion Rotations                  Plot of motion rorations acorss DWI scan
+Motion Displacements              Plot of motion displacements across DWI scan
+Prequal PDF Report                Complete Prequal Report
+Eddy Quad PDF Report              Complete Eddy Quad Report (run on Prequal output)
+Qsiprep HTML Report               Complete Qsiprep Report in HTML Format
+Qsiprep PDF Report                Complete Qsiprep Report in PDF Format
 T1 Registration                   GIF of T1w image to Template Registration
-================================= ==========================================
+Complete Motion Plot              Motion plot including transl, rot, displacements
+Brain Mask/Segmentations          Gray Matter/White Matter Segmentations and Mask
+B0 Volume                         B0 Volume from DWI Scan
+================================= =================================================
