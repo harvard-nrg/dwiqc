@@ -10,6 +10,9 @@ import subprocess as sp
 import collections as col
 from xnattagger import Tagger
 from bids import BIDSLayout
+import xnattagger.config as config 
+
+tagger_conf = config.default()
 
 
 #### Need to add support for downloading the T1w data as well. Primarily for qsiprep.
@@ -22,7 +25,11 @@ def do(args):
         yaxil.CHECK_CERTIFICATE = False
 
 
-    # ******* potential idea here-- call and run tagger on the diffusion data ******
+    # call and run xnattagger on the diffusion data
+
+    tagger = Tagger(args.xnat_alias, tagger_conf, 'dwi', args.label)
+    tagger.generate_updates()
+    tagger.apply_updates()
 
 
     # load authentication data and set environment variables for ArcGet.py
