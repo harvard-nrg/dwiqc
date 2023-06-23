@@ -30,7 +30,7 @@ def do(args):
     with open(tagger_conf) as fo:
         filters = yaml.load(fo, Loader=yaml.SafeLoader)
 
-    tagger = Tagger(args.xnat_alias, tagger_conf, filters, args.label)
+    tagger = Tagger(args.xnat_alias, filters, 'dwi', args.label)
     tagger.generate_updates()
     tagger.apply_updates()
 
@@ -47,8 +47,6 @@ def do(args):
     os.environ['XNAT_PASS'] = auth.password
 
     conf = yaml.safe_load(open(args.config)) # load 
-
-    # config file under anatqc/config/anatqc.yaml
 
     # query T1w and vNav scans from XNAT
     with yaxil.session(auth) as ses:
