@@ -104,7 +104,7 @@ DWI Scan       DWI scan used
 
 SNR/CNR Metrics
 """"""""""
-The ``SNR/CNR Metrics`` pane displays SNR/CNR metrics computed *for each individual shell*
+The ``SNR/CNR Metrics`` pane displays SNR/CNR metrics computed *for each individual shell*.
 
 .. image:: images/xnat-acq-left-snr-metrics.png
 
@@ -128,10 +128,10 @@ The ``Motion Metrics`` pane displays motion metrics computed over dwi scan(s).
 Metric            From                    Description
 ================= ======================= ===========================================================
 Avg Abs Motion    Eddy Quad (Prequal/FSL) Estimated amount of all motion in any direction
-Avg Rel Motion    Eddy Quad (Prequal/FSL) Estimated amount of motion relative to start of scan(s)
-Avg X Translation Eddy Quad (Prequal/FSL) Estimated X translation direction motion
-Avg Y Translation Eddy Quad (Prequal/FSL) Estimated Y translation direction motion
-Avg Z Translation Eddy Quad (Prequal/FSL) Estimated Z translation direction motion
+Avg Rel Motion    Eddy Quad (Prequal/FSL) Estimated motion relative to initial head position
+Avg X Translation Eddy Quad (Prequal/FSL) Estimated X translation motion
+Avg Y Translation Eddy Quad (Prequal/FSL) Estimated Y translation motion
+Avg Z Translation Eddy Quad (Prequal/FSL) Estimated Z translation motion
 ================= ======================= ===========================================================
 
 Files
