@@ -200,7 +200,7 @@ class Report:
 
         # get all the b-shell values from eddy-quad
         shells = list()
-        no_prefix_sub = f"{self.sub[3:]}"
+        no_prefix_sub = f"{self.sub[4:]}"
         qcdir = os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{no_prefix_sub}_{self.ses}.qc')
         for filename in os.listdir(qcdir):
             fullfile = os.path.join(qcdir, filename)
