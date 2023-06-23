@@ -27,7 +27,7 @@ def do(args):
 
     # call and run xnattagger on the diffusion data
 
-    tagger = Tagger(args.xnat_alias, tagger_conf, 'dwi', args.label)
+    tagger = Tagger(args.xnat_alias, tagger_conf, args.tagger_target, args.label)
     tagger.generate_updates()
     tagger.apply_updates()
 
