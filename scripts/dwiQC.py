@@ -32,8 +32,6 @@ def main():
         help='Output BIDS directory')
     parser_get.add_argument('--xnat-alias',
         help='YAXIL authentication alias')
-    parser_get.add_argument('--tagger-target',
-        help='Target modality for xnattagger')
     parser_get.add_argument('--xnat-host',
         help='XNAT host')
     parser_get.add_argument('--xnat-user',
