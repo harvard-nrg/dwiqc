@@ -31,7 +31,7 @@ def do(args):
 
     # call and run xnattagger on the diffusion data
 
-    print("running xnattagger...")
+    logger.info("running xnattagger...")
 
     with open(tagger_conf) as fo:
         filters = yaml.load(fo, Loader=yaml.SafeLoader)
@@ -39,6 +39,8 @@ def do(args):
     tagger = Tagger(args.xnat_alias, filters, 'dwi', args.label)
     tagger.generate_updates()
     tagger.apply_updates()
+
+    logger.info('downloading data from xnat...')
 
     # load authentication data and set environment variables for ArcGet.py
     auth = yaxil.auth2(
