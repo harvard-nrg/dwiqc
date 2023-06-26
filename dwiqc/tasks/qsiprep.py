@@ -214,7 +214,7 @@ class Task(tasks.BaseTask):
 			'--nv',
 			#'-B',
 			#'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
-			'/n/sw/ncf/containers/hub.docker.io/pennbbl/qsiprep/0.18.0',			
+			'/n/sw/ncf/containers/hub.docker.io/pennbbl/qsiprep/0.18.0/qsiprep.sif',			
 			self._bids,
 			self._outdir,
 			'participant',
