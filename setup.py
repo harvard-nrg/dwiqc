@@ -6,7 +6,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 requires = [
     'yaxil>=0.9.1',
     'pyaml',
-    'xnattagger>=0.4.9',
+    'xnattagger>=0.4.10',
     'PyBIDS',
     'executors==0.6a1',
     'selfie',
