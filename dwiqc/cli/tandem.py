@@ -14,6 +14,8 @@ import dwiqc.cli.get as get
 import dwiqc.cli.process as process
 import collections as col
 import yaxil.bids
+from xnattagger import Tagger
+import xnattagger.config as config 
 
 
 logger = logging.getLogger(__name__)
@@ -24,8 +26,19 @@ def do(args):
         yaxil.CHECK_CERTIFICATE = False
 
 
-    # ******* potential idea here-- call and run tagger on the diffusion data ******
+    
+    tagger_conf = config.default()
 
+    # call and run xnattagger on the diffusion data
+
+    print("running xnattagger...")
+
+    with open(tagger_conf) as fo:
+        filters = yaml.load(fo, Loader=yaml.SafeLoader)
+
+    tagger = Tagger(args.xnat_alias, filters, 'dwi', args.label)
+    tagger.generate_updates()
+    tagger.apply_updates()
 
     # load authentication data and set environment variables for ArcGet.py
     auth = yaxil.auth2(
