@@ -221,8 +221,6 @@ class Task(tasks.BaseTask):
 			'--output-resolution',
 			self._output_resolution,
 			'--separate-all-dwis',
-			'-output-space',
-			'T1w',
 			'--eddy-config',
 			f'{self._bids}/eddy_params_s2v_mbs.json',
 			'--recon-spec',
