@@ -15,7 +15,7 @@ import shutil
 from executors.models import Job
 
 
-module('load', 'cuda/9.1.85-fasrc01')
+#module('load', 'cuda/9.1.85-fasrc01')
 
 
 logger = logging.getLogger(__name__)
@@ -212,9 +212,9 @@ class Task(tasks.BaseTask):
 			'singularity',
 			'run',
 			'--nv',
-			'-B',
-			'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
-			'/n/sw/ncf/apps/qsiprep/0.14.0/qsiprep.sif',			
+			#'-B',
+			#'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
+			'/n/sw/ncf/containers/hub.docker.io/pennbbl/qsiprep/0.18.0',			
 			self._bids,
 			self._outdir,
 			'participant',
