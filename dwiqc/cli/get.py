@@ -27,6 +27,8 @@ def do(args):
 
     # call and run xnattagger on the diffusion data
 
+    print("running xnattagger...")
+
     with open(tagger_conf) as fo:
         filters = yaml.load(fo, Loader=yaml.SafeLoader)
 
