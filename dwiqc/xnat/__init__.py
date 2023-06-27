@@ -179,7 +179,7 @@ class Report:
                 'dest': os.path.join('denoise', '{0}_denoise.svg'.format(aid))
             },
             {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_dwi_denoise_ses_' + self.ses + '_run_' + str(self.run) + '_dwi_wf_biascorr.svg'),
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_final_denoise_wf_biascorr.svg'),
                 'dest': os.path.join('bias-corr', '{0}_bias_correction.svg'.format(aid))
             },
             {
