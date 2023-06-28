@@ -28,7 +28,7 @@
                                 <xs:element name="shell_cnr">
                                     <xs:complexType>
                                         <xs:sequence>
-                                            <xs:element name='cnr'>
+                                            <xs:element name="cnr" maxOccurs="unbounded">
                                                 <xs:complexType>
                                                     <xs:simpleContent>
                                                         <xs:extension base="xs:decimal">
