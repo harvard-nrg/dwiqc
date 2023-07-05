@@ -381,8 +381,8 @@ class Task(tasks.BaseTask):
 		logfile = os.path.join(logdir, 'dwiqc-prequal.log')
 		self.job = Job(
 			name='dwiqc-prequal',
-			time='360',
-			memory='20G',
+			time='3000',
+			memory='40G',
 			gpus=1,
 			nodes=1,
 			command=self._command,
