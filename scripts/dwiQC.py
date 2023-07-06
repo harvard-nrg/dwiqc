@@ -65,7 +65,7 @@ def main():
     parser_process.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
     parser_process.add_argument('--no-gpu', action='store_true',
-        help='Run prequal and qsiprep without gpu functionality.'
+        help='Run prequal and qsiprep without gpu functionality.')
     parser_process.add_argument('--sub-tasks', nargs='+', default=['prequal', 'qsiprep'],
         help='Run only certain sub tasks')
     parser_process.add_argument('--fs-license',
@@ -105,7 +105,7 @@ def main():
     parser_tandem.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
     parser_process.add_argument('--no-gpu', action='store_true',
-        help='Run prequal and qsiprep without gpu functionality.'
+        help='Run prequal and qsiprep without gpu functionality.')
     parser_tandem.add_argument('--sub-tasks', nargs='+', default=['prequal', 'qsiprep'],
         help='Run only certain sub tasks')
     parser_tandem.add_argument('--fs-license',

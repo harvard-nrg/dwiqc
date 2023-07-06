@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 
 requires = [
-    'yaxil>=0.9.1',
+    'yaxil>=0.9.7',
     'pyaml',
     'xnattagger>=0.4.12',
     'PyBIDS',
