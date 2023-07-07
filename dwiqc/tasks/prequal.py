@@ -27,7 +27,7 @@ class Task(tasks.BaseTask):
 		self._ses = ses
 		self._run = run
 		self._bids = bids
-		self._no_gpu = gpu
+		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
 		super().__init__(outdir, tempdir, pipenv)
 
