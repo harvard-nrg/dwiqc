@@ -22,11 +22,12 @@ module('load', 'cuda/9.1.85-fasrc01')
 # pull in some parameters from the BaseTask class in the __init__.py directory
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, no_gpu=False, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
+		self._no_gpu = gpu
 		self._layout = BIDSLayout(bids)
 		super().__init__(outdir, tempdir, pipenv)
 
@@ -275,7 +276,7 @@ class Task(tasks.BaseTask):
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
 		if self._spec == "ABCD":
-			if args.no_gpu:
+			if self._no_gpu:
 				self._command = [
 					'selfie',
 					'--lock',
@@ -370,7 +371,7 @@ class Task(tasks.BaseTask):
 				]
 
 		elif self._spec == "UKBio":
-			if args.no_gpu:
+			if self._no_gpu:
 
 				self._command = [
 					'selfie',
@@ -472,7 +473,7 @@ class Task(tasks.BaseTask):
 
 		logdir = self.logdir()
 		logfile = os.path.join(logdir, 'dwiqc-prequal.log')
-		if args.no_gpu:
+		if self._no_gpu:
 			self.job = Job(
 				name='dwiqc-prequal',
 				time='3000',

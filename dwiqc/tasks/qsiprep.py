@@ -22,11 +22,12 @@ logger = logging.getLogger(__name__)
 
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, output_resolution=None, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
+		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
 		self._output_resolution = output_resolution
 		super().__init__(outdir, tempdir, pipenv)
@@ -34,6 +35,11 @@ class Task(tasks.BaseTask):
 
 
 	def calc_mporder(self):
+		## if --no-gpu argument is passed, make mporder equal to 1
+		if self._no_gpu:
+			mporder = 1
+			return mporder
+
 		# need to get the length of the SliceTiming File (i.e. number of slices) divided by the "MultibandAccelerationFactor". From there, 
 		# divide that number by 3. That's the number passed to mporder.
 
@@ -236,18 +242,33 @@ class Task(tasks.BaseTask):
 			self._tempdir
 		]
 
-		logdir = self.logdir()
-		logfile = os.path.join(logdir, 'dwiqc-qsiprep.log')
-		self.job = Job(
-			name='dwiqc-qsiprep',
-			time='3000',
-			memory='40G',
-			gpus=1,
-			nodes=1,
-			command=self._command,
-			output=logfile,
-			error=logfile
-		)
+		if self._no_gpu:
+			logdir = self.logdir()
+			logfile = os.path.join(logdir, 'dwiqc-qsiprep.log')
+			self.job = Job(
+				name='dwiqc-qsiprep',
+				time='3000',
+				memory='40G',
+				cpus=2,
+				nodes=1,
+				command=self._command,
+				output=logfile,
+				error=logfile
+			)
+
+		else:
+			logdir = self.logdir()
+			logfile = os.path.join(logdir, 'dwiqc-qsiprep.log')
+			self.job = Job(
+				name='dwiqc-qsiprep',
+				time='3000',
+				memory='40G',
+				gpus=1,
+				nodes=1,
+				command=self._command,
+				output=logfile,
+				error=logfile
+			)
 
 
 
