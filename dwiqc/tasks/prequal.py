@@ -95,7 +95,7 @@ class Task(tasks.BaseTask):
 		json_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.json', return_type='filename').pop()
 
 		# Grab the slice timing info
-		series_desc = dwi_file.get_metadata()['SeriesDescription']
+		slice_timing = dwi_file.get_metadata()['SliceTiming']
 
 		# sort it in ascending order
 		slice_timing.sort()
