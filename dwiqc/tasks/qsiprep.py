@@ -276,10 +276,6 @@ class Task(tasks.BaseTask):
 			self._tempdir
 		]
 
-		### ******** temporary check ***********
-		print(self._command)
-		sys.exit()
-
 		if self._no_gpu:
 			logdir = self.logdir()
 			logfile = os.path.join(logdir, 'dwiqc-qsiprep.log')
