@@ -218,7 +218,7 @@ class Task(tasks.BaseTask):
 
 		max_val = max(int_data)
 
-		if manufacturer == "Siemens" && scanner_model == "Skyra" && max_val == 2000:
+		if manufacturer == "Siemens" and scanner_model == "Skyra" and max_val == 2000:
 			self._nonzero_shells = True
 		else:
 			self._nonzero_shells = False
