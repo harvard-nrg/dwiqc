@@ -111,7 +111,7 @@ class Task(tasks.BaseTask):
 			self.even_slices(json_file, inputs_dir)
 
 		else:
-			self.odd_slices(json_file, inputs_dir)
+			self.odd_slices(json_file, inputs_dir, num_slices)
 
 		# call method that creates the necessary csv file for prequal
 		self.create_csv(inputs_dir, dwi_file)
@@ -157,7 +157,7 @@ class Task(tasks.BaseTask):
 
 	# helper method that generates slspec file for an acquisition with an odd number of slices
 
-	def odd_slices(self, json_file, inputs_dir):
+	def odd_slices(self, json_file, inputs_dir, num_slices):
 		## build the first column
 
 		col1 = []
