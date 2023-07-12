@@ -105,17 +105,17 @@ class Task(tasks.BaseTask):
 
 		# check if there's an even or odd number of slices, run corresponding helper method
 		if num_slices % 2 == 0:
-			self.even_slices(json_file, inputs_dir)
+			self.even_slices(json_file)
 
 		else:
-			self.odd_slices(json_file, inputs_dir)
+			self.odd_slices(json_file)
 
 	# helper method that creates slspec file for an acquisition with an even number of slices
 
 	# if the number of slices is even, create spec file accordingly. source = https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/eddy/Faq#How_should_my_--slspec_file_look.3F
     # line 138 edited from `item - 1` to `item - 0`
 
-	def even_slices(self, json_file, inputs_dir):
+	def even_slices(self, json_file):
 		# open the json file and 
 		with open(json_file, 'r') as fp:
 			fcont = fp.read()
@@ -131,21 +131,19 @@ class Task(tasks.BaseTask):
 		slspec = [sindx[i:i + mb] for i in range(0, len(sindx), mb)]
 		slspec = [[item - 0 for item in sublist] for sublist in slspec]
 
-		spec_file = f"{inputs_dir}/even_slices_slspec.txt"
+		spec_file = f"{self._bids}/even_slices_slspec.txt"
 
 		with open(spec_file, 'w') as fp:
 			for sublist in slspec:
 				fp.write(' '.join(str(item) for item in sublist))
 				fp.write('\n')
 
-		os.makedirs(self._outdir)
-		shutil.copy(f"{inputs_dir}/even_slices_slspec.txt", self._outdir)
 		self._spec = spec_file
 
 
 	# helper method that generates slspec file for an acquisition with an odd number of slices
 
-	def odd_slices(self, json_file, inputs_dir):
+	def odd_slices(self, json_file):
 		## build the first column
 
 		col1 = []
@@ -181,12 +179,10 @@ class Task(tasks.BaseTask):
 
 		all_cols = np.column_stack([col1, col2, col3])
 
-		spec_file = f"{inputs_dir}/odd_slices_slspec.txt"
+		spec_file = f"{self._bids}/odd_slices_slspec.txt"
 
 		np.savetxt(spec_file, data, fmt=['%d', '%d', '%d'])
 
-		os.makedirs(self._outdir)
-		shutil.copy(f"{inputs_dir}/odd_slices_slspec.txt", self._outdir)
 		self._spec = spec_file
 
 	# this method will grab the manufacturer name and model and the max bval value. 
@@ -215,7 +211,7 @@ class Task(tasks.BaseTask):
 
 	def create_eddy_params(self):
 		mporder = self.calc_mporder()
-		spec_file = self.create_spec()
+		self.create_spec()
 		params_file = {
 			"flm": "quadratic",
 			"slm": "linear",
