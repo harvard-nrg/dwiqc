@@ -108,10 +108,10 @@ class Task(tasks.BaseTask):
 
 		# check if there's an even or odd number of slices, run corresponding helper method
 		if num_slices % 2 == 0:
-			self.even_slices(self, json_file, inputs_dir)
+			self.even_slices(json_file, inputs_dir)
 
 		else:
-			self.odd_slices(self, json_file, inputs_dir)
+			self.odd_slices(json_file, inputs_dir)
 
 		# call method that creates the necessary csv file for prequal
 		self.create_csv(inputs_dir, dwi_file)
