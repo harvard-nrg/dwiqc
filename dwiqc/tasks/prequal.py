@@ -92,95 +92,138 @@ class Task(tasks.BaseTask):
 		else:
 			dwi_file = dwi_file.pop()
 
+		json_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.json', return_type='filename').pop()
+
+		# Grab the slice timing info
 		series_desc = dwi_file.get_metadata()['SeriesDescription']
 
-		if 'ABCD_dMRI_lowSR' in series_desc:
-			# Define the values
-			ABCD_values = """0 27 54
-			2 29 56
-			4 31 58
-			6 33 60
-			8 35 62
-			10 37 64
-			12 39 66
-			14 41 68
-			16 43 70
-			18 45 72
-			20 47 74
-			22 49 76
-			24 51 78
-			26 53 80
-			1 28 55
-			3 30 57
-			5 32 59
-			7 34 61
-			9 36 63
-			11 38 65
-			13 40 67
-			15 42 69
-			17 44 71
-			19 46 73
-			21 48 75
-			23 50 77
-			25 52 79"""
+		# sort it in ascending order
+		slice_timing.sort()
 
-			# Create a text file
-			with open(f"{inputs_dir}/slspec_ABCD_dMRI.txt", "w") as file:
-				# Write the values into the text file
-				file.write(ABCD_values)
-			os.makedirs(self._outdir)
-			shutil.copy(f"{inputs_dir}/slspec_ABCD_dMRI.txt", self._outdir)
-			self._spec = "ABCD"
+		# remove any duplicates
+		slice_timing = list(set(slice_timing))
 
+		# get the total number of slices
+		num_slices = len(slice_timing)
 
-
-
-		# check for the UK Bio bank version of the scan and then create the slspec file accordingly
-
-		elif 'UKbioDiff_ABCDseq_ABCDdvs' in series_desc:
-			# Define Values
-			UKBio_values = """1 25 49
-			3 27 51
-			5 29 53
-			7 31 55
-			9 33 57
-			11 35 59
-			23 47 71
-			13 37 61
-			15 39 63
-			17 41 65
-			19 43 67
-			21 45 69
-			2 26 50
-			4 28 52
-			6 30 54
-			8 32 56
-			10 34 58
-			12 36 60
-			0 24 48
-			14 38 62
-			16 40 64
-			18 42 66
-			20 44 68
-			22 46 70"""
-
-
-			# Create a text file
-			with open(f"{inputs_dir}/slspec_UKBio_dMRI.txt", "w") as file:
-				# Write the values into the text file
-				file.write(UKBio_values)
-
-			os.makedirs(self._outdir)
-			shutil.copy(f"{inputs_dir}/slspec_UKBio_dMRI.txt", self._outdir)
-			self._spec = "UKBio"
-		
+		# check if there's an even or odd number of slices, run corresponding helper method
+		if num_slices % 2 == 0:
+			self.even_slices(self, json_file, inputs_dir)
 
 		else:
-			logger.info('Unable to determine dwi scan type. Moving on without creating slspec file.')
+			self.odd_slices(self, json_file, inputs_dir)
 
-
+		# call method that creates the necessary csv file for prequal
 		self.create_csv(inputs_dir, dwi_file)
+
+		# call method that adds an "IntendedFor" key-value pair to json file (for fieldmaps)
 		self.add_intended_for()
+
+		# call method that checks the manufacturer, scanner model and max bval. that will determine if --nonzero_shells argument needs to be passed to prequal
+		self.check_shells(dwi_file)
+
+	# helper method that creates slspec file for an acquisition with an even number of slices
+
+	# if the number of slices is even, create spec file accordingly. source = https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/eddy/Faq#How_should_my_--slspec_file_look.3F
+    # line 138 edited from `item - 1` to `item - 0`
+
+	def even_slices(self, json_file, inputs_dir):
+		# open the json file and 
+		with open(json_file, 'r') as fp:
+			fcont = fp.read()
+
+		i1 = fcont.find('SliceTiming')
+		i2 = fcont[i1:].find('[')
+		i3 = fcont[i1 + i2:].find(']')
+		cslicetimes = fcont[i1 + i2 + 1:i1 + i2 + i3]
+		slicetimes = list(map(float, cslicetimes.split(',')))
+		sortedslicetimes = sorted(slicetimes)
+		sindx = sorted(range(len(slicetimes)), key=lambda k: slicetimes[k])
+		mb = len(sortedslicetimes) // (sum(1 for a, b in zip(sortedslicetimes, sortedslicetimes[1:]) if a != b) + 1)
+		slspec = [sindx[i:i + mb] for i in range(0, len(sindx), mb)]
+		slspec = [[item - 0 for item in sublist] for sublist in slspec]
+
+		spec_file = f"{inputs_dir}/even_slices_slspec.txt"
+
+		with open(spec_file, 'w') as fp:
+			for sublist in slspec:
+				fp.write(' '.join(str(item) for item in sublist))
+				fp.write('\n')
+
+		os.makedirs(self._outdir)
+		shutil.copy(f"{inputs_dir}/even_slices_slspec.txt", self._outdir)
+		self._spec = "even"
+
+
+	# helper method that generates slspec file for an acquisition with an odd number of slices
+
+	def odd_slices(self, json_file, inputs_dir):
+		## build the first column
+
+		col1 = []
+
+		for i in range(0, num_slices, 2):
+			col1.append(i)
+
+		for j in range(1, num_slices, 2):
+			col1.append(j)
+
+		col1 = np.array(col1)
+
+		if len(col1) != num_slices:
+			raise DWISpecError('Spec file column does not match length of slice timing file. Exiting.')
+
+		## build second column
+
+		col2 = []
+
+		for col1_num in col1:
+			col2_num = col1_num + num_slices
+			col2.append(col2_num)
+		col2 = np.array(col2)
+
+		# build third column
+
+		col3 = []
+
+		for col2_num in col2:
+			col3_num = col2_num + num_slices
+			col3.append(col3_num)
+		col3 = np.array(col3)
+
+		all_cols = np.column_stack([col1, col2, col3])
+
+		spec_file = f"{inputs_dir}/odd_slices_slspec.txt"
+
+		np.savetxt(spec_file, data, fmt=['%d', '%d', '%d'])
+
+		os.makedirs(self._outdir)
+		shutil.copy(f"{inputs_dir}/odd_slices_slspec.txt", self._outdir)
+		self._spec = "odd"
+
+	# this method will grab the manufacturer name and model and the max bval value. 
+	# if it is a Siemens Skyra and the max bval is 2000, the non-zero_shells argument needs to be passed to prequal
+	def check_shells(self, dwi_file):
+		# grab the Manufacturer and model from dwi file metadata
+		manufacturer = dwi_file.get_metadata()['Manufacturer']
+		scanner_model = dwi_file.get_metadata()['ManufacturersModelName']
+
+		# load the f val and convert it to a python list. convert the elements from strings to integers
+		bval_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.bval', return_type='filename').pop()
+
+		bval = open(bval_file, 'r')
+		data = bval.read()
+		data = data.replace('\n', '').split(" ")
+		int_data = [eval(i) for i in data]
+
+		max_val = max(int_data)
+
+		if manufacturer == "Siemens" && scanner_model == "Skyra" && max_val == 2000:
+			self._nonzero_shells = True
+		else:
+			self._nonzero_shells = False
+
+
 
 	# this method will grab the phase encode direction and total readout time for the main dwi scan and both fieldmaps and place them into a csv file named
 	# dtiQA_config.csv
@@ -243,10 +286,6 @@ class Task(tasks.BaseTask):
 		return PA_phase, AP_phase
 
 
-	# ******** this will also need to be added to qsiprep.py ***********
-
-
-
 # this method will add an "IntendedFor" key-value pair to the fieldmap scans
 
 	def add_intended_for(self):
@@ -275,7 +314,7 @@ class Task(tasks.BaseTask):
 		self._tempdir = tempfile.gettempdir()
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
-		if self._spec == "ABCD":
+		if self._nonzero_shells == False:
 			if self._no_gpu:
 				self._command = [
 					'selfie',
@@ -370,7 +409,7 @@ class Task(tasks.BaseTask):
 					self._ses
 				]
 
-		elif self._spec == "UKBio":
+		elif self._nonzero_shells == True:
 			if self._no_gpu:
 
 				self._command = [
@@ -470,6 +509,10 @@ class Task(tasks.BaseTask):
 					'--session',
 					self._ses
 				]
+
+		### ******** temporary check ***********
+		print(self._command)
+		sys.exit()
 
 		logdir = self.logdir()
 		logfile = os.path.join(logdir, 'dwiqc-prequal.log')
