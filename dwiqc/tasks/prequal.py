@@ -12,6 +12,7 @@ import shutil
 from executors.models import Job
 sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
 from env_modules_python import module
+import numpy as np
 
 
 logger = logging.getLogger(__name__)
