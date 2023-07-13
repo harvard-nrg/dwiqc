@@ -14,4 +14,4 @@ dwiQC.py process --sub SUBJECT --ses SESSION --bids-dir BIDSDIR --xnat-alias ALI
 
 tandem mode (both get and process):
 
-dwiQC.py tandem --label XNATLABEL --bidsdir BIDSDIR --xnat-alias --xnat-upload
+dwiQC.py tandem --label XNATLABEL --bidsdir BIDSDIR --xnat-alias ALIAS --xnat-upload
