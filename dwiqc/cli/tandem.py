@@ -53,7 +53,7 @@ def do(args):
     os.environ['XNAT_USER'] = auth.username
     os.environ['XNAT_PASS'] = auth.password
 
-    conf = yaml.safe_load(open(args.config)) # load 
+    conf = yaml.safe_load(open(args.xnat_config)) # load 
 
     # config file under anatqc/config/anatqc.yaml
 
