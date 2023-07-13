@@ -1,0 +1,29 @@
+qsiprep:
+  shell:
+    - 'selfie'
+    - '--lock'
+    - '--output-file'
+    - <path_to_prov_file>
+    - 'singularity'
+    - 'run'
+    - '--nv'
+    - '/n/sw/ncf/containers/hub.docker.io/pennbbl/qsiprep/0.18.0/qsiprep.sif'
+    - <bids_dir>
+    - <output_dir>
+    - 'participant'
+    - '--output-resolution'
+    - <output_resolution>
+    - '--separate-all-dwis'
+    - '--eddy-config'
+    - <bids_dir>/eddy_params_s2v_mbs.json
+    - '--recon-spec'
+    - 'reorient_fslstd'
+    - '--notrack'
+    - '--n_cpus'
+    - <cpus>
+    - '--mem_mb' 
+    - <mem>
+    - '--fs-license-file'
+    - <path_to_freesurfer_license>
+    - '-w' 
+    - <temp_dir>
