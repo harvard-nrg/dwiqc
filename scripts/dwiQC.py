@@ -16,7 +16,7 @@ def main():
     parser = ap.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true',
         help='Enable verbose logging')
-    parser.add_argument('-c', '--config', default=config.default(),
+    parser.add_argument('-c', '--xnat-config', default=config.xnat_download(),
         help='dwiQC configuration file')
     parser.add_argument('--insecure', action='store_true',
         help='Disable SSL certificate verification')
@@ -64,6 +64,10 @@ def main():
         help='Resolution of output data. Defaut is resolution of input data.')
     parser_process.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
+    parser_process.add_argument('--prequal-config', action='store_true',
+        help='Config file for custom prequal command.')
+    parser_process.add_argument('--qsiprep-config', action='store_true',
+        help='Config file for custom qsiprep command.')
     parser_process.add_argument('--no-gpu', action='store_true',
         help='Run prequal and qsiprep without gpu functionality.')
     parser_process.add_argument('--sub-tasks', nargs='+', default=['prequal', 'qsiprep'],
@@ -104,6 +108,10 @@ def main():
         help='Rate limit the number of tasks executed in parallel (1=serial)')
     parser_tandem.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
+    parser_tandem.add_argument('--prequal-config', action='store_true',
+        help='Config file for custom prequal command.')
+    parser_tandem.add_argument('--qsiprep-config', action='store_true',
+        help='Config file for custom qsiprep command.')
     parser_tandem.add_argument('--no-gpu', action='store_true',
         help='Run prequal and qsiprep without gpu functionality.')
     parser_tandem.add_argument('--sub-tasks', nargs='+', default=['prequal', 'qsiprep'],
