@@ -197,7 +197,7 @@ class Task(tasks.BaseTask):
 
 		spec_file = f"{inputs_dir}/odd_slices_slspec.txt"
 
-		np.savetxt(spec_file, data, fmt=['%d', '%d', '%d'])
+		np.savetxt(spec_file, all_cols, fmt=['%d', '%d', '%d'])
 
 		os.makedirs(self._outdir)
 		shutil.copy(f"{inputs_dir}/odd_slices_slspec.txt", self._outdir)
