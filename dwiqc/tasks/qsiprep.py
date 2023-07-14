@@ -14,6 +14,7 @@ from env_modules_python import module
 import shutil
 from executors.models import Job
 import dwiqc.config as config
+import numpy as np
 
 
 #module('load', 'cuda/9.1.85-fasrc01')
