@@ -228,7 +228,7 @@ class Task(tasks.BaseTask):
 		#self.create_nipype()
 		self.check_output_resolution()
 		if self._qsiprep_config:
-			qsiprep_command = yaml.safe_load(open(config.qsiprep_config()))
+			qsiprep_command = yaml.safe_load(open(config.qsiprep_command()))
 			self._command = qsiprep_command['qsiprep']['shell']
 		else:
 			self._command = [
