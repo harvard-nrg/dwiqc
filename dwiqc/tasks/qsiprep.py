@@ -261,9 +261,6 @@ class Task(tasks.BaseTask):
 				'-w',
 				self._tempdir
 			]
-		# ******** temporary check for debugging ##########
-		print(self._command)
-		sys.exit()
 
 		if self._no_gpu:
 			logdir = self.logdir()

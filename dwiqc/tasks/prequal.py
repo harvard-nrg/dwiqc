@@ -518,10 +518,6 @@ class Task(tasks.BaseTask):
 						self._ses
 					]
 
-		# ******** temporary check for debugging ##########
-		print(self._command)
-		sys.exit()
-
 		logdir = self.logdir()
 		logfile = os.path.join(logdir, 'dwiqc-prequal.log')
 		if self._no_gpu:
