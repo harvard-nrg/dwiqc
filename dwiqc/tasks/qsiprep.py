@@ -3,6 +3,7 @@
 
 import subprocess
 import os
+import yaml
 import logging
 from bids import BIDSLayout
 import sys
