@@ -110,7 +110,7 @@ class Task(tasks.BaseTask):
 			self.even_slices(json_file)
 
 		else:
-			self.odd_slices(json_file)
+			self.odd_slices(json_file, num_slices)
 
 	# helper method that creates slspec file for an acquisition with an even number of slices
 
@@ -145,7 +145,7 @@ class Task(tasks.BaseTask):
 
 	# helper method that generates slspec file for an acquisition with an odd number of slices
 
-	def odd_slices(self, json_file):
+	def odd_slices(self, json_file, num_slices):
 		## build the first column
 
 		col1 = []
