@@ -2,6 +2,7 @@
 #### load necessary libraries
 import tempfile
 import subprocess
+import yaml
 import os
 import logging
 from bids import BIDSLayout
@@ -318,7 +319,7 @@ class Task(tasks.BaseTask):
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
 		if self._prequal_config:
-			prequal_command = config.prequal_command()
+			prequal_command = yaml.safe_load(open(config.prequal_command()))
 			self._command = prequal_command['prequal']['shell']
 		else:
 			if self._nonzero_shells == False:
