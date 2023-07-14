@@ -3,6 +3,7 @@
 
 import subprocess
 import os
+import yaml
 import logging
 from bids import BIDSLayout
 import sys
@@ -13,6 +14,8 @@ sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
 from env_modules_python import module
 import shutil
 from executors.models import Job
+import dwiqc.config as config
+import numpy as np
 
 
 #module('load', 'cuda/9.1.85-fasrc01')
@@ -22,11 +25,12 @@ logger = logging.getLogger(__name__)
 
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config=False, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
+		self._qsiprep_config = qsiprep_config
 		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
 		self._output_resolution = output_resolution
@@ -108,7 +112,7 @@ class Task(tasks.BaseTask):
 			self.even_slices(json_file)
 
 		else:
-			self.odd_slices(json_file)
+			self.odd_slices(json_file, num_slices)
 
 	# helper method that creates slspec file for an acquisition with an even number of slices
 
@@ -143,7 +147,7 @@ class Task(tasks.BaseTask):
 
 	# helper method that generates slspec file for an acquisition with an odd number of slices
 
-	def odd_slices(self, json_file):
+	def odd_slices(self, json_file, num_slices):
 		## build the first column
 
 		col1 = []
@@ -181,7 +185,7 @@ class Task(tasks.BaseTask):
 
 		spec_file = f"{self._bids}/odd_slices_slspec.txt"
 
-		np.savetxt(spec_file, data, fmt=['%d', '%d', '%d'])
+		np.savetxt(spec_file, all_cols, fmt=['%d', '%d', '%d'])
 
 		self._spec = spec_file
 
@@ -223,36 +227,40 @@ class Task(tasks.BaseTask):
 		self.create_eddy_params()
 		#self.create_nipype()
 		self.check_output_resolution()
-		self._command = [
-			'selfie',
-			'--lock',
-			'--output-file', self._prov,
-			'singularity',
-			'run',
-			'--nv',
-			#'-B',
-			#'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
-			'/n/sw/ncf/containers/hub.docker.io/pennbbl/qsiprep/0.18.0/qsiprep.sif',			
-			self._bids,
-			self._outdir,
-			'participant',
-			'--output-resolution',
-			self._output_resolution,
-			'--separate-all-dwis',
-			'--eddy-config',
-			f'{self._bids}/eddy_params_s2v_mbs.json',
-			'--recon-spec',
-			'reorient_fslstd',
-			'--notrack',
-			'--n_cpus',
-			'2',
-			'--mem_mb',
-			'40000',
-			'--fs-license-file',
-			'/n/helmod/apps/centos7/Core/freesurfer/6.0.0-fasrc01/license.txt',
-			'-w',
-			self._tempdir
-		]
+		if self._qsiprep_config:
+			qsiprep_command = yaml.safe_load(open(config.qsiprep_command()))
+			self._command = qsiprep_command['qsiprep']['shell']
+		else:
+			self._command = [
+				'selfie',
+				'--lock',
+				'--output-file', self._prov,
+				'singularity',
+				'run',
+				'--nv',
+				#'-B',
+				#'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
+				'/n/sw/ncf/containers/hub.docker.io/pennbbl/qsiprep/0.18.0/qsiprep.sif',			
+				self._bids,
+				self._outdir,
+				'participant',
+				'--output-resolution',
+				self._output_resolution,
+				'--separate-all-dwis',
+				'--eddy-config',
+				f'{self._bids}/eddy_params_s2v_mbs.json',
+				'--recon-spec',
+				'reorient_fslstd',
+				'--notrack',
+				'--n_cpus',
+				'2',
+				'--mem_mb',
+				'40000',
+				'--fs-license-file',
+				'/n/helmod/apps/centos7/Core/freesurfer/6.0.0-fasrc01/license.txt',
+				'-w',
+				self._tempdir
+			]
 
 		if self._no_gpu:
 			logdir = self.logdir()

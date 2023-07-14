@@ -71,6 +71,7 @@ def do(args):
             run=args.run,
             bids=args.bids_dir,
             outdir=prequal_outdir,
+            prequal_config=args.prequal_config,
             no_gpu=args.no_gpu,
             tempdir=tempfile.gettempdir(),
             pipenv='/sw/apps/prequal'
@@ -91,6 +92,7 @@ def do(args):
             run=args.run,
             bids=args.bids_dir,
             outdir=qsiprep_outdir,
+            qsiprep_config=args.qsiprep_config,
             no_gpu=args.no_gpu,
             tempdir=tempfile.gettempdir(),
             pipenv='/sw/apps/qsiprep'

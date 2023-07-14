@@ -2,6 +2,7 @@
 #### load necessary libraries
 import tempfile
 import subprocess
+import yaml
 import os
 import logging
 from bids import BIDSLayout
@@ -12,6 +13,8 @@ import shutil
 from executors.models import Job
 sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
 from env_modules_python import module
+import dwiqc.config as config
+import numpy as np
 
 
 logger = logging.getLogger(__name__)
@@ -22,11 +25,12 @@ module('load', 'cuda/9.1.85-fasrc01')
 # pull in some parameters from the BaseTask class in the __init__.py directory
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, no_gpu=False, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, prequal_config=False, no_gpu=False, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
+		self._prequal_config = prequal_config
 		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
 		super().__init__(outdir, tempdir, pipenv)
@@ -195,7 +199,7 @@ class Task(tasks.BaseTask):
 
 		spec_file = f"{inputs_dir}/odd_slices_slspec.txt"
 
-		np.savetxt(spec_file, data, fmt=['%d', '%d', '%d'])
+		np.savetxt(spec_file, all_cols, fmt=['%d', '%d', '%d'])
 
 		os.makedirs(self._outdir)
 		shutil.copy(f"{inputs_dir}/odd_slices_slspec.txt", self._outdir)
@@ -314,201 +318,205 @@ class Task(tasks.BaseTask):
 		self._tempdir = tempfile.gettempdir()
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
-		if self._nonzero_shells == False:
-			if self._no_gpu:
-				self._command = [
-					'selfie',
-					'--lock',
-					'--output-file', self._prov,
-					'singularity',
-					'run',
-					'-e',
-					'--contain',
-					'-B',
-					f'{inputs_dir}:/INPUTS/',
-					'-B',
-					f'{self._outdir}:/OUTPUTS',
-					'-B',
-					f'{self._tempdir}:/tmp',
-					'-B',
-					'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-					'-B',
-					'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
-					'-B',
-					'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
-					'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
-					'--save_component_pngs',
-					'j',
-					'--num_threads',
-					'2',
-					'--denoise',
-					'off',
-					'--degibbs',
-					'off',
-					'--rician',
-					'off',
-					'--prenormalize',
-					'on',
-					'--correct_bias',
-					'on',
-					'--topup_first_b0s_only',
-					'--subject',
-					self._sub,
-					'--project',
-					'SSBC',
-					'--session',
-					self._ses
-				]
-			else:
-				self._command = [
-					'selfie',
-					'--lock',
-					'--output-file', self._prov,
-					'singularity',
-					'run',
-					'-e',
-					'--contain',
-					'--nv',
-					'-B',
-					f'{inputs_dir}:/INPUTS/',
-					'-B',
-					f'{self._outdir}:/OUTPUTS',
-					'-B',
-					f'{self._tempdir}:/tmp',
-					'-B',
-					'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-					'-B',
-					'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
-					'-B',
-					'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
-					'-B',
-					'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
-					'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
-					'--save_component_pngs',
-					'j',
-					'--eddy_cuda',
-					'9.1',
-					'--num_threads',
-					'2',
-					'--denoise',
-					'off',
-					'--degibbs',
-					'off',
-					'--rician',
-					'off',
-					'--prenormalize',
-					'on',
-					'--correct_bias',
-					'on',
-					'--topup_first_b0s_only',
-					'--subject',
-					self._sub,
-					'--project',
-					'SSBC',
-					'--session',
-					self._ses
-				]
+		if self._prequal_config:
+			prequal_command = yaml.safe_load(open(config.prequal_command()))
+			self._command = prequal_command['prequal']['shell']
+		else:
+			if self._nonzero_shells == False:
+				if self._no_gpu:
+					self._command = [
+						'selfie',
+						'--lock',
+						'--output-file', self._prov,
+						'singularity',
+						'run',
+						'-e',
+						'--contain',
+						'-B',
+						f'{inputs_dir}:/INPUTS/',
+						'-B',
+						f'{self._outdir}:/OUTPUTS',
+						'-B',
+						f'{self._tempdir}:/tmp',
+						'-B',
+						'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
+						'-B',
+						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
+						'-B',
+						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
+						'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
+						'--save_component_pngs',
+						'j',
+						'--num_threads',
+						'2',
+						'--denoise',
+						'off',
+						'--degibbs',
+						'off',
+						'--rician',
+						'off',
+						'--prenormalize',
+						'on',
+						'--correct_bias',
+						'on',
+						'--topup_first_b0s_only',
+						'--subject',
+						self._sub,
+						'--project',
+						'SSBC',
+						'--session',
+						self._ses
+					]
+				else:
+					self._command = [
+						'selfie',
+						'--lock',
+						'--output-file', self._prov,
+						'singularity',
+						'run',
+						'-e',
+						'--contain',
+						'--nv',
+						'-B',
+						f'{inputs_dir}:/INPUTS/',
+						'-B',
+						f'{self._outdir}:/OUTPUTS',
+						'-B',
+						f'{self._tempdir}:/tmp',
+						'-B',
+						'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
+						'-B',
+						'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
+						'-B',
+						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
+						'-B',
+						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
+						'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
+						'--save_component_pngs',
+						'j',
+						'--eddy_cuda',
+						'9.1',
+						'--num_threads',
+						'2',
+						'--denoise',
+						'off',
+						'--degibbs',
+						'off',
+						'--rician',
+						'off',
+						'--prenormalize',
+						'on',
+						'--correct_bias',
+						'on',
+						'--topup_first_b0s_only',
+						'--subject',
+						self._sub,
+						'--project',
+						'SSBC',
+						'--session',
+						self._ses
+					]	
 
-		elif self._nonzero_shells == True:
-			if self._no_gpu:
+			elif self._nonzero_shells == True:
+				if self._no_gpu:	
 
-				self._command = [
-					'selfie',
-					'--lock',
-					'--output-file', self._prov,
-					'singularity',
-					'run',
-					'-e',
-					'--contain',
-					'-B',
-					f'{inputs_dir}:/INPUTS/',
-					'-B',
-					f'{self._outdir}:/OUTPUTS',
-					'-B',
-					f'{self._tempdir}:/tmp',
-					'-B',
-					'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-					'-B',
-					'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
-					'-B',
-					'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
-					'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
-					'--save_component_pngs',
-					'j',
-					'--num_threads',
-					'2',
-					'--denoise',
-					'off',
-					'--degibbs',
-					'off',
-					'--rician',
-					'off',
-					'--prenormalize',
-					'on',
-					'--correct_bias',
-					'on',
-					'--topup_first_b0s_only',
-					'--nonzero_shells',
-					'350,650,1350,2000',
-					'--subject',
-					self._sub,
-					'--project',
-					'SSBC',
-					'--session',
-					self._ses
-				]
-			else:
+					self._command = [
+						'selfie',
+						'--lock',
+						'--output-file', self._prov,
+						'singularity',
+						'run',
+						'-e',
+						'--contain',
+						'-B',
+						f'{inputs_dir}:/INPUTS/',
+						'-B',
+						f'{self._outdir}:/OUTPUTS',
+						'-B',
+						f'{self._tempdir}:/tmp',
+						'-B',
+						'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
+						'-B',
+						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
+						'-B',
+						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
+						'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
+						'--save_component_pngs',
+						'j',
+						'--num_threads',
+						'2',
+						'--denoise',
+						'off',
+						'--degibbs',
+						'off',
+						'--rician',
+						'off',
+						'--prenormalize',
+						'on',
+						'--correct_bias',
+						'on',
+						'--topup_first_b0s_only',
+						'--nonzero_shells',
+						'350,650,1350,2000',
+						'--subject',
+						self._sub,
+						'--project',
+						'SSBC',
+						'--session',
+						self._ses
+					]
+				else:	
 
-				self._command = [
-					'selfie',
-					'--lock',
-					'--output-file', self._prov,
-					'singularity',
-					'run',
-					'-e',
-					'--contain',
-					'--nv',
-					'-B',
-					f'{inputs_dir}:/INPUTS/',
-					'-B',
-					f'{self._outdir}:/OUTPUTS',
-					'-B',
-					f'{self._tempdir}:/tmp',
-					'-B',
-					'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-					'-B',
-					'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
-					'-B',
-					'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
-					'-B',
-					'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
-					'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
-					'--save_component_pngs',
-					'j',
-					'--eddy_cuda',
-					'9.1',
-					'--num_threads',
-					'2',
-					'--denoise',
-					'off',
-					'--degibbs',
-					'off',
-					'--rician',
-					'off',
-					'--prenormalize',
-					'on',
-					'--correct_bias',
-					'on',
-					'--topup_first_b0s_only',
-					'--nonzero_shells',
-					'350,650,1350,2000',
-					'--subject',
-					self._sub,
-					'--project',
-					'SSBC',
-					'--session',
-					self._ses
-				]
+					self._command = [
+						'selfie',
+						'--lock',
+						'--output-file', self._prov,
+						'singularity',
+						'run',
+						'-e',
+						'--contain',
+						'--nv',
+						'-B',
+						f'{inputs_dir}:/INPUTS/',
+						'-B',
+						f'{self._outdir}:/OUTPUTS',
+						'-B',
+						f'{self._tempdir}:/tmp',
+						'-B',
+						'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
+						'-B',
+						'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
+						'-B',
+						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
+						'-B',
+						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
+						'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
+						'--save_component_pngs',
+						'j',
+						'--eddy_cuda',
+						'9.1',
+						'--num_threads',
+						'2',
+						'--denoise',
+						'off',
+						'--degibbs',
+						'off',
+						'--rician',
+						'off',
+						'--prenormalize',
+						'on',
+						'--correct_bias',
+						'on',
+						'--topup_first_b0s_only',
+						'--nonzero_shells',
+						'350,650,1350,2000',
+						'--subject',
+						self._sub,
+						'--project',
+						'SSBC',
+						'--session',
+						self._ses
+					]
 
 		logdir = self.logdir()
 		logfile = os.path.join(logdir, 'dwiqc-prequal.log')
