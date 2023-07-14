@@ -184,7 +184,7 @@ class Task(tasks.BaseTask):
 
 		spec_file = f"{self._bids}/odd_slices_slspec.txt"
 
-		np.savetxt(spec_file, data, fmt=['%d', '%d', '%d'])
+		np.savetxt(spec_file, all_cols, fmt=['%d', '%d', '%d'])
 
 		self._spec = spec_file
 
