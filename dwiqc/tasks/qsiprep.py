@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
 from env_modules_python import module
 import shutil
 from executors.models import Job
+import dwiqc.config as config
 
 
 #module('load', 'cuda/9.1.85-fasrc01')
@@ -225,7 +226,8 @@ class Task(tasks.BaseTask):
 		#self.create_nipype()
 		self.check_output_resolution()
 		if self._qsiprep_config:
-			self._command = self._qsiprep_config
+			qsiprep_command = yaml.safe_load(open(config.qsiprep_config()))
+			self._command = qsiprep_command['qsiprep']['shell']
 		else:
 			self._command = [
 				'selfie',
@@ -257,6 +259,9 @@ class Task(tasks.BaseTask):
 				'-w',
 				self._tempdir
 			]
+		# ******** temporary check for debugging ##########
+		print(self._command)
+		sys.exit()
 
 		if self._no_gpu:
 			logdir = self.logdir()
