@@ -322,9 +322,10 @@ class Task(tasks.BaseTask):
 			try:
 				prequal_command = yaml.safe_load(open(self._prequal_config))
 			except yaml.parser.ParserError:
-				print("There's an issue with the prequal config file. Exiting.")
+				print("There's an issue with the prequal config file.\nMake sure it is a .yaml file with proper formatting.")
 				sys.exit()
 			self._command = prequal_command['prequal']['shell']
+			print(self._command)
 			sys.exit()
 		else:
 			if self._nonzero_shells == False:
