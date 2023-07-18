@@ -325,8 +325,6 @@ class Task(tasks.BaseTask):
 				print("There's an issue with the prequal config file.\nMake sure it is a .yaml file with proper formatting.")
 				sys.exit()
 			self._command = prequal_command['prequal']['shell']
-			print(self._command)
-			sys.exit()
 		else:
 			if self._nonzero_shells == False:
 				if self._no_gpu:
