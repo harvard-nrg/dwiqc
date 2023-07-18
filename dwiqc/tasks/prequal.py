@@ -25,7 +25,7 @@ module('load', 'cuda/9.1.85-fasrc01')
 # pull in some parameters from the BaseTask class in the __init__.py directory
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, prequal_config=False, no_gpu=False, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, prequal_config, no_gpu=False, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
@@ -319,6 +319,8 @@ class Task(tasks.BaseTask):
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
 		if self._prequal_config:
+			print("the catch worked!")
+			sys.exit()
 			prequal_command = yaml.safe_load(open(config.prequal_command()))
 			self._command = prequal_command['prequal']['shell']
 		else:
