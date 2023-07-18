@@ -319,10 +319,9 @@ class Task(tasks.BaseTask):
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
 		if self._prequal_config:
-			print("the catch worked!")
-			sys.exit()
-			prequal_command = yaml.safe_load(open(config.prequal_command()))
+			prequal_command = yaml.safe_load(open(self._prequal_config))
 			self._command = prequal_command['prequal']['shell']
+			sys.exit()
 		else:
 			if self._nonzero_shells == False:
 				if self._no_gpu:
