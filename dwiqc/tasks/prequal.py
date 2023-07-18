@@ -319,7 +319,11 @@ class Task(tasks.BaseTask):
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
 		if self._prequal_config:
-			prequal_command = yaml.safe_load(open(self._prequal_config))
+			try:
+				prequal_command = yaml.safe_load(open(self._prequal_config))
+			except yaml.parser.ParserError:
+				print("There's an issue with the prequal config file. Exiting.")
+				sys.exit()
 			self._command = prequal_command['prequal']['shell']
 			sys.exit()
 		else:
