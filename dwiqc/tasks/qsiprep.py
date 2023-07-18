@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config=False, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
@@ -228,7 +228,11 @@ class Task(tasks.BaseTask):
 		#self.create_nipype()
 		self.check_output_resolution()
 		if self._qsiprep_config:
-			qsiprep_command = yaml.safe_load(open(config.qsiprep_command()))
+			try:
+				qsiprep_command = yaml.safe_load(open(self._qsiprep_config))
+			except yaml.parser.ParserError:
+				print("There's an issue with the prequal config file.\nMake sure it is a .yaml file with proper formatting.")
+				sys.exit()
 			self._command = qsiprep_command['qsiprep']['shell']
 		else:
 			self._command = [
