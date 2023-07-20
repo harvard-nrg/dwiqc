@@ -217,9 +217,11 @@ class Task(tasks.BaseTask):
 			"slice_order": self._spec,
 			"args": "--ol_nstd=5 --ol_type=gw"
 		}
-
-		with open(f"{self._bids}/eddy_params_s2v_mbs.json", "w") as f:
-			json.dump(params_file, f)
+		if not self._qsiprep_config:
+			with open(f"{self._bids}/eddy_params_s2v_mbs.json", "w") as f:
+				json.dump(params_file, f)
+		else:
+			print('Custom eddy_params file being fed in by user.')
 
 	# create qsiprep command to be executed
 
