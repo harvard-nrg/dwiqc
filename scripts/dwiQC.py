@@ -38,7 +38,7 @@ def main():
         help='XNAT username')
     parser_get.add_argument('--xnat-pass',
         help='XNAT password')
-    parser_get.add_argument('--no-tagger', action='store_true',
+    parser_get.add_argument('--no-tagger', action='store_true', default=False,
         help='Do not run xnattagger')
     parser_get.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
@@ -128,7 +128,7 @@ def main():
         help='XNAT username')
     parser_tandem.add_argument('--xnat-pass',
         help='XNAT password')
-    parser_tandem.add_argument('--no-tagger', action='store_true',
+    parser_tandem.add_argument('--no-tagger', action='store_true', default=False,
         help='Do not run xnattagger')
     parser_tandem.add_argument('--artifacts-dir',
         help='Location for generated assessors and resources')
