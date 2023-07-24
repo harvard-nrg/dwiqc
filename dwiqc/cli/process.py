@@ -49,7 +49,23 @@ def do(args):
 
     # grab the dwi and json files using pybids and os
 
-    dwi_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='dwi', run=args.run, return_type='filename').pop())
+    try:
+        dwi_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='dwi', run=args.run, return_type='filename').pop())
+    except IndexError:
+        logger.error("No diffusion data found. Double check bids directory to verify. Exiting.")
+        sys.exit()
+
+    try:
+        ap_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='epi', direction='AP', run=args.run, return_type='filename').pop())
+    except IndexError:
+        logger.error("No AP field map data found. Double check bids directory to verify. Exiting.")
+        sys.exit()
+
+    try:
+        pa_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='epi', direction='PA', run=args.run, return_type='filename').pop())
+    except IndexError:
+        logger.error("No PA field map data found. Double check bids directory to verify. Exiting.")
+        sys.exit()
 
     json_file = os.path.basename(layout.get(subject=args.sub, extension='.json', suffix='dwi', run=args.run, return_type='filename').pop())
 
