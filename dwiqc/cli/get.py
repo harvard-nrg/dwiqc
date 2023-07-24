@@ -27,14 +27,16 @@ def do(args):
 
     # call and run xnattagger on the diffusion data
 
-    logger.info("running xnattagger...")
+    if not args.no_tagger:
 
-    with open(tagger_conf) as fo:
-        filters = yaml.load(fo, Loader=yaml.SafeLoader)
+        logger.info("running xnattagger...")
 
-    tagger = Tagger(args.xnat_alias, filters, 'dwi', args.label)
-    tagger.generate_updates()
-    tagger.apply_updates()
+        with open(tagger_conf) as fo:
+         filters = yaml.load(fo, Loader=yaml.SafeLoader)
+
+        tagger = Tagger(args.xnat_alias, filters, 'dwi', args.label)
+        tagger.generate_updates()
+        tagger.apply_updates()
 
     logger.info('downloading data from xnat...')
 
