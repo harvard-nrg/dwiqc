@@ -32,7 +32,7 @@ def do(args):
         logger.info("running xnattagger...")
 
         with open(tagger_conf) as fo:
-         filters = yaml.load(fo, Loader=yaml.SafeLoader)
+            filters = yaml.load(fo, Loader=yaml.SafeLoader)
 
         tagger = Tagger(args.xnat_alias, filters, 'dwi', args.label)
         tagger.generate_updates()
