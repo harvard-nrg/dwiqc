@@ -9,7 +9,7 @@ import dwiqc.config as config
 
 
 logger = logging.getLogger(__name__)
-
+home_dir = os.path.expanduser("~")
 
 
 
