@@ -25,11 +25,15 @@ prequal_link = 'https://www.dropbox.com/scl/fi/p58pbj4v662ji1ax19lka/prequal_nrg
 
 qsiprep_link = 'https://www.dropbox.com/scl/fi/s8asxwmykyw7paqdcnaev/qsiprep.sif?rlkey=lnuffrzn9mf894q6j9tl2l2mc&dl=1'
 
-default_location = '~/.config/dwiqc/containers/'
+home_dir = os.path.expanduser("~")
+
+default_location = os.path.join(home_dir, '.config/dwiqc/containers/')
 
 def do(args):
 
 	os.makedirs(default_location, exist_ok=True)
+
+	os.chdir(default_location)
 
 	logger.info('installing chromium...')
 
