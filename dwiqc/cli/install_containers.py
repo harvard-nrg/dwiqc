@@ -7,6 +7,7 @@ import yaml
 import yaxil
 import glob
 import math
+import time
 import logging
 import subprocess
 import shutil
@@ -33,11 +34,13 @@ def do(args):
 
 	os.makedirs(args.install_location, exist_ok=True)
 
+
+
 	check_storage(args.install_location)
 
 	logger.info('installing chromium...')
 
-	download_chromium = f'curl -L -o chromium.sif {args.install_location}/{chromium_link}'
+	download_chromium = f'curl -L -o {args.install_location}/chromium.sif {chromium_link}'
 	proc1 = subprocess.Popen(download_chromium, shell=True, stdout=subprocess.PIPE)
 	proc1.communicate()
 
@@ -45,7 +48,7 @@ def do(args):
 
 	logger.info('installing prequal...')
 
-	download_prequal = f'curl -L -o prequal_nrg.sif {args.install_location}/{prequal_link}'
+	download_prequal = f'curl -L -o {args.install_location}/prequal_nrg.sif {prequal_link}'
 	proc2 = subprocess.Popen(download_prequal, shell=True, stdout=subprocess.PIPE)
 	proc2.communicate()
 
@@ -53,7 +56,7 @@ def do(args):
 	
 	logger.info('installing qsiprep...')
 
-	download_qsiprep = f'curl -L -o qsiprep.sif {args.install_location}/{qsiprep_link}'
+	download_qsiprep = f'curl -L -o {args.install_location}/qsiprep.sif {qsiprep_link}'
 	proc3 = subprocess.Popen(download_qsiprep, shell=True, stdout=subprocess.PIPE)
 	proc3.communicate()
 
@@ -78,6 +81,8 @@ def check_storage(directory):
 
 	else:
 		logger.info(f'This directory has {avail_gigs}GB of available space. The dwiqc containers will take up 22GB.')
+		print("\n\n")
+		time.sleep(5)
 
 
 
