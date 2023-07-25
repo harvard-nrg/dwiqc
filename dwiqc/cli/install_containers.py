@@ -50,7 +50,7 @@ def do(args):
 		proc1 = subprocess.Popen(download_chromium, shell=True, stdout=subprocess.PIPE)
 		proc1.communicate()
 
-		print("\n\n")
+		print("\n")
 
 	if os.path.isfile(f"{args.install_location}/prequal_nrg.sif"):
 		logger.warning(f'Prequal has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping to qsiprep...')
@@ -64,7 +64,7 @@ def do(args):
 		proc2 = subprocess.Popen(download_prequal, shell=True, stdout=subprocess.PIPE)
 		proc2.communicate()
 
-		print("\n\n")
+		print("\n")
 
 	if os.path.isfile(f"{args.install_location}/qsiprep.sif"):
 		logger.warning(f'Qsiprep has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping...')
@@ -93,7 +93,6 @@ def create_symlinks(source):
 	os.chdir(source)
 	for file in os.listdir(source):
 		os.symlink(file, f"{symlink_location}{file}")
-		print(f'creating symlink for {file}')
 
 	
 
