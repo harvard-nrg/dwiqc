@@ -34,8 +34,6 @@ def do(args):
 
 	os.makedirs(args.install_location, exist_ok=True)
 
-
-
 	check_storage(args.install_location)
 
 	logger.info('installing chromium...')
@@ -60,9 +58,22 @@ def do(args):
 	proc3 = subprocess.Popen(download_qsiprep, shell=True, stdout=subprocess.PIPE)
 	proc3.communicate()
 
+	create_symlinks(args.install_location)
 
-def symlink():
-	pass
+	logger.info(f'Containers successfully downloaded to {args.install_location}')
+
+
+def create_symlinks(source):
+
+	if source == symlink_location:
+		print('normally will not see anything here')
+		return
+
+	os.chdir(source)
+	for file in os.listdir(source):
+		os.symlink(file, f"{symlink_location}{file}")
+		print(f'creating symlink for {file}')
+
 	
 
 def check_storage(directory):
@@ -81,7 +92,7 @@ def check_storage(directory):
 
 	else:
 		logger.info(f'This directory has {avail_gigs}GB of available space. The dwiqc containers will take up 22GB.')
-		print("\n\n")
+		print("\n")
 		time.sleep(5)
 
 
