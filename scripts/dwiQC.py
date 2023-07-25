@@ -24,7 +24,7 @@ def main():
 
     # install mode
     parser_install = subparsers.add_parser('install-containers', help='install-containers -h')
-    parser_install.add_argument('--install-location', default='~/.config',
+    parser_install.add_argument('--install-location', default='~/.config/dwiqc/containers',
         help='Path to desired container installation location')
     parser_install.set_defaults(func=cli.install_containers.do)
     
