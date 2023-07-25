@@ -21,6 +21,12 @@ def main():
     parser.add_argument('--insecure', action='store_true',
         help='Disable SSL certificate verification')
     subparsers = parser.add_subparsers(help='sub-command help')
+
+    # install mode
+    parser_install = subparsers.add_parser('install', help='install -h')
+    parser_install.add_argument('--install-location', default='~/.config',
+        help='Path to desired container installation location')
+    parser_process.set_defaults(func=cli.install.do)
     
     # get mode
     parser_get = subparsers.add_parser('get', help='get -h')
