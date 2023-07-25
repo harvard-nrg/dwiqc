@@ -99,7 +99,7 @@ def create_symlinks(source):
 
 def check_storage(directory):
 	# run df -Ph and tokenize each line's values into a list of 2 elements.
-	df_output_lines = [s.split() for s in os.popen(f"df -Ph {directory}").read().splitlines()]
+	df_output_lines = [s.split() for s in os.popen(f"df -Ph --block-size=1GB {directory}").read().splitlines()]
 
 	# this line grabs the value attached to 'Avail' from the above df -Ph command. It then 
 	# gets rid of the non numeric characters using re and converts that number from a string
