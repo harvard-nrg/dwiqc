@@ -26,7 +26,7 @@ def main():
     parser_install = subparsers.add_parser('install', help='install -h')
     parser_install.add_argument('--install-location', default='~/.config',
         help='Path to desired container installation location')
-    parser_install.set_defaults(func=cli.install.do)
+    parser_install.set_defaults(func=cli.install-containers.do)
     
     # get mode
     parser_get = subparsers.add_parser('get', help='get -h')
