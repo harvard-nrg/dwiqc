@@ -27,29 +27,33 @@ qsiprep_link = 'https://www.dropbox.com/scl/fi/s8asxwmykyw7paqdcnaev/qsiprep.sif
 
 home_dir = os.path.expanduser("~")
 
-default_location = os.path.join(home_dir, '.config/dwiqc/containers/')
+symlink_location = os.path.join(home_dir, '.config/dwiqc/containers/')
 
 def do(args):
 
-	os.makedirs(default_location, exist_ok=True)
+	os.makedirs(args.install_location, exist_ok=True)
 
-	os.chdir(default_location)
+	check_storage(args.install_location)
 
 	logger.info('installing chromium...')
 
-	download_chromium = f'curl -L -o chromium.sif {chromium_link}'
+	download_chromium = f'curl -L -o chromium.sif {args.install_location}/{chromium_link}'
 	proc1 = subprocess.Popen(download_chromium, shell=True, stdout=subprocess.PIPE)
 	proc1.communicate()
 
+	print("\n\n")
+
 	logger.info('installing prequal...')
 
-	download_prequal = f'curl -L -o prequal_nrg.sif {prequal_link}'
+	download_prequal = f'curl -L -o prequal_nrg.sif {args.install_location}/{prequal_link}'
 	proc2 = subprocess.Popen(download_prequal, shell=True, stdout=subprocess.PIPE)
 	proc2.communicate()
+
+	print("\n\n")
 	
 	logger.info('installing qsiprep...')
 
-	download_qsiprep = f'curl -L -o qsiprep.sif {qsiprep_link}'
+	download_qsiprep = f'curl -L -o qsiprep.sif {args.install_location}/{qsiprep_link}'
 	proc3 = subprocess.Popen(download_qsiprep, shell=True, stdout=subprocess.PIPE)
 	proc3.communicate()
 
@@ -57,3 +61,27 @@ def do(args):
 def symlink():
 	pass
 	
+
+def check_storage(directory):
+	# run df -Ph and tokenize each line's values into a list of 2 elements.
+	df_output_lines = [s.split() for s in os.popen(f"df -Ph {directory}").read().splitlines()]
+
+	# this line grabs the value attached to 'Avail' from the above df -Ph command. It then 
+	# gets rid of the non numeric characters using re and converts that number from a string
+	# to an integer
+
+	avail_gigs = int(re.sub("[^0-9]", "", [line[3] for line in df_output_lines][1]))
+
+	if avail_gigs < 22:
+		logger.error(f'Not enough desk space at {directory}.\nPlease select a different directory using the --install-location argument.')
+		sys.exit(1)
+
+	else:
+		logger.info(f'This directory has {avail_gigs}GB of available space. The dwiqc containers will take up 22GB.')
+
+
+
+
+
+
+
