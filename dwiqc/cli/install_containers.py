@@ -38,25 +38,42 @@ def do(args):
 
 	logger.info('installing chromium...')
 
-	download_chromium = f'curl -L -o {args.install_location}/chromium.sif {chromium_link}'
-	proc1 = subprocess.Popen(download_chromium, shell=True, stdout=subprocess.PIPE)
-	proc1.communicate()
+	### check if chromium already there
 
-	print("\n\n")
+	if os.path.isfile(f"{args.install_location}/chromium.sif"):
+		logger.warning(f'Chromium has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping to prequal...')
 
-	logger.info('installing prequal...')
+	else:
 
-	download_prequal = f'curl -L -o {args.install_location}/prequal_nrg.sif {prequal_link}'
-	proc2 = subprocess.Popen(download_prequal, shell=True, stdout=subprocess.PIPE)
-	proc2.communicate()
+		download_chromium = f'curl -L -o {args.install_location}/chromium.sif {chromium_link}'
+		proc1 = subprocess.Popen(download_chromium, shell=True, stdout=subprocess.PIPE)
+		proc1.communicate()
 
-	print("\n\n")
+		print("\n\n")
+
+	if os.path.isfile(f"{args.install_location}/prequal_nrg.sif"):
+		logger.warning(f'Prequal has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping to qsiprep...')	
+
+	else:
+
+		logger.info('installing prequal...')
+
+		download_prequal = f'curl -L -o {args.install_location}/prequal_nrg.sif {prequal_link}'
+		proc2 = subprocess.Popen(download_prequal, shell=True, stdout=subprocess.PIPE)
+		proc2.communicate()
+
+		print("\n\n")
+
+	if os.path.isfile(f"{args.install_location}/qsiprep.sif"):
+		logger.warning(f'Qsiprep has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping...')
+
+	else:
 	
-	logger.info('installing qsiprep...')
+		logger.info('installing qsiprep...')
 
-	download_qsiprep = f'curl -L -o {args.install_location}/qsiprep.sif {qsiprep_link}'
-	proc3 = subprocess.Popen(download_qsiprep, shell=True, stdout=subprocess.PIPE)
-	proc3.communicate()
+		download_qsiprep = f'curl -L -o {args.install_location}/qsiprep.sif {qsiprep_link}'
+		proc3 = subprocess.Popen(download_qsiprep, shell=True, stdout=subprocess.PIPE)
+		proc3.communicate()
 
 	create_symlinks(args.install_location)
 
