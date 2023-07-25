@@ -50,5 +50,6 @@ def do(args):
 	proc3.communicate()
 
 
-def symlink()
+def symlink():
+	pass
 	
