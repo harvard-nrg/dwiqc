@@ -4,11 +4,12 @@ import dwiqc
 import dwiqc.cli as cli
 import logging
 import argparse as ap
+import os
 import dwiqc.config as config
 
 
 logger = logging.getLogger(__name__)
-
+home_dir = os.path.expanduser("~")
 
 
 
@@ -21,6 +22,12 @@ def main():
     parser.add_argument('--insecure', action='store_true',
         help='Disable SSL certificate verification')
     subparsers = parser.add_subparsers(help='sub-command help')
+
+    # install mode
+    parser_install = subparsers.add_parser('install-containers', help='install-containers -h')
+    parser_install.add_argument('--install-location', default=os.path.join(home_dir, '.config/dwiqc/containers/'),
+        help='Path to desired container installation location')
+    parser_install.set_defaults(func=cli.install_containers.do)
     
     # get mode
     parser_get = subparsers.add_parser('get', help='get -h')
