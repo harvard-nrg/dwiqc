@@ -37,19 +37,19 @@ def do(args):
 
 	logger.info('installing chromium...')
 
-	download_chromium = f'curl -L -s {chromium_link}'
+	download_chromium = f'curl -L -o chromium.sif {chromium_link}'
 	proc1 = subprocess.Popen(download_chromium, shell=True, stdout=subprocess.PIPE)
 	proc1.communicate()
 
 	logger.info('installing prequal...')
 
-	download_prequal = f'curl -L -s {prequal_link}'
+	download_prequal = f'curl -L -o prequal_nrg.sif {prequal_link}'
 	proc2 = subprocess.Popen(download_prequal, shell=True, stdout=subprocess.PIPE)
 	proc2.communicate()
 	
 	logger.info('installing qsiprep...')
 
-	download_qsiprep = f'curl -L -s {qsiprep_link}'
+	download_qsiprep = f'curl -L -o qsiprep.sif {qsiprep_link}'
 	proc3 = subprocess.Popen(download_qsiprep, shell=True, stdout=subprocess.PIPE)
 	proc3.communicate()
 
