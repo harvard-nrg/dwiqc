@@ -42,6 +42,7 @@ def do(args):
 
 	if os.path.isfile(f"{args.install_location}/chromium.sif"):
 		logger.warning(f'Chromium has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping to prequal...')
+		print('\n')
 
 	else:
 
@@ -52,7 +53,8 @@ def do(args):
 		print("\n\n")
 
 	if os.path.isfile(f"{args.install_location}/prequal_nrg.sif"):
-		logger.warning(f'Prequal has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping to qsiprep...')	
+		logger.warning(f'Prequal has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping to qsiprep...')
+		print('\n')
 
 	else:
 
@@ -66,6 +68,7 @@ def do(args):
 
 	if os.path.isfile(f"{args.install_location}/qsiprep.sif"):
 		logger.warning(f'Qsiprep has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping...')
+		print('\n')
 
 	else:
 	
@@ -77,13 +80,14 @@ def do(args):
 
 	create_symlinks(args.install_location)
 
+	print('\n')
+
 	logger.info(f'Containers successfully downloaded to {args.install_location}')
 
 
 def create_symlinks(source):
 
 	if source == symlink_location:
-		print('normally will not see anything here')
 		return
 
 	os.chdir(source)
@@ -108,7 +112,7 @@ def check_storage(directory):
 		sys.exit(1)
 
 	else:
-		logger.info(f'This directory has {avail_gigs}GB of available space. The dwiqc containers will take up 22GB.')
+		logger.info(f'This directory has {avail_gigs}GB of available space. The dwiqc containers will take up 22GB of storage.')
 		print("\n")
 		time.sleep(5)
 
