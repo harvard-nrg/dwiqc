@@ -6,10 +6,11 @@ from pathlib import Path
 import mimetypes
 import os
 logger = logging.getLogger(__name__)
+home_dir = os.path.expanduser("~")
 
 
 def snapshot(url, saveto):
-	proc1 = f'chromium.sif --no-sandbox --headless --print-to-pdf={saveto} {url}'
+	proc1 = f'{home_dir}/.config/dwiqc/containers/chromium.sif --no-sandbox --headless --print-to-pdf={saveto} {url}'
 	output = subprocess.Popen(proc1, shell=True, stderr=subprocess.PIPE)
 	output.communicate()
 
