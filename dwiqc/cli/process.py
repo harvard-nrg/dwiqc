@@ -84,6 +84,7 @@ def do(args):
             run=args.run,
             bids=args.bids_dir,
             outdir=prequal_outdir,
+            fs_license = args.fs_license,
             prequal_config=args.prequal_config,
             no_gpu=args.no_gpu,
             tempdir=tempfile.gettempdir(),

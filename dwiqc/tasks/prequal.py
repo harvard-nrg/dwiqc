@@ -11,8 +11,6 @@ import json
 import dwiqc.tasks as tasks
 import shutil
 from executors.models import Job
-sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
-from env_modules_python import module
 import dwiqc.config as config
 import numpy as np
 
@@ -20,17 +18,16 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 
-module('load', 'cuda/9.1.85-fasrc01')
-
 # pull in some parameters from the BaseTask class in the __init__.py directory
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, prequal_config, no_gpu=False, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, prequal_config, fs_license, no_gpu=False, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
 		self._prequal_config = prequal_config
+		self._fs_license = fs_license
 		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
 		super().__init__(outdir, tempdir, pipenv)
@@ -318,6 +315,8 @@ class Task(tasks.BaseTask):
 		self._tempdir = tempfile.gettempdir()
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
+		home_dir = os.path.expanduser("~")
+		prequal_sif = os.path.join(home_dir, '.config/dwiqc/containers/prequal_nrg.sif')
 		if self._prequal_config:
 			try:
 				prequal_command = yaml.safe_load(open(self._prequal_config))
@@ -343,18 +342,14 @@ class Task(tasks.BaseTask):
 						'-B',
 						f'{self._tempdir}:/tmp',
 						'-B',
-						'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
-						'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
+						f'{self._fs_license}:/APPS/freesurfer/license.txt',
+						f'{prequal_sif}',
 						'--save_component_pngs',
 						'j',
 						'--num_threads',
 						'2',
 						'--denoise',
-						'off',
+						'on',
 						'--degibbs',
 						'off',
 						'--rician',
@@ -367,7 +362,7 @@ class Task(tasks.BaseTask):
 						'--subject',
 						self._sub,
 						'--project',
-						'SSBC',
+						'Proj',
 						'--session',
 						self._ses
 					]
@@ -388,22 +383,16 @@ class Task(tasks.BaseTask):
 						'-B',
 						f'{self._tempdir}:/tmp',
 						'-B',
-						'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-						'-B',
-						'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
-						'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
+						f'{self._fs_license}:/APPS/freesurfer/license.txt',
+						f'{prequal_sif}',
 						'--save_component_pngs',
 						'j',
 						'--eddy_cuda',
-						'9.1',
+						'10.2',
 						'--num_threads',
 						'2',
 						'--denoise',
-						'off',
+						'on',
 						'--degibbs',
 						'off',
 						'--rician',
@@ -416,7 +405,7 @@ class Task(tasks.BaseTask):
 						'--subject',
 						self._sub,
 						'--project',
-						'SSBC',
+						'Proj',
 						'--session',
 						self._ses
 					]	
@@ -439,18 +428,14 @@ class Task(tasks.BaseTask):
 						'-B',
 						f'{self._tempdir}:/tmp',
 						'-B',
-						'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
-						'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
+						f'{self._fs_license}:/APPS/freesurfer/license.txt',
+						f'{prequal_sif}',
 						'--save_component_pngs',
 						'j',
 						'--num_threads',
 						'2',
 						'--denoise',
-						'off',
+						'on',
 						'--degibbs',
 						'off',
 						'--rician',
@@ -465,7 +450,7 @@ class Task(tasks.BaseTask):
 						'--subject',
 						self._sub,
 						'--project',
-						'SSBC',
+						'Proj',
 						'--session',
 						self._ses
 					]
@@ -487,22 +472,16 @@ class Task(tasks.BaseTask):
 						'-B',
 						f'{self._tempdir}:/tmp',
 						'-B',
-						'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-						'-B',
-						'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
-						'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
+						f'{self._fs_license}:/APPS/freesurfer/license.txt',
+						f'{prequal_sif}',
 						'--save_component_pngs',
 						'j',
 						'--eddy_cuda',
-						'9.1',
+						'10.2',
 						'--num_threads',
 						'2',
 						'--denoise',
-						'off',
+						'on',
 						'--degibbs',
 						'off',
 						'--rician',
@@ -517,7 +496,7 @@ class Task(tasks.BaseTask):
 						'--subject',
 						self._sub,
 						'--project',
-						'SSBC',
+						'Proj',
 						'--session',
 						self._ses
 					]
