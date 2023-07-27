@@ -34,6 +34,8 @@ def do(args):
 
 	os.makedirs(args.install_location, exist_ok=True)
 
+	os.makedirs(symlink_location, exist_ok=True)
+
 	check_storage(args.install_location)
 
 	logger.info('installing chromium...')
