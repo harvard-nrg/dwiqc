@@ -92,7 +92,8 @@ def create_symlinks(source):
 
 	os.chdir(source)
 	for file in os.listdir(source):
-		os.symlink(file, f"{symlink_location}{file}")
+		abs_path = os.path.abspath(file)
+		os.symlink(abs_path, f"{symlink_location}{file}")
 
 	
 
