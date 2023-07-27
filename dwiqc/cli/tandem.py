@@ -57,8 +57,6 @@ def do(args):
 
     conf = yaml.safe_load(open(args.xnat_config)) # load 
 
-    # config file under anatqc/config/anatqc.yaml
-
     # query DWI, T1 and fieldmap scans from XNAT
     with yaxil.session(auth) as ses:
         scans = col.defaultdict(dict)
