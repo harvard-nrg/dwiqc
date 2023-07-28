@@ -99,7 +99,10 @@ def create_symlinks(source):
 	os.chdir(source)
 	for file in os.listdir(source):
 		abs_path = os.path.abspath(file)
-		os.symlink(abs_path, f"{symlink_location}{file}")
+		try:
+			os.symlink(abs_path, f"{symlink_location}{file}")
+		except FileExistsError:
+			continue
 
 	
 
