@@ -53,7 +53,7 @@ def main():
 
     # process mode
     parser_process = subparsers.add_parser('process', help='process -h')
-    parser_process.add_argument('--partition', default='fasse_gpu',
+    parser_process.add_argument('--partition', required=True,
         help='Job scheduler partition')
     parser_process.add_argument('--scheduler', default=None,
         help='Choose a specific job scheduler')
@@ -109,7 +109,7 @@ def main():
         help='BIDS run')
     parser_process.add_argument('--output-resolution',
         help='Resolution of output data. Defaut is resolution of input data.')
-    parser_tandem.add_argument('--partition', default='fasse_gpu',
+    parser_tandem.add_argument('--partition', required=True,
         help='Job scheduler partition')
     parser_tandem.add_argument('--scheduler', default=None,
         help='Choose a specific job scheduler')
