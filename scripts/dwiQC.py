@@ -81,7 +81,7 @@ def main():
         help='Run prequal and qsiprep without gpu functionality.')
     parser_process.add_argument('--sub-tasks', nargs='+', default=['prequal', 'qsiprep'],
         help='Run only certain sub tasks')
-    parser_process.add_argument('--fs-license',
+    parser_process.add_argument('--fs-license', required=True,
         help='Base64 encoded FreeSurfer license file')
     parser_process.add_argument('--xnat-alias',
         help='YAXIL authentication alias')
@@ -125,7 +125,7 @@ def main():
         help='Run prequal and qsiprep without gpu functionality.')
     parser_tandem.add_argument('--sub-tasks', nargs='+', default=['prequal', 'qsiprep'],
         help='Run only certain sub tasks')
-    parser_tandem.add_argument('--fs-license',
+    parser_tandem.add_argument('--fs-license', required=True,
         help='Base64 encoded FreeSurfer license')
     parser_tandem.add_argument('--xnat-alias',
         help='YAXIL authentication alias')
