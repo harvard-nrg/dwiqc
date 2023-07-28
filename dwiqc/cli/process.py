@@ -67,8 +67,6 @@ def do(args):
     json_file = os.path.basename(layout.get(subject=args.sub, extension='.json', suffix='dwi', run=args.run, return_type='filename').pop())
 
     basename = os.path.splitext(json_file)[0]
-   
-    logger.debug('DWI raw: %s', raw)
 
     os.system('mkdir -p $TMPDIR')
 
