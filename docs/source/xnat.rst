@@ -14,6 +14,7 @@ XNAT user documentation
 .. _GM SNR: https://mriqc.readthedocs.io/en/latest/iqms/t1w.html
 .. _Euler Holes: https://surfer.nmr.mgh.harvard.edu/fswiki/mris_euler_number
 .. _Entropy Focus Criterion: http://dx.doi.org/10.1109/42.650886
+.. _installation: developers.html#hpc-installation
 
 Tagging your scans
 ------------------
@@ -36,45 +37,7 @@ The image below displays an MR Session report page with populated notes.
 
 Running the pipeline
 --------------------
-To run the DWIQC pipeline, use the ``Run Containers > dwiqc-session`` button located within the ``Actions`` box on the MR Session report page
-
-.. note::
-   If you don't see the ``Run Containers`` menu, please refer to `Setting up the container <developers.html#setting-up-the-container>`_.
-
-.. image:: images/xnat-run-button.png
-
-
-This should bring up a small form with several configurable settings. Continue reading for a description of each setting
-
-.. image:: images/xnat-container-form.png
-
-run
-^^^
-This should be set to the integer value of the scan you want to process. If there's a corresponding ``move`` scan, that scan will also be processed
-
-================= =======
-DWI scan          run
-================= =======
-``#DWI_MAIN_001`` 1
-``#DWI_MAIN_002`` 2
-``#DWI_MAIN_999`` 999
-================= =======
-
-subtasks
-^^^^^^^^
-Under most circumstances you'll want to leave this field set to its default value ::
-
-    prequal qsiprep
-
-fslicense
-^^^^^^^^^
-This field should be set to a base64 encoded `FreeSurfer license`_. If you have a license file on a Linux or macOS machine, you can use the ``openssl`` command ::
-
-    openssl base64 < license.txt
-
-or you can use the ``base64`` command, if that utility is installed :: 
-
-    base64 license.txt
+For the time being, DWIQC can only be run outside of XNAT on a High Performance Computing system. Please see developer documentation for `installation`_ details.
 
 Understanding the report page
 -----------------------------
