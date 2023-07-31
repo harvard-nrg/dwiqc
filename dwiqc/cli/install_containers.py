@@ -22,7 +22,9 @@ logger = logging.getLogger(__name__)
 
 chromium_link = 'https://www.dropbox.com/scl/fi/wgh2d6xtdgi87zaxc5m5l/chromium.sif?rlkey=go0y0yrgbdns6b2j8i55ufwro&dl=1'
 
-prequal_link = 'https://www.dropbox.com/scl/fi/p58pbj4v662ji1ax19lka/prequal_nrg.sif?rlkey=lmm9jspl81w6jjfvkmsmbd595&dl=1'
+#prequal_link = 'https://www.dropbox.com/scl/fi/p58pbj4v662ji1ax19lka/prequal_nrg.sif?rlkey=lmm9jspl81w6jjfvkmsmbd595&dl=1'
+
+prequal_link = 'https://www.dropbox.com/scl/fi/az4mmv9dzd9gmeuoilnqd/prequal_nrg2.sif?rlkey=nimyvlrf9hgq2yle19m2yxgq0&dl=1'
 
 qsiprep_link = 'https://www.dropbox.com/scl/fi/s8asxwmykyw7paqdcnaev/qsiprep.sif?rlkey=lnuffrzn9mf894q6j9tl2l2mc&dl=1'
 
