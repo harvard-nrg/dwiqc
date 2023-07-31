@@ -72,8 +72,6 @@ def do(args):
 
     basename = os.path.splitext(json_file)[0]
    
-    #logger.debug('DWI raw: %s', raw)
-
     os.system('mkdir -p $TMPDIR')
 
 
