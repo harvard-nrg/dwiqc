@@ -51,7 +51,7 @@ DWIQC was designed with the goal of speeding up the quality check workflow of di
 DWIQC is built on the `prequal`_ and `qsiprep`_ processing packages. Both of these tools are excellent in their own right. We found that by running both of them, we can maximize our understanding of the data quality and glean additional insights. DWIQC was built completely in python and we welcome anyone to peruse the `codebase <https://github.com/harvard-nrg/dwiqc>`_ and make build suggestions (hello, pull requests!)
 
 get, process and tandem modes
-^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This should be set to the integer value of the scan you want to process. If there's a corresponding ``move`` scan, that scan will also be processed
 
 subtasks
