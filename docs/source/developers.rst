@@ -1,4 +1,4 @@
-Developer documentation
+Developer Documentation
 =======================
 .. _XNAT: https://xnat.org
 .. _command.json: https://github.com/harvard-nrg/anatqc/blob/xnat-1.7.6/command.json

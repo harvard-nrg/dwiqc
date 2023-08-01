@@ -1,4 +1,4 @@
-XNAT user documentation
+XNAT User Documentation
 =======================
 .. _XNAT: https://doi.org/10.1385/NI:5:1:11
 .. _command.json: https://github.com/harvard-nrg/anatqc/blob/xnat-1.7.6/command.json
@@ -14,10 +14,11 @@ XNAT user documentation
 .. _GM SNR: https://mriqc.readthedocs.io/en/latest/iqms/t1w.html
 .. _Euler Holes: https://surfer.nmr.mgh.harvard.edu/fswiki/mris_euler_number
 .. _Entropy Focus Criterion: http://dx.doi.org/10.1109/42.650886
+.. _XNAT_TAGGER: https://github.com/harvard-nrg/xnattagger
 
 Tagging your scans
 ------------------
-For DWIQC to discover Diffusion and Fieldmap scans to process, you need to add notes to those scans in `XNAT`_. You can add notes using the ``Edit`` button located within the ``Actions`` box on the MR Session report page.
+For DWIQC to discover Diffusion and Fieldmap scans to process, you need to add notes to those scans in `XNAT`_. This can either be done via the XNAT interface or through the `XNAT_Tagger`_ command line tool. To tag via the XNAT interface, you can add notes using the ``Edit`` button located within the ``Actions`` box on the MR Session report page.
 
 ========= ================================  ===========================================================
 Type      Example series                    Note
@@ -33,6 +34,10 @@ The image below displays an MR Session report page with populated notes.
    Note that if a ``DWI`` scan has corresponding ``PA`` and ``AP`` scans, they should be assigned matching numbers. For example, ``#DWI_MAIN_001`` would correspond to ``#DWI_PA_001`` and ``#DWI_AP_001``.
 
 .. image:: images/xnat-scan-notes.png
+
+xnattagger
+------------
+xnattagger automates the process of tagging scans in your XNAT project. xnattagger runs by default in the ``get`` and ``tandem`` modes of dwiqc. The default tagging convention is the same as seen above, but can be configured to user specifications. Please see the xnattagger documentation for details. 
 
 Running the pipeline
 --------------------
