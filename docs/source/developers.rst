@@ -6,7 +6,7 @@ Developer Documentation
 .. _vNav: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3320676/
 .. _Gradle: https://gradle.org/install/
 
-Installation
+HPC Installation
 ------------
 At the moment, the only supported way to install AnatQC is `within a container <#building-a-container>`_.
 

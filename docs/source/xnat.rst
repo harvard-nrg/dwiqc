@@ -3,22 +3,13 @@ XNAT User Documentation
 .. _XNAT: https://doi.org/10.1385/NI:5:1:11
 .. _command.json: https://github.com/harvard-nrg/anatqc/blob/xnat-1.7.6/command.json
 .. _T1w: https://tinyurl.com/hhru8ytz
-.. _vNav: https://doi.org/10.1002/mrm.23228
-.. _FreeSurfer: https://doi.org/10.1016/j.neuroimage.2012.01.021
-.. _FreeSurfer license: https://surfer.nmr.mgh.harvard.edu/registration.html
-.. _MRIQC: https://doi.org/10.1371/journal.pone.0184661
-.. _SNR Tot: https://mriqc.readthedocs.io/en/latest/iqms/t1w.html
-.. _Image Quality Metrics: https://mriqc.readthedocs.io/en/latest/iqms/t1w.html
-.. _EFC: https://mriqc.readthedocs.io/en/latest/iqms/t1w.html
-.. _FWHM Avg: https://mriqc.readthedocs.io/en/latest/iqms/t1w.html
-.. _GM SNR: https://mriqc.readthedocs.io/en/latest/iqms/t1w.html
-.. _Euler Holes: https://surfer.nmr.mgh.harvard.edu/fswiki/mris_euler_number
-.. _Entropy Focus Criterion: http://dx.doi.org/10.1109/42.650886
-.. _XNAT_TAGGER: https://github.com/harvard-nrg/xnattagger
+.. _prequal: https://github.com/MASILab/PreQual
+.. _qsiprep: https://qsiprep.readthedocs.io/en/latest/
+.. _installation: developers.html#hpc-installation
 
 Tagging your scans
 ------------------
-For DWIQC to discover Diffusion and Fieldmap scans to process, you need to add notes to those scans in `XNAT`_. This can either be done via the XNAT interface or through the `XNAT_Tagger`_ command line tool. To tag via the XNAT interface, you can add notes using the ``Edit`` button located within the ``Actions`` box on the MR Session report page.
+For DWIQC to discover Diffusion and Fieldmap scans to process, you need to add notes to those scans in `XNAT`_. This can either be done via the XNAT interface or through the `xnattagger <https://github.com/harvard-nrg/xnattagger>`_ command line tool. To tag via the XNAT interface, you can add notes using the ``Edit`` button located within the ``Actions`` box on the MR Session report page.
 
 ========= ================================  ===========================================================
 Type      Example series                    Note
@@ -37,25 +28,7 @@ The image below displays an MR Session report page with populated notes.
 
 xnattagger
 ------------
-xnattagger automates the process of tagging scans in your XNAT project. xnattagger runs by default in the ``get`` and ``tandem`` modes of dwiqc. The default tagging convention is the same as seen above, but can be configured to user specifications. Please see the xnattagger documentation for details. 
-
-Running the pipeline
---------------------
-To run the DWIQC pipeline, use the ``Run Containers > dwiqc-session`` button located within the ``Actions`` box on the MR Session report page
-
-.. note::
-   If you don't see the ``Run Containers`` menu, please refer to `Setting up the container <developers.html#setting-up-the-container>`_.
-
-.. image:: images/xnat-run-button.png
-
-
-This should bring up a small form with several configurable settings. Continue reading for a description of each setting
-
-.. image:: images/xnat-container-form.png
-
-run
-^^^
-This should be set to the integer value of the scan you want to process. If there's a corresponding ``move`` scan, that scan will also be processed
+xnattagger automates the process of tagging scans in your XNAT project. xnattagger runs by default in the ``get`` and ``tandem`` modes of dwiqc. The default tagging convention is the same as seen here (and above), but can be configured to user specifications. Please see the `xnattagger documentation <xnattagger.html>`_ for details. 
 
 ================= =======
 DWI scan          run
@@ -65,27 +38,27 @@ DWI scan          run
 ``#DWI_MAIN_999`` 999
 ================= =======
 
+Running the pipeline
+--------------------
+For the time being, DWIQC can only be run outside of XNAT on a High Performance Computing system. Please see developer documentation for `installation`_ details.
+
+Overview
+^^^^^^^^^
+With DWIQC and it's necessary containers installed, you're ready to analyze some diffusion data! Let's start by giving you a broad idea of what DWIQC does. 
+
+DWIQC was designed with the goal of speeding up the quality check workflow of diffusion weighted imaging data. Ideally, DWIQC would be run on subjects while the study is ongoing and as to help researchers catch problems (excessive motion, acquisition issues, etc.) as they happen, rather than discovering them after the data has been collected and the problems cannot be rectified. That being said, running DWIQC on previously acquired data can certainly provide helpful information. 
+
+DWIQC is built on the `prequal`_ and `qsiprep`_ processing packages. Both of these tools are excellent in their own right. We found that by running both of them, we can maximize our understanding of the data quality and glean additional insights. DWIQC was built completely in python and we welcome anyone to peruse the `codebase <https://github.com/harvard-nrg/dwiqc>`_ and make build suggestions (hello, pull requests!)
+
+get, process and tandem modes
+^^^
+This should be set to the integer value of the scan you want to process. If there's a corresponding ``move`` scan, that scan will also be processed
+
 subtasks
 ^^^^^^^^
-Under most circumstances you'll want to leave this field set to its default value ::
-
-    prequal qsiprep
 
 fslicense
 ^^^^^^^^^
-This field should be set to a base64 encoded `FreeSurfer license`_. If you have a license file on a Linux or macOS machine, you can use the ``openssl`` command ::
-
-    openssl base64 < license.txt
-
-or you can use the ``base64`` command, if that utility is installed :: 
-
-    base64 license.txt
-
-Understanding the report page
------------------------------
-The following section will break down each section of the DWIQC report page.
-
-.. image:: images/logo.png
 
 Left pane
 ^^^^^^^^^
