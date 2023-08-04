@@ -28,7 +28,7 @@ The image below displays an MR Session report page with populated notes.
 
 xnattagger
 ------------
-xnattagger automates the process of tagging scans in your XNAT project. xnattagger runs by default in the ``get`` and ``tandem`` modes of dwiqc. The default tagging convention is the same as seen here (and above), but can be configured to user specifications. Please see the `xnattagger documentation <xnattagger.html>`_ for details. 
+xnattagger automates the process of tagging scans in your XNAT project. xnattagger runs by default in the *get* and *tandem* modes of dwiqc. The default tagging convention is the same as seen here (and above), but can be configured to user specifications. Please see the `xnattagger documentation <xnattagger.html>`_ for details. 
 
 ================= =======
 DWI scan          run
@@ -52,13 +52,88 @@ DWIQC is built on the `prequal`_ and `qsiprep`_ processing packages. Both of the
 
 get, process and tandem modes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-This should be set to the integer value of the scan you want to process. If there's a corresponding ``move`` scan, that scan will also be processed
+DWIQC is broken down into four different "modes". As you saw in the `installation`_ section, the *install-containers* mode is used upon initial setup of your DWIQC environment. *get*, *process* and *tandem* modes are used once everything has been properly installed and you're ready to start working with the data. We'll start by looking at *get* mode.
 
-subtasks
+.. note::
+        The following sections assume you've activated your python virtual environment as demonstrated in the `installation`_ section. Shown again here:
+
+.. code-block:: shell
+
+    source dwqic/bin/activate
+
+get mode
 ^^^^^^^^
+.. note::
+    *get* mode is only applicable if you have an XNAT instance you're going to interact with. If you're only going to use DWIQC outside of XNAT, please feel free to skip to the `process <#process-mode>`_ mode section. 
 
-fslicense
-^^^^^^^^^
+*get* mode functions as a way to download data from XNAT to your local compute environment. *get* mode's primary feature is the ability to download data and convert it to BIDS format. If you're unfamiliar with BIDS, read up on it `here <https://bids-specification.readthedocs.io/en/stable/>`_. Note that `dcm2niix <https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage#General_Usage>`_ must be installed and on your path or loaded via ``module load``. *get* mode will fail without it.
+
+Before using *get* mode, I strongly recommend creating an `xnat_auth alias <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using the excellent `yaxil <https://yaxil.readthedocs.io/en/latest/>`_ python library. It's not stictly necessary to do so, but it will make your life easier. Example code will use an xnat alias. If you've already `installed <developers.html#hpc-installation>`_ DWIQC, yaxil will have been installed as well (yaxil is a DWIQC dependency). 
+
+**Arguments**
+
+*get* mode requires three arguments: `1) ---label` `2) ---bids-dir` `3) ---xnat-alias`
+
+*---label* refers to the XNAT MR Session ID, which is found under XNAT PROJECT ---> SUBJECT ---> MR_SESSION
+
+.. image:: images/MR-Session.png
+
+*---bids-dir* should be the **absolute** path to the desired download directory. If the directory doesn't exist, it will be created.
+
+.. code-block:: shell
+
+    /usr/home/username/project_data/MR_Session
+
+``cd`` into the desired directory and execute ``pwd`` to get a directory's absolute path.
+
+*---xnat-alias* is the alias containing credentials associated with your XNAT project. It can be created `here <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_.
+
+**Executing the Command**
+
+Command Template:
+
+.. code-block:: shell
+
+    dwiQC.py get --label <MR_SESSION> --bids-dir <PATH_TO_BIDS_DIR> --xnat-alias <ALIAS>
+
+Command Example:
+
+.. code-block:: shell
+
+    dwiQC.py get --label PE201222_230719 --bids-dir /users/nrg/PE201222_230719 --xnat-alias ssbc
+
+.. note::
+    Ensure that every MR_Session has its own dedicated BIDS download directory. If not, DWIQC will not run properly. 
+
+**Common Errors**
+
+The most common *get* mode error stems from DWIQC being unable to locate and use dcm2niix. Make sure it's on your path! 
+
+**Other Arguments- Advanced Usage**
+
+There are a few *get* mode optional arguments that are worth noting. By default, *get* mode will run `xnattagger <xnattagger.html>`_ on the provided MR Session. If you'd like to turn off that functionality, simply pass the ``--no-tagger`` argument.
+
+Related to xnattagger is the `--xnat-config` argument. This argument refers to a config file found `here <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/dwiqc.yaml>`_ which DWIQC uses to find the appropriately tagged scans in your XNAT project. The config file, written in the yaml format, uses regular expressions (regex) to find the desired scans. The expressions used in the default config file follow the convention depicted `above <#tagging-your-scans>`_. If your scans are tagged using a different convention, create a yaml file similar in structure to the example given here and pass it to ``--xnat-config`` in *get* mode. 
+ 
+If you would like to see what data will be downloaded from XNAT without actually downloading it, pass the ``--dry-run`` argument. You will also have to specify an output json file: ``-o test.json``. That json file will contain metadata about the scans *get* mode would download. This can be useful for testing.
+
+**Expected Output**
+
+After running DWIQC *get* you should see two new directories and one new file under your BIDS dir, similar to what's shown here:
+
+.. image:: images/get-output.png
+
+*dataset_description.json* conatains very basic information about the downloaded data. It's required by BIDS format. *sourcedata* contains the raw dicoms of all the downloaded scans. *sub-PE201222* (will differ for you) contains the downloaded data in proper BIDS format. If you enter the directory, you should see the subject session, then three more directories: *anat*, *dwi* and *fmap*. Those directories contain the MR Session's respective anatomical, diffusion and diffusion field map data. If one of the directories is missing or empty, verify that your session's scans have been tagged correctly and that the data is downloadable.
+
+process mode
+^^^^^^^^^^^^
+With your data successfully downloaded using *get* mode (or organized in BIDS format through other means) you are ready to run DWIQC. We recommended running DWIQC in an HPC (High Performance Computing) environment rather than on a local machine. By default, DWIQC will run both `prequal`_ and `qsiprep`_ using gpu compute nodes. However, it is possible to turn off gpu-dependent features by using the ``--no-gpu`` argument. DWIQC may require up to 20GB of RAM if run on a local/non-gpu machine so please allocate resources appropriately. 
+
+**Arguments**
+
+*process* mode requires 6 arguments:
+
+`1) ---sub` `2) ---ses` `3) ---bids-dir` `4) ---partition` `5) ---fs-license` `6) ---xnat-alias`
 
 Left pane
 ^^^^^^^^^
@@ -81,7 +156,7 @@ DWI Scan       DWI scan used
 ============== ==================================
 
 SNR/CNR Metrics
-""""""""""
+"""""""""""""""
 The ``SNR/CNR Metrics`` pane displays SNR/CNR metrics computed *for each individual shell*.
 
 .. image:: images/xnat-acq-left-snr-metrics.png
@@ -97,7 +172,7 @@ BN CNR      Eddy Quad (Prequal/FSL) Contrast-to-noise ratio for each shell
       Anywhere you see "Eddy Quad (Prequal/FSL)" means that FSL's Eddy Quad tool was run on Prequal output.
 
 Motion Metrics
-"""""""""""
+""""""""""""""
 The ``Motion Metrics`` pane displays motion metrics computed over dwi scan(s).
 
 .. image:: images/xnat-acq-left-motion.png
@@ -153,19 +228,19 @@ Clicking on an image within the ``Images`` tab will display a larger version of 
 .. image:: images/motion-plot.png
 
 Prequal Report tab
-""""""""""""""""
+""""""""""""""""""
 The ``Prequal Report`` tab displays the complete Prequal PDF report.
 
 .. image:: images/prequal-tab.png
 
 Eddy Quad Report Tab
-""""""""""
+""""""""""""""""""""
 The ``Eddy Quad Report`` tab displays key metrics and figures from the FSL Eddy command. 
 
 .. image:: images/eddy-quad-tab.png
 
 Qsiprep Report Tab
-""""""""""
+""""""""""""""""""
 The ``Qsiprep Report`` tab displays the complete Qsiprep HTML report.
 
 .. image:: images/qsiprep-tab.png

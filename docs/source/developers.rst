@@ -7,7 +7,7 @@ Developer Documentation
 .. _Gradle: https://gradle.org/install/
 
 HPC Installation
-------------
+----------------
 At the moment, the only supported way to install AnatQC is `within a container <#building-a-container>`_.
 
 downloading a container

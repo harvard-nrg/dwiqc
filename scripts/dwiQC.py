@@ -17,8 +17,6 @@ def main():
     parser = ap.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true',
         help='Enable verbose logging')
-    parser.add_argument('-c', '--xnat-config', default=config.xnat_download(),
-        help='dwiQC configuration file')
     parser.add_argument('--insecure', action='store_true',
         help='Disable SSL certificate verification')
     subparsers = parser.add_subparsers(help='sub-command help')
@@ -35,6 +33,8 @@ def main():
         help='XNAT MR Session name')
     parser_get.add_argument('--project',
         help='XNAT Project name')
+    parser_get.add_argument('c', '--xnat-config', default=config.xnat_download(),
+        help='dwiqc XNAT configuration file')
     parser_get.add_argument('--bids-dir', required=True,
         help='Output BIDS directory')
     parser_get.add_argument('--xnat-alias',
