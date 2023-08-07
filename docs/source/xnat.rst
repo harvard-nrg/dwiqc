@@ -6,6 +6,7 @@ XNAT User Documentation
 .. _prequal: https://github.com/MASILab/PreQual
 .. _qsiprep: https://qsiprep.readthedocs.io/en/latest/
 .. _installation: developers.html#hpc-installation
+.. _FreeSurfer: https://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall
 
 Tagging your scans
 ------------------
@@ -66,19 +67,21 @@ get mode
 .. note::
     *get* mode is only applicable if you have an XNAT instance you're going to interact with. If you're only going to use DWIQC outside of XNAT, please feel free to skip to the `process <#process-mode>`_ mode section. 
 
+**Overview**
+
 *get* mode functions as a way to download data from XNAT to your local compute environment. *get* mode's primary feature is the ability to download data and convert it to BIDS format. If you're unfamiliar with BIDS, read up on it `here <https://bids-specification.readthedocs.io/en/stable/>`_. Note that `dcm2niix <https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage#General_Usage>`_ must be installed and on your path or loaded via ``module load``. *get* mode will fail without it.
 
 Before using *get* mode, I strongly recommend creating an `xnat_auth alias <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using the excellent `yaxil <https://yaxil.readthedocs.io/en/latest/>`_ python library. It's not stictly necessary to do so, but it will make your life easier. Example code will use an xnat alias. If you've already `installed <developers.html#hpc-installation>`_ DWIQC, yaxil will have been installed as well (yaxil is a DWIQC dependency). 
 
-**Arguments**
+**Required Arguments**
 
 *get* mode requires three arguments: `1) ---label` `2) ---bids-dir` `3) ---xnat-alias`
 
-*---label* refers to the XNAT MR Session ID, which is found under XNAT PROJECT ---> SUBJECT ---> MR_SESSION
+1. ``--label`` refers to the XNAT MR Session ID, which is found under XNAT PROJECT ---> SUBJECT ---> MR_SESSION
 
 .. image:: images/MR-Session.png
 
-*---bids-dir* should be the **absolute** path to the desired download directory. If the directory doesn't exist, it will be created.
+2. ``--bids-dir`` should be the **absolute** path to the desired download directory. If the directory doesn't exist, it will be created.
 
 .. code-block:: shell
 
@@ -86,7 +89,7 @@ Before using *get* mode, I strongly recommend creating an `xnat_auth alias <http
 
 ``cd`` into the desired directory and execute ``pwd`` to get a directory's absolute path.
 
-*---xnat-alias* is the alias containing credentials associated with your XNAT project. It can be created `here <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_.
+3. ``--xnat-alias`` is the alias containing credentials associated with your XNAT project. It can be created `here <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_.
 
 **Executing the Command**
 
@@ -105,18 +108,6 @@ Command Example:
 .. note::
     Ensure that every MR_Session has its own dedicated BIDS download directory. If not, DWIQC will not run properly. 
 
-**Common Errors**
-
-The most common *get* mode error stems from DWIQC being unable to locate and use dcm2niix. Make sure it's on your path! 
-
-**Other Arguments- Advanced Usage**
-
-There are a few *get* mode optional arguments that are worth noting. By default, *get* mode will run `xnattagger <xnattagger.html>`_ on the provided MR Session. If you'd like to turn off that functionality, simply pass the ``--no-tagger`` argument.
-
-Related to xnattagger is the `--xnat-config` argument. This argument refers to a config file found `here <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/dwiqc.yaml>`_ which DWIQC uses to find the appropriately tagged scans in your XNAT project. The config file, written in the yaml format, uses regular expressions (regex) to find the desired scans. The expressions used in the default config file follow the convention depicted `above <#tagging-your-scans>`_. If your scans are tagged using a different convention, create a yaml file similar in structure to the example given here and pass it to ``--xnat-config`` in *get* mode. 
- 
-If you would like to see what data will be downloaded from XNAT without actually downloading it, pass the ``--dry-run`` argument. You will also have to specify an output json file: ``-o test.json``. That json file will contain metadata about the scans *get* mode would download. This can be useful for testing.
-
 **Expected Output**
 
 After running DWIQC *get* you should see two new directories and one new file under your BIDS dir, similar to what's shown here:
@@ -125,15 +116,125 @@ After running DWIQC *get* you should see two new directories and one new file un
 
 *dataset_description.json* conatains very basic information about the downloaded data. It's required by BIDS format. *sourcedata* contains the raw dicoms of all the downloaded scans. *sub-PE201222* (will differ for you) contains the downloaded data in proper BIDS format. If you enter the directory, you should see the subject session, then three more directories: *anat*, *dwi* and *fmap*. Those directories contain the MR Session's respective anatomical, diffusion and diffusion field map data. If one of the directories is missing or empty, verify that your session's scans have been tagged correctly and that the data is downloadable.
 
+**Common Errors**
+
+The most common *get* mode error stems from DWIQC being unable to locate and use dcm2niix. Make sure it's on your path! 
+
+**Advanced Usage**
+
+There are a few *get* mode optional arguments that are worth noting. By default, *get* mode will run `xnattagger <xnattagger.html>`_ on the provided MR Session. If you'd like to turn off that functionality, simply pass the ``--no-tagger`` argument.
+
+Related to xnattagger is the `--xnat-config` argument. This argument refers to a config file found `here <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/dwiqc.yaml>`_ which DWIQC uses to find the appropriately tagged scans in your XNAT project. The config file, written in the yaml format, uses regular expressions (regex) to find the desired scans. The expressions used in the default config file follow the convention depicted `above <#tagging-your-scans>`_. If your scans are tagged using a different convention, create a yaml file similar in structure to the example given here and pass it to ``--xnat-config`` in *get* mode. 
+ 
+If you would like to see what data will be downloaded from XNAT without actually downloading it, pass the ``--dry-run`` argument. You will also have to specify an output json file: ``-o test.json``. That json file will contain metadata about the scans *get* mode would download. This can be useful for testing.
+
+**All Arguments**
+
+Fill in with grid of all possible command line arguments.
+
 process mode
 ^^^^^^^^^^^^
+**Overview**
+
 With your data successfully downloaded using *get* mode (or organized in BIDS format through other means) you are ready to run DWIQC. We recommended running DWIQC in an HPC (High Performance Computing) environment rather than on a local machine. By default, DWIQC will run both `prequal`_ and `qsiprep`_ using gpu compute nodes. However, it is possible to turn off gpu-dependent features by using the ``--no-gpu`` argument. DWIQC may require up to 20GB of RAM if run on a local/non-gpu machine so please allocate resources appropriately. 
 
-**Arguments**
+**Required Arguments**
 
 *process* mode requires 6 arguments:
 
 `1) ---sub` `2) ---ses` `3) ---bids-dir` `4) ---partition` `5) ---fs-license` `6) ---xnat-alias`
+
+| 1. ``--sub`` is the subject's identifier in the BIDS hierarchy. If you've used *get* mode to download your data it will be in the ``--bids-dir`` directory. In the case of the example we're using here, it would be PE201222. Remember not to include the "sub-"" prefix! 
+
+| 2. ``--ses`` is the specific session for your subject according to BIDS format. By default, get mode will place a session direcory one step below the sub-SUBJECT directory and combine the subject and session identifier from XNAT. The example above downloaded data under the XNAT label PE201222_230719, so the session directory will be called ses-PE201222230719. See example below. *get* mode will remove any non alpha-numeric characters in the ``--label`` argument when creating the session name.
+ 
+.. image:: images/session-directory.png
+
+| 3. ``--bids-dir`` is the same directory passed to the ``bids-dir`` argument in *get* mode.
+
+| 4. ``--partition`` refers to the name of the partition or cluster where the sbatch jobs will be submitted to. This is generally just the name of your HPC system (e.g. fasse, fasse_gpu, Armis, etc.) 
+
+| 5. ``--fs-license`` should be the **absolute** path to the FreeSurfer license file in your environment. You can obtain a license by downloading `FreeSurfer`_.
+
+| 6. ``--xnat-alias`` is the same alias passed to *get* mode above. See instructions `here <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_.
+
+**Executing the Command**
+
+Command Template:
+
+.. code-block:: shell
+
+    dwiQC.py process --sub <bids_subject> --ses <bids_session> --bids-dir <path_to_bids_dir> --partition <HPC_name> --fs-license <path_to_freesurfer_license> --xnat-alias <alias>
+
+Command Example:
+
+.. code-block:: shell
+
+    dwiQC.py process --sub PE201222 --ses PE201222230719 --bids-dir /users/nrg/PE201222_230719 --partition fasse_gpu --fs-license /home/apps/freesurfer/license.txt --xnat-alias ssbc
+
+
+**Expected Output**
+
+DWIQC runtime varies based on available resources, size of data and desired processing steps. Users should expect one session to take 3-5 hours to complete prequal and 7-10 hours to complete qsiprep. Prequal and qsiprep are run in parallel, so total processing time rarely exceeds 10 hours. DWIQC also makes use of the FSL tool eddy quad. Eddy quad runs a series of quality assesment commands to generate images and quantitative metric tables. Eddy quad doesn't take more than 10 minutes to run in most cases. A successful DWIQC run will contain output from all three of these software packages. 
+
+Prequal Output:
+
+To find the prequal pdf report, navigate to the ``--bids-dir`` directory you passed to *process* mode. The pdf will be located under several layers of directories:
+
+derivatives ---> dwiqc-prequal ---> subject_dir ---> session_dir ---> sub_session_dir_run__dwi ---> OUTPUTS ---> PDF ---> dtiQA.pdf
+
+Download an example :download:`here <examples/dtiQA.pdf>`.
+
+Qsiprep Output:
+
+To find the qsiprep html report, navigate to the ``--bids-dir`` directory you passed to *process* mode. The html file will be located under several layers of directories:
+
+derivatives ---> dwiqc-qsiprep ---> subject_dir ---> session_dir ---> sub_session_dir_run__dwi ---> qsiprep_output ---> qsiprep ---> sub-SUBJECT-imbedded_images.html
+
+Download an example :download:`here <examples/sub-MS881355-imbedded_images.html>`.
+
+Eddy Quad Output:
+
+To find the eddy quad pdf report, navigate to the ``--bids-dir`` directory you passed to *process* mode. The pdf file will be located under several layers of directories:
+
+derivatives ---> dwiqc-prequal ---> subject_dir ---> session_dir ---> sub_session_dir_run__dwi ---> OUTPUTS ---> EDDY ---> SUBJECT_SESSION.qc ---> qc.pdf
+
+Download an example :download:`here <examples/qc.pdf>`.
+
+**Common Errors**
+
+A somewhat common error (affects about 5% of subjects) is an Eddy Volume to Volume registration that looks something like this:
+
+.. image:: images/eddy-error.png
+
+This error means that the FSL tool Eddy, which both prequal and qsiprep use in their pipelines, could not find any volumes within a specific shell that did not have intensity outliers. There are three different approaches to solving this problem that have respective implications. One solution is to simply exclude that session from the larger dataset. This approach ensures that all data met the same standard of stringency. A second solution is to change what FSL considers to be an outlier. By default, DWIQC has told FSL that an outlier is anything more than 5 standard deviations from the mean. The user could change that to 6 standard deviations, which would increase the liklihood of running eddy successfully while keeping the same standard for all data. The third solution is to change the number of standard deviations to 6 only for the subjects that are being affected. The theoretical implications of these approaches are not explored in depth here and it is left to the user to make informed decisions.
+
+To adjust the number of standard deviations, users should utilize the ``--qsiprep-config `` and ``--prequal-config`` arguments in *process* mode. These arguments allow the user to customize the options/arguments being passed to qsiprep and prequal using `yaml <https://www.youtube.com/watch?v=9BGWtTahGnw>`_ config files. For qsiprep, the most important edit to make is the ``eddy_params_s2v_mbs.json`` line. There should be a file in your ``--bids-dir`` called ``eddy_params_s2v_mbs.json`` that was created when you
+
+**Advanced Usage**
+
+
+
+tandem mode
+^^^^^^^^^^^
+
+**Overview**
+
+**Required Arguments**
+
+**Executing the Command**
+
+**Command Template**
+
+**Expected Output**
+
+**Common Errors**
+
+**Advanced Usage**
+
+Understanding the Report Page
+-----------------------------
+
 
 Left pane
 ^^^^^^^^^
