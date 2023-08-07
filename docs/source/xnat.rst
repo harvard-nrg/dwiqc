@@ -207,11 +207,30 @@ A somewhat common error (affects about 5% of subjects) is an Eddy Volume to Volu
 
 .. image:: images/eddy-error.png
 
-This error means that the FSL tool Eddy, which both prequal and qsiprep use in their pipelines, could not find any volumes within a specific shell that did not have intensity outliers. There are three different approaches to solving this problem that have respective implications. One solution is to simply exclude that session from the larger dataset. This approach ensures that all data met the same standard of stringency. A second solution is to change what FSL considers to be an outlier. By default, DWIQC has told FSL that an outlier is anything more than 5 standard deviations from the mean. The user could change that to 6 standard deviations, which would increase the liklihood of running eddy successfully while keeping the same standard for all data. The third solution is to change the number of standard deviations to 6 only for the subjects that are being affected. The theoretical implications of these approaches are not explored in depth here and it is left to the user to make informed decisions.
+This error means that the FSL tool ``eddy``, which both prequal and qsiprep use in their pipelines, could not find any volumes within a specific shell that did not have intensity outliers. There are three different approaches to solving this problem that have their respective implications: 
 
-To adjust the number of standard deviations, users should utilize the ``--qsiprep-config `` and ``--prequal-config`` arguments in *process* mode. These arguments allow the user to customize the options/arguments being passed to qsiprep and prequal using `yaml <https://www.youtube.com/watch?v=9BGWtTahGnw>`_ config files. For qsiprep, the most important edit to make is the ``eddy_params_s2v_mbs.json`` line. There should be a file in your ``--bids-dir`` called ``eddy_params_s2v_mbs.json`` that was created when you
+| 1. Exclude that session from the larger dataset. This approach ensures that all data meet the same standard of stringency. 
+
+| 2. Change what FSL considers to be an outlier. By default, DWIQC tells FSL that an outlier is anything more than 5 standard deviations from the mean. The user could change that to 6 standard deviations, which would increase the liklihood of running eddy successfully while keeping the same standard for all data. 
+
+| 3. Change the number of standard deviations to 6 only for the subjects that are being affected. The theoretical implications of this approach are not explored in depth here and it is left to the user to make informed decisions.
+
+.. note:: 
+    This error generally only occurs in qsiprep.
+
+To adjust the number of standard deviations, edit a file in your ``--bids-dir`` called ``eddy_params_s2v_mbs.json`` that was created when you first ran DWIQC. Open the file and change the argument that says ``--ol_nstd=5`` to ``--ol_nstd=6``. Running DWIQC again will overwrite the ``eddy_params_s2v_mbs.json`` you just edited, so pass the ``--custom-eddy`` argument to DWIQC with the path to the newly edited ``eddy_params_s2v_mbs.json`` file.
+
+.. code-block:: shell
+
+    dwiQC.py process --sub PE201222 --ses PE201222230719 --bids-dir /users/nrg/PE201222_230719 --partition fasse_gpu --fs-license /home/apps/freesurfer/license.txt --xnat-alias ssbc --custom-eddy /users/nrg/PE201222_230719/eddy_params_s2v_mbs.json
+
+
+
+users should utilize the ``--qsiprep-config`` argument in *process* mode. This argument allows the user to customize the options/arguments being passed to qsiprep using `yaml <https://www.youtube.com/watch?v=9BGWtTahGnw>`_ config files. For qsiprep, the most important edit to make is the ``eddy_params_s2v_mbs.json`` line. There should be a file in your ``--bids-dir`` called ``eddy_params_s2v_mbs.json`` that was created when you first ran DWIQC. Make a copy of that file and name it something slightly different (keep it in the ``--bids-dir``). Open the file and change the argument that says ``--ol_nstd=5`` to ``--ol_nstd=6``. Now go back to the ``qsiprep.yaml`` file you created 
 
 **Advanced Usage**
+
+
 
 
 
