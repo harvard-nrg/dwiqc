@@ -61,7 +61,7 @@ def main():
         help='Rate limit the number of tasks executed in parallel (1=serial)')
     parser_process.add_argument('--sub', required=True,
         help='BIDS subject')
-    parser_process.add_argument('--ses',
+    parser_process.add_argument('--ses', required=True,
         help='BIDS session')
     parser_process.add_argument('--mod', default='dwi',
         help='BIDS modality')
