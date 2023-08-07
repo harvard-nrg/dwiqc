@@ -1,16 +1,5 @@
 qsiprep:
   shell:
-    - 'selfie'
-    - '--lock'
-    - '--output-file'
-    - <path_to_prov_file>
-    - 'singularity'
-    - 'run'
-    - '--nv'
-    - <path_to_qsiprep_file>
-    - <bids_dir>
-    - <output_dir>
-    - 'participant'
     - '--output-resolution'
     - <output_resolution>
     - '--separate-all-dwis'
@@ -23,7 +12,3 @@ qsiprep:
     - <cpus>
     - '--mem_mb' 
     - <mem>
-    - '--fs-license-file'
-    - <path_to_freesurfer_license>
-    - '-w' 
-    - <temp_dir>

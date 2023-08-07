@@ -1,26 +1,7 @@
 prequal:
   shell:
-    - 'selfie'
-    - '--lock'
-    - '--output-file'
-    - <path_to_prov_file>
-    - 'singularity'
-    - 'run'
-    - '-e'
-    - '--contain'
-    - '--nv'
-    - '-B'
-    - <inputs_dir>:/INPUTS/
-    - '-B'
-    - <output_dir>:/OUTPUTS
-    - '-B'
-    - <temp_dir>:/tmp
-    - '-B'
-    - <path_to_FreeSurfer_license>:/APPS/freesurfer/license.txt
-    - <path_to_prequal_sif>
-    - '--save_component_pngs'
     - '--eddy_cuda'
-    - '9.1'
+    - '10.2'
     - 'j'
     - '--num_threads'
     - '2'
@@ -35,9 +16,3 @@ prequal:
     - '--correct_bias'
     - 'on'
     - '--topup_first_b0s_only'
-    - '--subject'
-    - <subject>
-    - '--project'
-    - <project_name>
-    - '--session'
-    - <session>

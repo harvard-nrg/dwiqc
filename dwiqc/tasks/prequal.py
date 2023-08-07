@@ -317,189 +317,75 @@ class Task(tasks.BaseTask):
 		self.copy_inputs(inputs_dir)
 		home_dir = os.path.expanduser("~")
 		prequal_sif = os.path.join(home_dir, '.config/dwiqc/containers/prequal_nrg.sif')
-		if self._prequal_config:
-			try:
-				prequal_command = yaml.safe_load(open(self._prequal_config))
-			except yaml.parser.ParserError:
-				print("There's an issue with the prequal config file.\nMake sure it is a .yaml file with proper formatting.")
-				sys.exit()
-			self._command = prequal_command['prequal']['shell']
-		else:
-			if self._nonzero_shells == False:
-				if self._no_gpu:
-					self._command = [
-						'selfie',
-						'--lock',
-						'--output-file', self._prov,
-						'singularity',
-						'run',
-						'-e',
-						'--contain',
-						'-B',
-						f'{inputs_dir}:/INPUTS/',
-						'-B',
-						f'{self._outdir}:/OUTPUTS',
-						'-B',
-						f'{self._tempdir}:/tmp',
-						'-B',
-						f'{self._fs_license}:/APPS/freesurfer/license.txt',
-						f'{prequal_sif}',
-						'--save_component_pngs',
-						'j',
-						'--num_threads',
-						'2',
-						'--denoise',
-						'on',
-						'--degibbs',
-						'off',
-						'--rician',
-						'off',
-						'--prenormalize',
-						'on',
-						'--correct_bias',
-						'on',
-						'--topup_first_b0s_only',
-						'--subject',
-						self._sub,
-						'--project',
-						'Proj',
-						'--session',
-						self._ses
-					]
-				else:
-					self._command = [
-						'selfie',
-						'--lock',
-						'--output-file', self._prov,
-						'singularity',
-						'run',
-						'-e',
-						'--contain',
-						'--nv',
-						'-B',
-						f'{inputs_dir}:/INPUTS/',
-						'-B',
-						f'{self._outdir}:/OUTPUTS',
-						'-B',
-						f'{self._tempdir}:/tmp',
-						'-B',
-						f'{self._fs_license}:/APPS/freesurfer/license.txt',
-						f'{prequal_sif}',
-						'--save_component_pngs',
-						'j',
-						'--eddy_cuda',
-						'10.2',
-						'--num_threads',
-						'2',
-						'--denoise',
-						'on',
-						'--degibbs',
-						'off',
-						'--rician',
-						'off',
-						'--prenormalize',
-						'on',
-						'--correct_bias',
-						'on',
-						'--topup_first_b0s_only',
-						'--subject',
-						self._sub,
-						'--project',
-						'Proj',
-						'--session',
-						self._ses
-					]	
+		try:
+			prequal_command = yaml.safe_load(open(self._prequal_config))
+		except yaml.parser.ParserError:
+			print("There's an issue with the prequal config file.\nMake sure it is a .yaml file with proper formatting.")
+			sys.exit()
+		prequal_options = prequal_command['prequal']['shell']
+		if self._no_gpu:
+			if '--eddy_cuda' in prequal_options:
+				prequal_options.remove('--eddy_cuda')
+			if '10.2' in prequal_options:
+				prequal_options.remove('10.2')
+		if self._nonzero_shells == False:
+			self._command = [
+				'selfie',
+				'--lock',
+				'--output-file', self._prov,
+				'singularity',
+				'run',
+				'-e',
+				'--contain',
+				'-B',
+				f'{inputs_dir}:/INPUTS/',
+				'-B',
+				f'{self._outdir}:/OUTPUTS',
+				'-B',
+				f'{self._tempdir}:/tmp',
+				'-B',
+				f'{self._fs_license}:/APPS/freesurfer/license.txt',
+				f'{prequal_sif}',
+				'--save_component_pngs',
+				prequal_options,
+				'--subject',
+				self._sub,
+				'--project',
+				'Proj',
+				'--session',
+				self._ses
+				]
 
-			elif self._nonzero_shells == True:
-				if self._no_gpu:	
-
-					self._command = [
-						'selfie',
-						'--lock',
-						'--output-file', self._prov,
-						'singularity',
-						'run',
-						'-e',
-						'--contain',
-						'-B',
-						f'{inputs_dir}:/INPUTS/',
-						'-B',
-						f'{self._outdir}:/OUTPUTS',
-						'-B',
-						f'{self._tempdir}:/tmp',
-						'-B',
-						f'{self._fs_license}:/APPS/freesurfer/license.txt',
-						f'{prequal_sif}',
-						'--save_component_pngs',
-						'j',
-						'--num_threads',
-						'2',
-						'--denoise',
-						'on',
-						'--degibbs',
-						'off',
-						'--rician',
-						'off',
-						'--prenormalize',
-						'on',
-						'--correct_bias',
-						'on',
-						'--topup_first_b0s_only',
-						'--nonzero_shells',
-						'350,650,1350,2000',
-						'--subject',
-						self._sub,
-						'--project',
-						'Proj',
-						'--session',
-						self._ses
-					]
-				else:	
-
-					self._command = [
-						'selfie',
-						'--lock',
-						'--output-file', self._prov,
-						'singularity',
-						'run',
-						'-e',
-						'--contain',
-						'--nv',
-						'-B',
-						f'{inputs_dir}:/INPUTS/',
-						'-B',
-						f'{self._outdir}:/OUTPUTS',
-						'-B',
-						f'{self._tempdir}:/tmp',
-						'-B',
-						f'{self._fs_license}:/APPS/freesurfer/license.txt',
-						f'{prequal_sif}',
-						'--save_component_pngs',
-						'j',
-						'--eddy_cuda',
-						'10.2',
-						'--num_threads',
-						'2',
-						'--denoise',
-						'on',
-						'--degibbs',
-						'off',
-						'--rician',
-						'off',
-						'--prenormalize',
-						'on',
-						'--correct_bias',
-						'on',
-						'--topup_first_b0s_only',
-						'--nonzero_shells',
-						'350,650,1350,2000',
-						'--subject',
-						self._sub,
-						'--project',
-						'Proj',
-						'--session',
-						self._ses
-					]
+		elif self._nonzero_shells == True:
+			if self._no_gpu:	
+				self._command = [
+					'selfie',
+					'--lock',
+					'--output-file', self._prov,
+					'singularity',
+					'run',
+					'-e',
+					'--contain',
+					'-B',
+					f'{inputs_dir}:/INPUTS/',
+					'-B',
+					f'{self._outdir}:/OUTPUTS',
+					'-B',
+					f'{self._tempdir}:/tmp',
+					'-B',
+					f'{self._fs_license}:/APPS/freesurfer/license.txt',
+					f'{prequal_sif}',
+					'--save_component_pngs',
+					prequal_options,
+					'--nonzero_shells',
+					'350,650,1350,2000',
+					'--subject',
+					self._sub,
+					'--project',
+					'Proj',
+					'--session',
+					self._ses
+				]
 
 		logdir = self.logdir()
 		logfile = os.path.join(logdir, 'dwiqc-prequal.log')
