@@ -73,7 +73,7 @@ def main():
         help='Resolution of output data. Defaut is resolution of input data.')
     parser_process.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
-    parser_process.add_argument('--prequal-config', default=False,
+    parser_process.add_argument('--prequal-config', default=config.prequal_command(),
         help='Config file for custom prequal command.')
     parser_process.add_argument('--qsiprep-config', default=False,
         help='Config file for custom qsiprep command.')
@@ -117,7 +117,7 @@ def main():
         help='Rate limit the number of tasks executed in parallel (1=serial)')
     parser_tandem.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
-    parser_tandem.add_argument('--prequal-config', default=False,
+    parser_tandem.add_argument('--prequal-config', default=config.prequal_command(),
         help='Config file for custom prequal command.')
     parser_tandem.add_argument('--qsiprep-config', default=False,
         help='Config file for custom qsiprep command.')
