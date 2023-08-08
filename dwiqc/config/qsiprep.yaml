@@ -1,14 +1,11 @@
 qsiprep:
   shell:
-    - '--output-resolution'
-    - <output_resolution>
     - '--separate-all-dwis'
     - '--eddy-config'
-    - <bids_dir>/eddy_params_s2v_mbs.json
     - '--recon-spec'
     - 'reorient_fslstd'
     - '--notrack'
     - '--n_cpus'
-    - <cpus>
+    - '2'
     - '--mem_mb' 
-    - <mem>
+    - '40000'

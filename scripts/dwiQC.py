@@ -75,7 +75,7 @@ def main():
         help='Do not execute any jobs')
     parser_process.add_argument('--prequal-config', default=config.prequal_command(),
         help='Config file for custom prequal command.')
-    parser_process.add_argument('--qsiprep-config', default=False,
+    parser_process.add_argument('--qsiprep-config', default=config.qsiprep_command(),
         help='Config file for custom qsiprep command.')
     parser_process.add_argument('--no-gpu', action='store_true',
         help='Run prequal and qsiprep without gpu functionality.')
@@ -121,7 +121,7 @@ def main():
         help='Do not execute any jobs')
     parser_tandem.add_argument('--prequal-config', default=config.prequal_command(),
         help='Config file for custom prequal command.')
-    parser_tandem.add_argument('--qsiprep-config', default=False,
+    parser_tandem.add_argument('--qsiprep-config', default=config.qsiprep_command(),
         help='Config file for custom qsiprep command.')
     parser_tandem.add_argument('--no-gpu', action='store_true',
         help='Run prequal and qsiprep without gpu functionality.')

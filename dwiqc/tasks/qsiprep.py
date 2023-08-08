@@ -217,7 +217,8 @@ class Task(tasks.BaseTask):
 			"slice_order": self._spec,
 			"args": "--ol_nstd=5 --ol_type=gw"
 		}
-		if not self._qsiprep_config:
+		params = f"{self._bids}/eddy_params_s2v_mbs.json"
+		if not os.path.isfile(params):
 			with open(f"{self._bids}/eddy_params_s2v_mbs.json", "w") as f:
 				json.dump(params_file, f)
 		else:
@@ -229,42 +230,40 @@ class Task(tasks.BaseTask):
 		self.create_eddy_params()
 		self.create_nipype()
 		self.check_output_resolution()
-		if self._qsiprep_config:
-			try:
-				qsiprep_command = yaml.safe_load(open(self._qsiprep_config))
-			except yaml.parser.ParserError:
-				print("There's an issue with the prequal config file.\nMake sure it is a .yaml file with proper formatting.")
-				sys.exit()
-			self._command = qsiprep_command['qsiprep']['shell']
-		else:
-			self._command = [
-				'selfie',
-				'--lock',
-				'--output-file', self._prov,
-				'singularity',
-				'run',
-				'--nv',
-				qsiprep_sif,			
-				self._bids,
-				self._outdir,
-				'participant',
-				'--output-resolution',
-				self._output_resolution,
-				'--separate-all-dwis',
-				'--eddy-config',
-				f'{self._bids}/eddy_params_s2v_mbs.json',
-				'--recon-spec',
-				'reorient_fslstd',
-				'--notrack',
-				'--n_cpus',
-				'2',
-				'--mem_mb',
-				'40000',
-				'--fs-license-file',
-				self._fs_license,
-				'-w',
-				self._tempdir
-			]
+		try:
+			qsiprep_command = yaml.safe_load(open(self._qsiprep_config))
+		except yaml.parser.ParserError:
+			print("There's an issue with the prequal config file.\nMake sure it is a .yaml file with proper formatting.")
+			sys.exit()
+		qsiprep_options = qsiprep_command['qsiprep']['shell']
+		
+		self._command = [
+			'selfie',
+			'--lock',
+			'--output-file', self._prov,
+			'singularity',
+			'run',
+			'--nv',
+			qsiprep_sif,			
+			self._bids,
+			self._outdir,
+			'participant',
+			'--output-resolution',
+			self._output_resolution,
+			'--eddy-config',
+			f'{self._bids}/eddy_params_s2v_mbs.json',
+			'--fs-license-file',
+			self._fs_license,
+			'-w',
+			self._tempdir
+		]
+
+		for item in qsiprep_options:
+			self._command.append(item)
+
+		print(self._command)
+		sys.exit()
+
 
 		if self._no_gpu:
 			logdir = self.logdir()
