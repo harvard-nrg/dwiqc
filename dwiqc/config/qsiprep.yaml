@@ -1,7 +1,6 @@
 qsiprep:
   shell:
     - '--separate-all-dwis'
-    - '--eddy-config'
     - '--recon-spec'
     - 'reorient_fslstd'
     - '--notrack'
