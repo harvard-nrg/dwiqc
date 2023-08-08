@@ -104,8 +104,9 @@ def do(args):
             run=args.run,
             bids=args.bids_dir,
             outdir=qsiprep_outdir,
-            fs_license = args.fs_license,
             qsiprep_config=args.qsiprep_config,
+            fs_license=args.fs_license,
+            custom_eddy=args.custom_eddy,
             no_gpu=args.no_gpu,
             tempdir=tempfile.gettempdir(),
             pipenv='/sw/apps/qsiprep'

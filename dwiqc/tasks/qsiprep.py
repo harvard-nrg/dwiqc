@@ -23,13 +23,14 @@ logger = logging.getLogger(__name__)
 
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config, fs_license, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config, fs_license, custom_eddy=False, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
 		self._qsiprep_config = qsiprep_config
 		self._fs_license = fs_license
+		self._custom_eddy = custom_eddy
 		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
 		self._output_resolution = output_resolution
@@ -217,8 +218,8 @@ class Task(tasks.BaseTask):
 			"slice_order": self._spec,
 			"args": "--ol_nstd=5 --ol_type=gw"
 		}
-		params = f"{self._bids}/eddy_params_s2v_mbs.json"
-		if not os.path.isfile(params):
+		
+		if not self._custom_eddy:
 			with open(f"{self._bids}/eddy_params_s2v_mbs.json", "w") as f:
 				json.dump(params_file, f)
 		else:
