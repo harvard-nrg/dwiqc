@@ -122,11 +122,13 @@ The most common *get* mode error stems from DWIQC being unable to locate and use
 
 **Advanced Usage**
 
-There are a few *get* mode optional arguments that are worth noting. By default, *get* mode will run `xnattagger <xnattagger.html>`_ on the provided MR Session. If you'd like to turn off that functionality, simply pass the ``--no-tagger`` argument.
+There are a few *get* mode optional arguments that are worth noting. 
 
-Related to xnattagger is the `--xnat-config` argument. This argument refers to a config file found `here <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/dwiqc.yaml>`_ which DWIQC uses to find the appropriately tagged scans in your XNAT project. The config file, written in the yaml format, uses regular expressions (regex) to find the desired scans. The expressions used in the default config file follow the convention depicted `above <#tagging-your-scans>`_. If your scans are tagged using a different convention, create a yaml file similar in structure to the example given here and pass it to ``--xnat-config`` in *get* mode. 
+| 1. By default, *get* mode will run `xnattagger <xnattagger.html>`_ on the provided MR Session. If you'd like to turn off that functionality, simply pass the ``--no-tagger`` argument.
+
+| 2. Related to xnattagger is the `--xnat-config` argument. This argument refers to a config file found `here <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/dwiqc.yaml>`_ which DWIQC uses to find the appropriately tagged scans in your XNAT project. The config file, written in the yaml format, uses regular expressions (regex) to find the desired scans. The expressions used in the default config file follow the convention depicted `above <#tagging-your-scans>`_. If your scans are tagged using a different convention, create a yaml file similar in structure to the example given here and pass it to ``--xnat-config`` in *get* mode. 
  
-If you would like to see what data will be downloaded from XNAT without actually downloading it, pass the ``--dry-run`` argument. You will also have to specify an output json file: ``-o test.json``. That json file will contain metadata about the scans *get* mode would download. This can be useful for testing.
+| 3. If you would like to see what data will be downloaded from XNAT without actually downloading it, pass the ``--dry-run`` argument. You will also have to specify an output json file: ``-o test.json``. That json file will contain metadata about the scans *get* mode would download. This can be useful for testing.
 
 **All Arguments**
 
@@ -213,26 +215,36 @@ This error means that the FSL tool ``eddy``, which both prequal and qsiprep use 
 
 | 2. Change what FSL considers to be an outlier. By default, DWIQC tells FSL that an outlier is anything more than 5 standard deviations from the mean. The user could change that to 6 standard deviations, which would increase the liklihood of running eddy successfully while keeping the same standard for all data. 
 
-| 3. Change the number of standard deviations to 6 only for the subjects that are being affected. The theoretical implications of this approach are not explored in depth here and it is left to the user to make informed decisions.
+| 3. Change the number of standard deviations to 6 only for the subjects that are being affected. The theoretical implications of this approach (or any others) are not explored in depth here and it is left to the user to make informed decisions.
 
 .. note:: 
     This error generally only occurs in qsiprep.
 
-To adjust the number of standard deviations, edit a file in your ``--bids-dir`` called ``eddy_params_s2v_mbs.json`` that was created when you first ran DWIQC. Open the file and change the argument that says ``--ol_nstd=5`` to ``--ol_nstd=6``. Running DWIQC again will overwrite the ``eddy_params_s2v_mbs.json`` you just edited, so pass the ``--custom-eddy`` argument to DWIQC with the path to the newly edited ``eddy_params_s2v_mbs.json`` file.
+To adjust the number of standard deviations, edit a file in your ``--bids-dir`` called ``eddy_params_s2v_mbs.json`` that was created when you first ran DWIQC. Open the file and change the argument that says ``--ol_nstd=5`` to ``--ol_nstd=6``. Simply running DWIQC again will overwrite the ``eddy_params_s2v_mbs.json`` you just edited, so pass the ``--custom-eddy`` argument to DWIQC with the path to the newly edited ``eddy_params_s2v_mbs.json`` file.
 
 .. code-block:: shell
 
     dwiQC.py process --sub PE201222 --ses PE201222230719 --bids-dir /users/nrg/PE201222_230719 --partition fasse_gpu --fs-license /home/apps/freesurfer/license.txt --xnat-alias ssbc --custom-eddy /users/nrg/PE201222_230719/eddy_params_s2v_mbs.json
 
-
-
-users should utilize the ``--qsiprep-config`` argument in *process* mode. This argument allows the user to customize the options/arguments being passed to qsiprep using `yaml <https://www.youtube.com/watch?v=9BGWtTahGnw>`_ config files. For qsiprep, the most important edit to make is the ``eddy_params_s2v_mbs.json`` line. There should be a file in your ``--bids-dir`` called ``eddy_params_s2v_mbs.json`` that was created when you first ran DWIQC. Make a copy of that file and name it something slightly different (keep it in the ``--bids-dir``). Open the file and change the argument that says ``--ol_nstd=5`` to ``--ol_nstd=6``. Now go back to the ``qsiprep.yaml`` file you created 
-
 **Advanced Usage**
 
+Only a few of the many possible *procss* mode arguments will be discussed here. 
 
+| 1. ``--qsiprep-config`` and ``--prequal-config`` allow you to customize the arguments passed to qsiprep and prequal. By default, these are the `qsiprep config <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/qsiprep.yaml>`_ and `prequal config <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/prequal.yaml>`_ arguments being passed. Using these config files as a template, you can customize your prequal and qsiprep commands. Example usage: ``--prequal-config /users/nrg/PE201222_230719/prequal.yaml``
 
+| 2. ``--xnat-upload`` indicates that the output from DWIQC should be uploaded to your XNAT project. ``--xnat-alias`` must be passed for this argument to work. Example usage: ``--xnat-upload`` (just passing the argument is sufficient)
 
+| 3. ``--output-resolution`` allows you to specify the resolution of images created by qsiprep. The default is the same as the input data. Example usage: ``--output-resolution 1.0``
+
+| 4. ``--no-gpu`` enables users without access to a gpu node to run DWIQC. Note that some advanced process features are not available without gpu computing. Example usage: ``--no-gpu`` (just passing the argument is sufficient)
+
+| 5. ``--sub-tasks`` is used to run either just qsiprep or prequal. Example usage: ``--sub-tasks qsiprep``
+
+| 6. ``--custom-eddy`` is used to pass custom FSL eddy parameters to qsiprep as noted under *Common Errors*. Example usage: ``--custom-eddy /users/nrg/PE201222_230719/eddy_params_s2v_mbs.json``
+
+**All Arguments**
+
+Fill in with box of all possible arguments for *process*.
 
 tandem mode
 ^^^^^^^^^^^
