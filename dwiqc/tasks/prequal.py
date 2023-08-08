@@ -328,6 +328,7 @@ class Task(tasks.BaseTask):
 				prequal_options.remove('--eddy_cuda')
 			if '10.2' in prequal_options:
 				prequal_options.remove('10.2')
+		num_opts = len(prequal_options)
 		if self._nonzero_shells == False:
 			self._command = [
 				'selfie',
@@ -347,7 +348,6 @@ class Task(tasks.BaseTask):
 				f'{self._fs_license}:/APPS/freesurfer/license.txt',
 				f'{prequal_sif}',
 				'--save_component_pngs',
-				prequal_options,
 				'--subject',
 				self._sub,
 				'--project',
@@ -355,6 +355,9 @@ class Task(tasks.BaseTask):
 				'--session',
 				self._ses
 				]
+
+			for item in prequal_options:
+				self._command.append(item)
 
 		elif self._nonzero_shells == True:
 			if self._no_gpu:	
