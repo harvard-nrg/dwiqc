@@ -379,7 +379,6 @@ class Task(tasks.BaseTask):
 					f'{self._fs_license}:/APPS/freesurfer/license.txt',
 					f'{prequal_sif}',
 					'--save_component_pngs',
-					prequal_options,
 					'--nonzero_shells',
 					'350,650,1350,2000',
 					'--subject',
@@ -389,9 +388,8 @@ class Task(tasks.BaseTask):
 					'--session',
 					self._ses
 				]
-
-		print(self._command)
-		sys.exit()
+			for item in prequal_options:
+				self._command.append(item)
 
 		logdir = self.logdir()
 		logfile = os.path.join(logdir, 'dwiqc-prequal.log')
