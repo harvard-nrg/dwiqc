@@ -261,10 +261,6 @@ class Task(tasks.BaseTask):
 		for item in qsiprep_options:
 			self._command.append(item)
 
-		print(self._command)
-		sys.exit()
-
-
 		if self._no_gpu:
 			logdir = self.logdir()
 			logfile = os.path.join(logdir, 'dwiqc-qsiprep.log')
