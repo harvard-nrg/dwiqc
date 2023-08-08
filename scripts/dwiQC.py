@@ -93,6 +93,8 @@ def main():
         help='XNAT password')
     parser_process.add_argument('--artifacts-dir',
         help='Location for generated assessors and resources')
+    parser_process.add_argument('--custom-eddy',
+        help='Feed in path to customized eddy parameters file for qsiprep.')
     parser_process.add_argument('--xnat-upload', action='store_true',
         help='Upload results to XNAT over REST API')
     parser_process.set_defaults(func=cli.process.do)
@@ -141,6 +143,8 @@ def main():
         help='Do not run xnattagger')
     parser_tandem.add_argument('--artifacts-dir',
         help='Location for generated assessors and resources')
+    parser_tandem.add_argument('--custom-eddy',
+        help='Feed in path to customized eddy parameters file for qsiprep.')
     parser_tandem.add_argument('--xnat-upload', action='store_true',
         help='Upload results to XNAT over REST API')
     parser_tandem.set_defaults(func=cli.tandem.do)
