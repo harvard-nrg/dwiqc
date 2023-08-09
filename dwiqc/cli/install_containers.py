@@ -92,6 +92,8 @@ def do(args):
 		proc3 = subprocess.Popen(download_qsiprep, shell=True, stdout=subprocess.PIPE)
 		proc3.communicate()
 
+		print('\n')
+
 	### check if fsl already there
 
 	if os.path.isfile(f"{args.install_location}/fsl_6.0.4.sif"):
@@ -99,6 +101,9 @@ def do(args):
 		print('\n')
 
 	else:
+
+		logger.info('installing fsl...')
+
 		download_fsl = f'curl -L -o {args.install_location}/fsl_6.0.4.sif {fsl_link}'
 		proc4 = subprocess.Popen(download_fsl, shell=True, stdout=subprocess.PIPE)
 		proc4.communicate()
