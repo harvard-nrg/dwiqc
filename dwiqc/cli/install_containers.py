@@ -142,7 +142,7 @@ def check_storage(directory):
 		sys.exit(1)
 
 	else:
-		logger.info(f'This directory has {avail_gigs}GB of available space. The dwiqc containers will take up 30GB of storage.')
+		logger.info(f'This directory has {avail_gigs}GB of available space.\nThe dwiqc containers will take up 30GB of storage.')
 		print("\n")
 		time.sleep(5)
 
