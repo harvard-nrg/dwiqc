@@ -24,9 +24,15 @@ chromium_link = 'https://www.dropbox.com/scl/fi/wgh2d6xtdgi87zaxc5m5l/chromium.s
 
 #prequal_link = 'https://www.dropbox.com/scl/fi/p58pbj4v662ji1ax19lka/prequal_nrg.sif?rlkey=lmm9jspl81w6jjfvkmsmbd595&dl=1'
 
-prequal_link = 'https://www.dropbox.com/scl/fi/az4mmv9dzd9gmeuoilnqd/prequal_nrg2.sif?rlkey=nimyvlrf9hgq2yle19m2yxgq0&dl=1'
+#prequal_link = 'https://www.dropbox.com/scl/fi/az4mmv9dzd9gmeuoilnqd/prequal_nrg2.sif?rlkey=nimyvlrf9hgq2yle19m2yxgq0&dl=1'
+
+prequal_link = 'https://www.dropbox.com/scl/fi/hl6f4tk7bgfoegp2txmhe/prequal_nrg4.sif?rlkey=yvzp0s81r5j3kgu4gcc19vjt5&dl=1'
+
+fsl_link = 'https://www.dropbox.com/scl/fi/8tsprztgka1bv60ipu2yj/fsl_6.0.4.sif?rlkey=thw0g6s7jayc0bupi3n6z1p1s&dl=1'
 
 qsiprep_link = 'https://www.dropbox.com/scl/fi/s8asxwmykyw7paqdcnaev/qsiprep.sif?rlkey=lnuffrzn9mf894q6j9tl2l2mc&dl=1'
+
+
 
 home_dir = os.path.expanduser("~")
 
@@ -56,6 +62,8 @@ def do(args):
 
 		print("\n")
 
+	### check if prequal already there
+
 	if os.path.isfile(f"{args.install_location}/prequal_nrg.sif"):
 		logger.warning(f'Prequal has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping to qsiprep...')
 		print('\n')
@@ -70,8 +78,10 @@ def do(args):
 
 		print("\n")
 
+	### check if qsiprep already there
+
 	if os.path.isfile(f"{args.install_location}/qsiprep.sif"):
-		logger.warning(f'Qsiprep has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping...')
+		logger.warning(f'Qsiprep has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping to fsl...')
 		print('\n')
 
 	else:
@@ -81,6 +91,18 @@ def do(args):
 		download_qsiprep = f'curl -L -o {args.install_location}/qsiprep.sif {qsiprep_link}'
 		proc3 = subprocess.Popen(download_qsiprep, shell=True, stdout=subprocess.PIPE)
 		proc3.communicate()
+
+	### check if fsl already there
+
+	if os.path.isfile(f"{args.install_location}/fsl_6.0.4.sif"):
+		logger.warning(f'FSL has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping...')
+		print('\n')
+
+	else:
+		download_fsl = f'curl -L -o {args.install_location}/fsl_6.0.4.sif {fsl_link}'
+		proc4 = subprocess.Popen(download_fsl, shell=True, stdout=subprocess.PIPE)
+		proc4.communicate()
+
 
 	create_symlinks(args.install_location)
 
@@ -115,12 +137,12 @@ def check_storage(directory):
 
 	avail_gigs = int(re.sub("[^0-9]", "", [line[3] for line in df_output_lines][1]))
 
-	if avail_gigs < 22:
+	if avail_gigs < 30:
 		logger.error(f'Not enough desk space at {directory}.\nPlease select a different directory using the --install-location argument.')
 		sys.exit(1)
 
 	else:
-		logger.info(f'This directory has {avail_gigs}GB of available space. The dwiqc containers will take up 22GB of storage.')
+		logger.info(f'This directory has {avail_gigs}GB of available space. The dwiqc containers will take up 30GB of storage.')
 		print("\n")
 		time.sleep(5)
 
