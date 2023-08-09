@@ -360,34 +360,34 @@ class Task(tasks.BaseTask):
 				self._command.append(item)
 
 		elif self._nonzero_shells == True:
-			if self._no_gpu:	
-				self._command = [
-					'selfie',
-					'--lock',
-					'--output-file', self._prov,
-					'singularity',
-					'run',
-					'-e',
-					'--contain',
-					'-B',
-					f'{inputs_dir}:/INPUTS/',
-					'-B',
-					f'{self._outdir}:/OUTPUTS',
-					'-B',
-					f'{self._tempdir}:/tmp',
-					'-B',
-					f'{self._fs_license}:/APPS/freesurfer/license.txt',
-					f'{prequal_sif}',
-					'--save_component_pngs',
-					'--nonzero_shells',
-					'350,650,1350,2000',
-					'--subject',
-					self._sub,
-					'--project',
-					'Proj',
-					'--session',
-					self._ses
+			self._command = [
+				'selfie',
+				'--lock',
+				'--output-file', self._prov,
+				'singularity',
+				'run',
+				'-e',
+				'--contain',
+				'-B',
+				f'{inputs_dir}:/INPUTS/',
+				'-B',
+				f'{self._outdir}:/OUTPUTS',
+				'-B',
+				f'{self._tempdir}:/tmp',
+				'-B',
+				f'{self._fs_license}:/APPS/freesurfer/license.txt',
+				f'{prequal_sif}',
+				'--save_component_pngs',
+				'--nonzero_shells',
+				'350,650,1350,2000',
+				'--subject',
+				self._sub,
+				'--project',
+				'Proj',
+				'--session',
+				self._ses
 				]
+
 			for item in prequal_options:
 				self._command.append(item)
 
