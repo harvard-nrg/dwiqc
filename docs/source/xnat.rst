@@ -134,6 +134,14 @@ There are a few *get* mode optional arguments that are worth noting.
 
 Fill in with grid of all possible command line arguments.
 
+================ ================================  ===========================================================
+Argument         Description                       Required
+================ ================================  ===========================================================
+``--label``      
+``--bids-dir``   
+``--xnat-alias`` 
+================ ================================  ===========================================================
+
 process mode
 ^^^^^^^^^^^^
 **Overview**
@@ -142,9 +150,9 @@ With your data successfully downloaded using *get* mode (or organized in BIDS fo
 
 **Required Arguments**
 
-*process* mode requires 6 arguments:
+*process* mode requires 5 arguments:
 
-`1) ---sub` `2) ---ses` `3) ---bids-dir` `4) ---partition` `5) ---fs-license` `6) ---xnat-alias`
+`1) ---sub` `2) ---ses` `3) ---bids-dir` `4) ---partition` `5) ---fs-license`
 
 | 1. ``--sub`` is the subject's identifier in the BIDS hierarchy. If you've used *get* mode to download your data it will be in the ``--bids-dir`` directory. In the case of the example we're using here, it would be PE201222. Remember not to include the "sub-"" prefix! 
 
@@ -158,21 +166,19 @@ With your data successfully downloaded using *get* mode (or organized in BIDS fo
 
 | 5. ``--fs-license`` should be the **absolute** path to the FreeSurfer license file in your environment. You can obtain a license by downloading `FreeSurfer`_.
 
-| 6. ``--xnat-alias`` is the same alias passed to *get* mode above. See instructions `here <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_.
-
 **Executing the Command**
 
 Command Template:
 
 .. code-block:: shell
 
-    dwiQC.py process --sub <bids_subject> --ses <bids_session> --bids-dir <path_to_bids_dir> --partition <HPC_name> --fs-license <path_to_freesurfer_license> --xnat-alias <alias>
+    dwiQC.py process --sub <bids_subject> --ses <bids_session> --bids-dir <path_to_bids_dir> --partition <HPC_name> --fs-license <path_to_freesurfer_license>
 
 Command Example:
 
 .. code-block:: shell
 
-    dwiQC.py process --sub PE201222 --ses PE201222230719 --bids-dir /users/nrg/PE201222_230719 --partition fasse_gpu --fs-license /home/apps/freesurfer/license.txt --xnat-alias ssbc
+    dwiQC.py process --sub PE201222 --ses PE201222230719 --bids-dir /users/nrg/PE201222_230719 --partition fasse_gpu --fs-license /home/apps/freesurfer/license.txt
 
 
 **Expected Output**
@@ -224,15 +230,15 @@ To adjust the number of standard deviations, edit a file in your ``--bids-dir`` 
 
 .. code-block:: shell
 
-    dwiQC.py process --sub PE201222 --ses PE201222230719 --bids-dir /users/nrg/PE201222_230719 --partition fasse_gpu --fs-license /home/apps/freesurfer/license.txt --xnat-alias ssbc --custom-eddy /users/nrg/PE201222_230719/eddy_params_s2v_mbs.json
+    dwiQC.py process --sub PE201222 --ses PE201222230719 --bids-dir /users/nrg/PE201222_230719 --partition fasse_gpu --fs-license /home/apps/freesurfer/license.txt --custom-eddy /users/nrg/PE201222_230719/eddy_params_s2v_mbs.json
 
 **Advanced Usage**
 
-Only a few of the many possible *procss* mode arguments will be discussed here. 
+Only a few of the many possible *process* mode arguments will be discussed here. 
 
 | 1. ``--qsiprep-config`` and ``--prequal-config`` allow you to customize the arguments passed to qsiprep and prequal. By default, these are the `qsiprep config <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/qsiprep.yaml>`_ and `prequal config <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/prequal.yaml>`_ arguments being passed. Using these config files as a template, you can customize your prequal and qsiprep commands. Example usage: ``--prequal-config /users/nrg/PE201222_230719/prequal.yaml``
 
-| 2. ``--xnat-upload`` indicates that the output from DWIQC should be uploaded to your XNAT project. ``--xnat-alias`` must be passed for this argument to work. Example usage: ``--xnat-upload`` (just passing the argument is sufficient)
+| 2. ``--xnat-upload`` indicates that the output from DWIQC should be uploaded to your XNAT project. ``--xnat-alias`` (see *get* mode) must be passed for this argument to work. Example usage: ``--xnat-upload`` (just passing the argument is sufficient)
 
 | 3. ``--output-resolution`` allows you to specify the resolution of images created by qsiprep. The default is the same as the input data. Example usage: ``--output-resolution 1.0``
 
