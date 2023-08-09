@@ -23,7 +23,7 @@ class Task(tasks.BaseTask):
 
 		home_dir = os.path.expanduser("~")
 
-		prequal_sif = os.path.join(home_dir, '.config/dwiqc/containers/prequal_nrg.sif')
+		fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
 
 		os.chdir(f"{self._outdir}/EDDY")
 
@@ -61,7 +61,7 @@ class Task(tasks.BaseTask):
 
 
 		eddy_quad = f"""singularity exec \
-		{prequal_sif} \
+		{fsl_sif} \
 		/APPS/fsl/bin/eddy_quad \
 		{self._sub}_{self._ses} \
 		-idx index.txt \
@@ -159,7 +159,7 @@ class Task(tasks.BaseTask):
 	def extract_b0_vol(self):
 		os.chdir(f"{self._outdir}/PREPROCESSED")
 		extract_command = f"""singularity exec \
-		{prequal_sif} \
+		{fsl_sif} \
 		/APPS/fsl/bin/fslselectvols \
 		-i dwmri.nii.gz \
 		-o b0_volume \
