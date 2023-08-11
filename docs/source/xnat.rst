@@ -132,15 +132,18 @@ There are a few *get* mode optional arguments that are worth noting.
 
 **All Arguments**
 
-Fill in with grid of all possible command line arguments.
-
-================ ================================  ===========================================================
-Argument         Description                       Required
-================ ================================  ===========================================================
-``--label``      
-``--bids-dir``   
-``--xnat-alias`` 
-================ ================================  ===========================================================
+==================== ========================================  ========
+Argument             Description                                Required
+==================== ========================================  ========
+``--label``          XNAT Session Label                        Yes
+``--bids-dir``       Path to BIDS download directory           Yes
+``--xnat-alias``     Alias for XNAT Project                    Yes
+``--project``        Project Name                              No
+``--xnat-config``    Configuration file for downloading scans  No
+``--no-tagger``      Turn off *xnattagger*                     No
+``--dry-run``        Generate list of to-be-downloaded scans   No
+``-o``               Path to ``--dry-run`` json output file    No
+==================== ========================================  ========
 
 process mode
 ^^^^^^^^^^^^
