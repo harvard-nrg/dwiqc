@@ -133,7 +133,7 @@ There are a few *get* mode optional arguments that are worth noting.
 **All Arguments**
 
 ==================== ========================================  ========
-Argument             Description                                Required
+Argument             Description                               Required
 ==================== ========================================  ========
 ``--label``          XNAT Session Label                        Yes
 ``--bids-dir``       Path to BIDS download directory           Yes
@@ -254,6 +254,26 @@ Only a few of the many possible *process* mode arguments will be discussed here.
 **All Arguments**
 
 Fill in with box of all possible arguments for *process*.
+
+=============================== ==============================================  ========
+Argument                        Description                                     Required
+=============================== ==============================================  ========
+``--sub``                       Subject label (excluding "sub-")                Yes
+``--ses``                       Session label (excluding "ses-")                Yes
+``--bids-dir``                  Path to BIDS directory                          Yes
+``--partition``                 Name of partition where jobs will be submitted  Yes
+``--fs-license``                Path to FreeSurfer License                      Yes
+``--run``                       BIDS Run Number                                 No
+``--output-resolution-process`` Resolution of Output Data                       No
+``--prequal-config``            Path to prequal command .yaml file              No
+``--qsiprep-config``            Path to qsiprep command .yaml file              No
+``--no-gpu``                    Turn off GPU functionality                      No
+``--sub-tasks``                 Pass only prequal or qsiprep to be run          No
+``--xnat-alias``                Alias for XNAT project                          No
+``--xnat-upload``               Indicate if results should be uploaded to XNAT  No
+``--artifacts-dir``             Location for generated reports                  No
+``--custom-eddy``               Path to customized eddy_params.json file        No
+=============================== ==============================================  ========
 
 tandem mode
 ^^^^^^^^^^^
