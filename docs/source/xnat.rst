@@ -163,7 +163,7 @@ With your data successfully downloaded using *get* mode (or organized in BIDS fo
  
 .. image:: images/session-directory.png
 
-| 3. ``--bids-dir`` is the same directory passed to the ``bids-dir`` argument in *get* mode.
+| 3. ``--bids-dir`` is the same directory passed to the ``bids-dir`` argument in *get* mode. Absolute path to the directory where the data is in BIDS format.
 
 | 4. ``--partition`` refers to the name of the partition or cluster where the sbatch jobs will be submitted to. This is generally just the name of your HPC system (e.g. fasse, fasse_gpu, Armis, etc.) 
 
@@ -280,7 +280,25 @@ tandem mode
 
 **Overview**
 
+*tandem* mode combines the best of both worlds and runs both *get* and *process* modes in a single command. *tandem* mode is only applicable for users hosting data on an XNAT instance and is useful for scripting and batching large numbers of subject data. See `get mode <#get-mode>`_ and `process mode <#process-mode>`_ documentation for further explanation of their functionality.
+
 **Required Arguments**
+
+*tandem* uses a combination of arguments from *get* and *process*:
+
+`1) ---label` `2) ---bids-dir` `3) ---xnat-alias` `4) ---partition` `5) ---fs-license`
+
+| 1. ``--label`` refers to the XNAT MR Session ID, which is found under XNAT PROJECT ---> SUBJECT ---> MR_SESSION
+
+.. image:: images/MR-Session.png
+
+| 2. ``--bids-dir`` should be the **absolute** path to the desired download directory. If the directory doesn't exist, it will be created.
+ 
+| 3. ``--xnat-alias`` is the alias containing credentials associated with your XNAT project. It can be created using yaxil `documentation <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_.
+
+| 4. ``--partition`` refers to the name of the partition or cluster where the sbatch jobs will be submitted to. This is generally just the name of your HPC system (e.g. fasse, fasse_gpu, Armis, etc.)
+
+| 5. ``--fs-license`` should be the **absolute** path to the FreeSurfer license file in your environment. You can obtain a license by downloading `FreeSurfer`_.
 
 **Executing the Command**
 
