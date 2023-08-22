@@ -280,7 +280,7 @@ Argument                        Description                                     
 ``--partition``                 Name of partition where jobs will be submitted  Yes
 ``--fs-license``                Path to FreeSurfer License                      Yes
 ``--run``                       BIDS Run Number                                 No
-``--output-resolution-process`` Resolution of Output Data                       No
+``--output-resolution``         Resolution of Output Data                       No
 ``--prequal-config``            Path to prequal command .yaml file              No
 ``--qsiprep-config``            Path to qsiprep command .yaml file              No
 ``--no-gpu``                    Turn off GPU functionality                      No
@@ -369,6 +369,31 @@ All the advanced usage arguments for *tandem* mode are the same as the *get* mod
 
 tandem: All Arguments
 """""""""""""""""""""
+
+======================= ==============================================  ========
+Argument                Description                                     Required
+======================= ==============================================  ========
+``--label``             XNAT Session Label                              Yes
+``--bids-dir``          Path to BIDS download directory                 Yes
+``--xnat-alias``        Alias for XNAT Project                          Yes
+``--partition``         Name of partition where jobs will be submitted  Yes
+``--fs-license``        Path to FreeSurfer License                      Yes
+``--project``           Project Name                                    No
+``--xnat-config``       Configuration file for downloading scans        No
+``--no-tagger``         Turn off *xnattagger*                           No
+``--dry-run``           Generate list of to-be-downloaded scans         No
+``-o``                  Path to ``--dry-run`` json output file          No
+``--run``               BIDS Run Number                                 No
+``--output-resolution`` Resolution of Output Data                       No
+``--prequal-config``    Path to prequal command .yaml file              No
+``--qsiprep-config``    Path to qsiprep command .yaml file              No
+``--no-gpu``            Turn off GPU functionality                      No
+``--sub-tasks``         Pass only prequal or qsiprep to be run          No
+``--xnat-alias``        Alias for XNAT project                          No
+``--xnat-upload``       Indicate if results should be uploaded to XNAT  No
+``--artifacts-dir``     Location for generated reports                  No
+``--custom-eddy``       Path to customized eddy_params.json file        No
+======================= ==============================================  ========
 
 Understanding the Report Page
 -----------------------------
