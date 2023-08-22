@@ -398,6 +398,9 @@ Argument                Description                                     Required
 Understanding the Report Page
 -----------------------------
 
+.. note::
+      This section is only relevant for users uploading *DWIQC* output to an XNAT instance.
+
 
 Left pane
 ^^^^^^^^^
