@@ -10,7 +10,7 @@ XNAT User Documentation
 
 Tagging your scans
 ------------------
-For DWIQC to discover Diffusion and Fieldmap scans to process, you need to add notes to those scans in `XNAT`_. This can either be done via the XNAT interface or through the `xnattagger <https://github.com/harvard-nrg/xnattagger>`_ command line tool. To tag via the XNAT interface, you can add notes using the ``Edit`` button located within the ``Actions`` box on the MR Session report page.
+For DWIQC to discover Diffusion and Fieldmap scans to process, you need to add notes to those scans in `XNAT`_. This can either be done via the XNAT interface or through the xnattagger `command line tool <https://github.com/harvard-nrg/xnattagger>`_. To tag via the XNAT interface, you can add notes using the ``Edit`` button located within the ``Actions`` box on the MR Session report page.
 
 ========= ================================  ===========================================================
 Type      Example series                    Note
@@ -67,13 +67,15 @@ get mode
 .. note::
     *get* mode is only applicable if you have an XNAT instance you're going to interact with. If you're only going to use DWIQC outside of XNAT, please feel free to skip to the `process <#process-mode>`_ mode section. 
 
-**Overview**
+get: Overview
+"""""""""""""
 
-*get* mode functions as a way to download data from XNAT to your local compute environment. *get* mode's primary feature is the ability to download data and convert it to BIDS format. If you're unfamiliar with BIDS, read up on it `here <https://bids-specification.readthedocs.io/en/stable/>`_. Note that `dcm2niix <https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage#General_Usage>`_ must be installed and on your path or loaded via ``module load``. *get* mode will fail without it.
+*get* mode functions as a way to download data from XNAT to your local compute environment. *get* mode's primary feature is the ability to download data and convert it to BIDS format. If you're unfamiliar with BIDS, take a look at the official `docs <https://bids-specification.readthedocs.io/en/stable/>`_. Note that `dcm2niix <https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage#General_Usage>`_ must be installed and on your path or loaded via ``module load``. *get* mode will fail without it.
 
 Before using *get* mode, I strongly recommend creating an `xnat_auth alias <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using the excellent `yaxil <https://yaxil.readthedocs.io/en/latest/>`_ python library. It's not stictly necessary to do so, but it will make your life easier. Example code will use an xnat alias. If you've already `installed <developers.html#hpc-installation>`_ DWIQC, yaxil will have been installed as well (yaxil is a DWIQC dependency). 
 
-**Required Arguments**
+get: Required Arguments
+"""""""""""""""""""""""
 
 *get* mode requires three arguments: `1) ---label` `2) ---bids-dir` `3) ---xnat-alias`
 
@@ -89,9 +91,10 @@ Before using *get* mode, I strongly recommend creating an `xnat_auth alias <http
 
 ``cd`` into the desired directory and execute ``pwd`` to get a directory's absolute path.
 
-3. ``--xnat-alias`` is the alias containing credentials associated with your XNAT project. It can be created `here <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_.
+3. ``--xnat-alias`` is the alias containing credentials associated with your XNAT project. It can be created in a few `steps <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_.
 
-**Executing the Command**
+get: Executing the Command
+""""""""""""""""""""""""""
 
 Command Template:
 
@@ -108,7 +111,8 @@ Command Example:
 .. note::
     Ensure that every MR_Session has its own dedicated BIDS download directory. If not, DWIQC will not run properly. 
 
-**Expected Output**
+get: Expected Output
+""""""""""""""""""""
 
 After running DWIQC *get* you should see two new directories and one new file under your BIDS dir, similar to what's shown here:
 
@@ -116,11 +120,13 @@ After running DWIQC *get* you should see two new directories and one new file un
 
 *dataset_description.json* conatains very basic information about the downloaded data. It's required by BIDS format. *sourcedata* contains the raw dicoms of all the downloaded scans. *sub-PE201222* (will differ for you) contains the downloaded data in proper BIDS format. If you enter the directory, you should see the subject session, then three more directories: *anat*, *dwi* and *fmap*. Those directories contain the MR Session's respective anatomical, diffusion and diffusion field map data. If one of the directories is missing or empty, verify that your session's scans have been tagged correctly and that the data is downloadable.
 
-**Common Errors**
+get: Common Errors
+""""""""""""""""""
 
 The most common *get* mode error stems from DWIQC being unable to locate and use dcm2niix. Make sure it's on your path! 
 
-**Advanced Usage**
+get: Advanced Usage
+"""""""""""""""""""
 
 There are a few *get* mode optional arguments that are worth noting. 
 
@@ -130,7 +136,8 @@ There are a few *get* mode optional arguments that are worth noting.
  
 | 3. If you would like to see what data will be downloaded from XNAT without actually downloading it, pass the ``--dry-run`` argument. You will also have to specify an output json file: ``-o test.json``. That json file will contain metadata about the scans *get* mode would download. This can be useful for testing.
 
-**All Arguments**
+get: All Arguments
+""""""""""""""""""
 
 ==================== ========================================  ========
 Argument             Description                               Required
@@ -147,11 +154,15 @@ Argument             Description                               Required
 
 process mode
 ^^^^^^^^^^^^
-**Overview**
+process: Overview
+"""""""""""""""""
+
+Testing a `link <#get-overview>`_
 
 With your data successfully downloaded using *get* mode (or organized in BIDS format through other means) you are ready to run DWIQC. We recommended running DWIQC in an HPC (High Performance Computing) environment rather than on a local machine. By default, DWIQC will run both `prequal`_ and `qsiprep`_ using gpu compute nodes. However, it is possible to turn off gpu-dependent features by using the ``--no-gpu`` argument. DWIQC may require up to 20GB of RAM if run on a local/non-gpu machine so please allocate resources appropriately. 
 
-**Required Arguments**
+process: Required Arguments
+"""""""""""""""""""""""""""
 
 *process* mode requires 5 arguments:
 
@@ -169,7 +180,8 @@ With your data successfully downloaded using *get* mode (or organized in BIDS fo
 
 | 5. ``--fs-license`` should be the **absolute** path to the FreeSurfer license file in your environment. You can obtain a license by downloading `FreeSurfer`_.
 
-**Executing the Command**
+process: Executing the Command
+""""""""""""""""""""""""""""""
 
 Command Template:
 
@@ -184,7 +196,8 @@ Command Example:
     dwiQC.py process --sub PE201222 --ses PE201222230719 --bids-dir /users/nrg/PE201222_230719 --partition fasse_gpu --fs-license /home/apps/freesurfer/license.txt
 
 
-**Expected Output**
+process: Expected Output
+""""""""""""""""""""""""
 
 DWIQC runtime varies based on available resources, size of data and desired processing steps. Users should expect one session to take 3-5 hours to complete prequal and 7-10 hours to complete qsiprep. Prequal and qsiprep are run in parallel, so total processing time rarely exceeds 10 hours. DWIQC also makes use of the FSL tool eddy quad. Eddy quad runs a series of quality assesment commands to generate images and quantitative metric tables. Eddy quad doesn't take more than 10 minutes to run in most cases. A successful DWIQC run will contain output from all three of these software packages. 
 
@@ -212,7 +225,8 @@ derivatives ---> dwiqc-prequal ---> subject_dir ---> session_dir ---> sub_sessio
 
 Download an example :download:`here <examples/qc.pdf>`.
 
-**Common Errors**
+process: Common Errors
+""""""""""""""""""""""
 
 A somewhat common error (affects about 5% of subjects) is an Eddy Volume to Volume registration that looks something like this:
 
@@ -235,7 +249,8 @@ To adjust the number of standard deviations, edit a file in your ``--bids-dir`` 
 
     dwiQC.py process --sub PE201222 --ses PE201222230719 --bids-dir /users/nrg/PE201222_230719 --partition fasse_gpu --fs-license /home/apps/freesurfer/license.txt --custom-eddy /users/nrg/PE201222_230719/eddy_params_s2v_mbs.json
 
-**Advanced Usage**
+process: Advanced Usage
+"""""""""""""""""""""""
 
 Only a few of the many possible *process* mode arguments will be discussed here. 
 
@@ -251,7 +266,8 @@ Only a few of the many possible *process* mode arguments will be discussed here.
 
 | 6. ``--custom-eddy`` is used to pass custom FSL eddy parameters to qsiprep as noted under *Common Errors*. Example usage: ``--custom-eddy /users/nrg/PE201222_230719/eddy_params_s2v_mbs.json``
 
-**All Arguments**
+process: All Arguments
+""""""""""""""""""""""
 
 Fill in with box of all possible arguments for *process*.
 
@@ -278,11 +294,13 @@ Argument                        Description                                     
 tandem mode
 ^^^^^^^^^^^
 
-**Overview**
+tandem: Overview
+""""""""""""""""
 
 *tandem* mode combines the best of both worlds and runs both *get* and *process* modes in a single command. *tandem* mode is only applicable for users hosting data on an XNAT instance and is useful for scripting and batching large numbers of subject data. See `get mode <#get-mode>`_ and `process mode <#process-mode>`_ documentation for further explanation of their functionality.
 
-**Required Arguments**
+tandem: Required Arguments
+""""""""""""""""""""""""""
 
 *tandem* uses a combination of arguments from *get* and *process*:
 
@@ -300,15 +318,38 @@ tandem mode
 
 | 5. ``--fs-license`` should be the **absolute** path to the FreeSurfer license file in your environment. You can obtain a license by downloading `FreeSurfer`_.
 
-**Executing the Command**
+tandem: Executing the Command
+"""""""""""""""""""""""""""""
 
-**Command Template**
+Command Template:
 
-**Expected Output**
+.. code-block:: shell
 
-**Common Errors**
+    dwiQC.py tandem --label <bids_subject> --bids-dir <path_to_bids_dir> --xnat-alias <xnat-alias> --partition <HPC_name> --fs-license <path_to_freesurfer_license>
 
-**Advanced Usage**
+Command Example:
+
+.. code-block:: shell
+
+    dwiQC.py tandem --label PE201222_230719 --bids-dir /users/nrg/PE201222_230719 --xnat-alias ssbc --partition fasse_gpu --fs-license /home/apps/freesurfer/license.txt
+
+tandem: Expected Output
+"""""""""""""""""""""""
+
+Please see process mode `expected output <#process-expected-output>`_ documentation regarding expected output.
+
+tandem: Common Errors
+"""""""""""""""""""""
+
+Please see `get mode common errors <#get-common-errors>`_ and `process mode common errors <#process-common-errors>`_ documentation regarding common errors.
+
+tandem: Advanced Usage
+""""""""""""""""""""""
+
+
+
+tandem: All Arguments
+"""""""""""""""""""""
 
 Understanding the Report Page
 -----------------------------
