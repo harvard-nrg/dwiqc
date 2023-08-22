@@ -5,10 +5,12 @@ Developer Documentation
 .. _T1w: https://tinyurl.com/hhru8ytz
 .. _vNav: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3320676/
 .. _Gradle: https://gradle.org/install/
+.. _pip: https://pip.pypa.io/en/stable/installation/
+.. _python: https://www.python.org/downloads/
 
 HPC Installation
 ----------------
-At the moment, the only supported way to install AnatQC is `within a container <#building-a-container>`_.
+At the moment, the only supported way to install *DWIQC* is via "bare metal" using the `python`_ package manager `pip`_.
 
 downloading a container
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -32,7 +34,7 @@ Now you can run ``anatQC.py`` using ``docker run`` ::
 
 XNAT Installation
 -----------------
-The following section will describe how to build and configure AnatQC as a `XNAT`_ plugin.
+The following section will describe how to build and configure *DWIQC* as an `XNAT`_ plugin.
 
 building the plugin
 ^^^^^^^^^^^^^^^^^^^
