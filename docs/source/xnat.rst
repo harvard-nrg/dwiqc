@@ -1,4 +1,4 @@
-XNAT User Documentation
+User Documentation
 =======================
 .. _XNAT: https://doi.org/10.1385/NI:5:1:11
 .. _command.json: https://github.com/harvard-nrg/anatqc/blob/xnat-1.7.6/command.json
@@ -60,7 +60,7 @@ DWIQC is broken down into four different "modes". As you saw in the `installatio
 
 .. code-block:: shell
 
-    source dwqic/bin/activate
+    source dwiqc/bin/activate
 
 get mode
 ^^^^^^^^
