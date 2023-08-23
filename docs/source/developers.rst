@@ -11,6 +11,9 @@ Developer Documentation
 .. _FSL: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki
 .. _chromium: https://www.chromium.org/chromium-projects/
 
+.. note::
+    This documentation assumes a basic understanding of the command line. Here's a quick (and free!) crash `course <https://www.codecademy.com/learn/learn-the-command-line>`_ if needed.
+
 HPC/Local Installation
 ----------------------
 At the moment, the only supported way to install *DWIQC* is via "bare metal" using the `python`_ package manager `pip`_. A python version >=3.4 will come with pip preinstalled. Esnure that you have both python and pip installed on your HPC or local machine before attempting to install *DWIQC*.
@@ -58,7 +61,7 @@ XNAT Installation
 -----------------
 The following section will describe how to build and configure *DWIQC* as an `XNAT`_ plugin.
 
-building the plugin
+Building the Plugin
 ^^^^^^^^^^^^^^^^^^^
 Clone the ``xnat-1.8`` branch from the ``github.com/harvard-nrg/dwiqc`` 
 repository ::
@@ -72,3 +75,27 @@ Change into the repository directory and compile the plugin using `Gradle`_ ::
 Once the plugin has been compiled, move the resulting ``.jar`` into your XNAT plugins directory ::
 
     mv ./build/libs/dwiqc-plugin-1.0.0.jar ${XNAT_HOME}/plugins/
+
+Activating the Plugin
+^^^^^^^^^^^^^^^^^^^^^
+There are several necessary steps to activate the *DWIQC* plugin via your XNAT instance's home page. First, login and click on the *Administer* button at the top:
+
+.. image:: images/administer-button.png
+
+Next, click on *Data Types*:
+
+.. image:: images/data-types.png
+
+Click on *Setup Additional Data Type*:
+
+.. image:: images/setup-data-type.png
+
+You will see a drop down menu. Select *neuroinfo:dwiqc* and click *Submit*.
+
+.. image:: images/neuroinfo-dwiqc.png
+
+You can leave all of the True/False statements as they are in this window (unless you have a reason to change them). Fill in the boxes labeled *Singular Name*, *Plural Name*, and *Category* with the information shown below and click *Next*. 
+
+.. image:: images/dwiqc-access-options.png
+
+Click *Next* through the remainder of the windows without editing anything, and Voila! *DWIQC* is now configured on your XNAT instance.
