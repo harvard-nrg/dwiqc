@@ -157,6 +157,8 @@ class Task(tasks.BaseTask):
 		logging.info('successfully parsed json and wrote out results to eddy_metrics.json')
 
 	def extract_b0_vol(self):
+		home_dir = os.path.expanduser("~")
+		fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif') 
 		os.chdir(f"{self._outdir}/PREPROCESSED")
 		extract_command = f"""singularity exec \
 		{fsl_sif} \
