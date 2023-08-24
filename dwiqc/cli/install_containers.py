@@ -26,9 +26,9 @@ chromium_link = 'https://www.dropbox.com/scl/fi/wgh2d6xtdgi87zaxc5m5l/chromium.s
 
 #prequal_link = 'https://www.dropbox.com/scl/fi/az4mmv9dzd9gmeuoilnqd/prequal_nrg2.sif?rlkey=nimyvlrf9hgq2yle19m2yxgq0&dl=1'
 
-prequal_link = 'https://www.dropbox.com/scl/fi/vklkupolvs34kn8rpzsyo/prequal_nrg3.sif?rlkey=kd1r20clr7xipe7gegi7htsho&dl=0'
+prequal_link = 'https://www.dropbox.com/scl/fi/vklkupolvs34kn8rpzsyo/prequal_nrg3.sif?rlkey=kd1r20clr7xipe7gegi7htsho&dl=1'
 
-fsl_link = 'https://www.dropbox.com/scl/fi/qboi0izu211j8fd5ffyym/fsl_6.0.4.sif?rlkey=qu7qsappf0w9ktluuqmvd8e8i&dl=0'
+fsl_link = 'https://www.dropbox.com/scl/fi/qboi0izu211j8fd5ffyym/fsl_6.0.4.sif?rlkey=qu7qsappf0w9ktluuqmvd8e8i&dl=1'
 
 qsiprep_link = 'https://www.dropbox.com/scl/fi/s8asxwmykyw7paqdcnaev/qsiprep.sif?rlkey=lnuffrzn9mf894q6j9tl2l2mc&dl=1'
 
