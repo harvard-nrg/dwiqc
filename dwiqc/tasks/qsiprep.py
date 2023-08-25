@@ -10,27 +10,27 @@ import sys
 import json
 import nibabel as nib
 import dwiqc.tasks as tasks
-sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
-from env_modules_python import module
 import shutil
 from executors.models import Job
 import dwiqc.config as config
 import numpy as np
 
-
-#module('load', 'cuda/9.1.85-fasrc01')
+home_dir = os.path.expanduser("~")
+qsiprep_sif = os.path.join(home_dir, '.config/dwiqc/containers/qsiprep.sif')
 
 
 logger = logging.getLogger(__name__)
 
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config, fs_license, custom_eddy=False, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
 		self._qsiprep_config = qsiprep_config
+		self._fs_license = fs_license
+		self._custom_eddy = custom_eddy
 		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
 		self._output_resolution = output_resolution
@@ -76,10 +76,11 @@ class Task(tasks.BaseTask):
 		
 		[execution]
 		remove_unnecessary_outputs = false
+		parameterize_dirs = false
 
 		[monitoring]"""
 
-		with open(f"{self._bids}/nipype.cfg", "w") as file:
+		with open(f"{home_dir}/.nipype/nipype.cfg", "w") as file:
 			file.write(nipype)
 
 
@@ -217,7 +218,8 @@ class Task(tasks.BaseTask):
 			"slice_order": self._spec,
 			"args": "--ol_nstd=5 --ol_type=gw"
 		}
-		if not self._qsiprep_config:
+		
+		if not self._custom_eddy:
 			with open(f"{self._bids}/eddy_params_s2v_mbs.json", "w") as f:
 				json.dump(params_file, f)
 		else:
@@ -227,46 +229,38 @@ class Task(tasks.BaseTask):
 
 	def build(self):
 		self.create_eddy_params()
-		#self.create_nipype()
+		self.create_nipype()
 		self.check_output_resolution()
-		if self._qsiprep_config:
-			try:
-				qsiprep_command = yaml.safe_load(open(self._qsiprep_config))
-			except yaml.parser.ParserError:
-				print("There's an issue with the prequal config file.\nMake sure it is a .yaml file with proper formatting.")
-				sys.exit()
-			self._command = qsiprep_command['qsiprep']['shell']
-		else:
-			self._command = [
-				'selfie',
-				'--lock',
-				'--output-file', self._prov,
-				'singularity',
-				'run',
-				'--nv',
-				#'-B',
-				#'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
-				'/n/sw/ncf/containers/hub.docker.io/pennbbl/qsiprep/0.18.0/qsiprep.sif',			
-				self._bids,
-				self._outdir,
-				'participant',
-				'--output-resolution',
-				self._output_resolution,
-				'--separate-all-dwis',
-				'--eddy-config',
-				f'{self._bids}/eddy_params_s2v_mbs.json',
-				'--recon-spec',
-				'reorient_fslstd',
-				'--notrack',
-				'--n_cpus',
-				'2',
-				'--mem_mb',
-				'40000',
-				'--fs-license-file',
-				'/n/helmod/apps/centos7/Core/freesurfer/6.0.0-fasrc01/license.txt',
-				'-w',
-				self._tempdir
-			]
+		try:
+			qsiprep_command = yaml.safe_load(open(self._qsiprep_config))
+		except yaml.parser.ParserError:
+			print("There's an issue with the prequal config file.\nMake sure it is a .yaml file with proper formatting.")
+			sys.exit()
+		qsiprep_options = qsiprep_command['qsiprep']['shell']
+		
+		self._command = [
+			'selfie',
+			'--lock',
+			'--output-file', self._prov,
+			'singularity',
+			'run',
+			'--nv',
+			qsiprep_sif,			
+			self._bids,
+			self._outdir,
+			'participant',
+			'--output-resolution',
+			self._output_resolution,
+			'--eddy-config',
+			f'{self._bids}/eddy_params_s2v_mbs.json',
+			'--fs-license-file',
+			self._fs_license,
+			'-w',
+			self._tempdir
+		]
+
+		for item in qsiprep_options:
+			self._command.append(item)
 
 		if self._no_gpu:
 			logdir = self.logdir()

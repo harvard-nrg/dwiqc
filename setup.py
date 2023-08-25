@@ -11,7 +11,8 @@ requires = [
     'executors==0.6a1',
     'selfie',
     'lxml',
-    'numpy'
+    'numpy',
+    'dcm2niix'
 ]
 
 about = dict()

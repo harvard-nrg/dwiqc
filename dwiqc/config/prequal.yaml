@@ -1,30 +1,7 @@
 prequal:
   shell:
-    - 'selfie'
-    - '--lock'
-    - '--output-file'
-    - <path_to_prov_file>
-    - 'singularity'
-    - 'run'
-    - '-e'
-    - '--contain'
-    - '--nv'
-    - '-B'
-    - <inputs_dir>:/INPUTS/
-    - '-B'
-    - <output_dir>:/OUTPUTS
-    - '-B'
-    - <temp_dir>:/tmp
-    - '-B'
-    - <path_to_FreeSurfer_license>:/APPS/freesurfer/license.txt
-    - '-B'
-    - /n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py
-    - '-B'
-    - /n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py
-    - /n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif
-    - '--save_component_pngs'
     - '--eddy_cuda'
-    - '9.1'
+    - '10.2'
     - 'j'
     - '--num_threads'
     - '2'
@@ -39,9 +16,3 @@ prequal:
     - '--correct_bias'
     - 'on'
     - '--topup_first_b0s_only'
-    - '--subject'
-    - <subject>
-    - '--project'
-    - <project_name>
-    - '--session'
-    - <session>

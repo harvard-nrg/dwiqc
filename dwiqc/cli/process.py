@@ -20,10 +20,6 @@ import dwiqc.tasks.qsiprep as qsiprep
 import dwiqc.tasks.prequal_EQ as prequal_EQ
 import dwiqc.tasks.qsiprep_EQ as qsiprep_EQ
 import dwiqc.browser as browser
-sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
-from env_modules_python import module
-
-module('load', 'chromium.org/chromium/102.0.5005.115-ncf')
 
 
 logger = logging.getLogger(__name__)
@@ -71,7 +67,7 @@ def do(args):
     json_file = os.path.basename(layout.get(subject=args.sub, extension='.json', suffix='dwi', run=args.run, return_type='filename').pop())
 
     basename = os.path.splitext(json_file)[0]
-   
+
     os.system('mkdir -p $TMPDIR')
 
 
@@ -86,6 +82,7 @@ def do(args):
             run=args.run,
             bids=args.bids_dir,
             outdir=prequal_outdir,
+            fs_license = args.fs_license,
             prequal_config=args.prequal_config,
             no_gpu=args.no_gpu,
             tempdir=tempfile.gettempdir(),
@@ -108,6 +105,8 @@ def do(args):
             bids=args.bids_dir,
             outdir=qsiprep_outdir,
             qsiprep_config=args.qsiprep_config,
+            fs_license=args.fs_license,
+            custom_eddy=args.custom_eddy,
             no_gpu=args.no_gpu,
             tempdir=tempfile.gettempdir(),
             pipenv='/sw/apps/qsiprep'

@@ -11,8 +11,6 @@ import json
 import dwiqc.tasks as tasks
 import shutil
 from executors.models import Job
-sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
-from env_modules_python import module
 import dwiqc.config as config
 import numpy as np
 
@@ -20,17 +18,16 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 
-module('load', 'cuda/9.1.85-fasrc01')
-
 # pull in some parameters from the BaseTask class in the __init__.py directory
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, prequal_config, no_gpu=False, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, prequal_config, fs_license, no_gpu=False, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
 		self._prequal_config = prequal_config
+		self._fs_license = fs_license
 		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
 		super().__init__(outdir, tempdir, pipenv)
@@ -318,209 +315,83 @@ class Task(tasks.BaseTask):
 		self._tempdir = tempfile.gettempdir()
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
-		if self._prequal_config:
-			try:
-				prequal_command = yaml.safe_load(open(self._prequal_config))
-			except yaml.parser.ParserError:
-				print("There's an issue with the prequal config file.\nMake sure it is a .yaml file with proper formatting.")
-				sys.exit()
-			self._command = prequal_command['prequal']['shell']
-		else:
-			if self._nonzero_shells == False:
-				if self._no_gpu:
-					self._command = [
-						'selfie',
-						'--lock',
-						'--output-file', self._prov,
-						'singularity',
-						'run',
-						'-e',
-						'--contain',
-						'-B',
-						f'{inputs_dir}:/INPUTS/',
-						'-B',
-						f'{self._outdir}:/OUTPUTS',
-						'-B',
-						f'{self._tempdir}:/tmp',
-						'-B',
-						'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
-						'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
-						'--save_component_pngs',
-						'j',
-						'--num_threads',
-						'2',
-						'--denoise',
-						'off',
-						'--degibbs',
-						'off',
-						'--rician',
-						'off',
-						'--prenormalize',
-						'on',
-						'--correct_bias',
-						'on',
-						'--topup_first_b0s_only',
-						'--subject',
-						self._sub,
-						'--project',
-						'SSBC',
-						'--session',
-						self._ses
-					]
-				else:
-					self._command = [
-						'selfie',
-						'--lock',
-						'--output-file', self._prov,
-						'singularity',
-						'run',
-						'-e',
-						'--contain',
-						'--nv',
-						'-B',
-						f'{inputs_dir}:/INPUTS/',
-						'-B',
-						f'{self._outdir}:/OUTPUTS',
-						'-B',
-						f'{self._tempdir}:/tmp',
-						'-B',
-						'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-						'-B',
-						'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
-						'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
-						'--save_component_pngs',
-						'j',
-						'--eddy_cuda',
-						'9.1',
-						'--num_threads',
-						'2',
-						'--denoise',
-						'off',
-						'--degibbs',
-						'off',
-						'--rician',
-						'off',
-						'--prenormalize',
-						'on',
-						'--correct_bias',
-						'on',
-						'--topup_first_b0s_only',
-						'--subject',
-						self._sub,
-						'--project',
-						'SSBC',
-						'--session',
-						self._ses
-					]	
+		home_dir = os.path.expanduser("~")
+		prequal_sif = os.path.join(home_dir, '.config/dwiqc/containers/prequal_nrg.sif')
+		try:
+			prequal_command = yaml.safe_load(open(self._prequal_config))
+		except yaml.parser.ParserError:
+			print("There's an issue with the prequal config file.\nMake sure it is a .yaml file with proper formatting.")
+			sys.exit()
+		prequal_options = prequal_command['prequal']['shell']
+		if self._no_gpu:
+			if '--eddy_cuda' in prequal_options:
+				prequal_options.remove('--eddy_cuda')
+			if '10.2' in prequal_options:
+				prequal_options.remove('10.2')
+		num_opts = len(prequal_options)
+		if self._nonzero_shells == False:
+			self._command = [
+				'selfie',
+				'--lock',
+				'--output-file', self._prov,
+				'singularity',
+				'run',
+				'-e',
+				'--contain',
+				'--nv',
+				'-B',
+				f'{inputs_dir}:/INPUTS/',
+				'-B',
+				f'{self._outdir}:/OUTPUTS',
+				'-B',
+				f'{self._tempdir}:/tmp',
+				'-B',
+				f'{self._fs_license}:/APPS/freesurfer/license.txt',
+				f'{prequal_sif}',
+				'--save_component_pngs',
+				'--subject',
+				self._sub,
+				'--project',
+				'Proj',
+				'--session',
+				self._ses
+				]
 
-			elif self._nonzero_shells == True:
-				if self._no_gpu:	
+			for item in prequal_options:
+				self._command.append(item)
 
-					self._command = [
-						'selfie',
-						'--lock',
-						'--output-file', self._prov,
-						'singularity',
-						'run',
-						'-e',
-						'--contain',
-						'-B',
-						f'{inputs_dir}:/INPUTS/',
-						'-B',
-						f'{self._outdir}:/OUTPUTS',
-						'-B',
-						f'{self._tempdir}:/tmp',
-						'-B',
-						'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
-						'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
-						'--save_component_pngs',
-						'j',
-						'--num_threads',
-						'2',
-						'--denoise',
-						'off',
-						'--degibbs',
-						'off',
-						'--rician',
-						'off',
-						'--prenormalize',
-						'on',
-						'--correct_bias',
-						'on',
-						'--topup_first_b0s_only',
-						'--nonzero_shells',
-						'350,650,1350,2000',
-						'--subject',
-						self._sub,
-						'--project',
-						'SSBC',
-						'--session',
-						self._ses
-					]
-				else:	
+		elif self._nonzero_shells == True:
+			self._command = [
+				'selfie',
+				'--lock',
+				'--output-file', self._prov,
+				'singularity',
+				'run',
+				'-e',
+				'--contain',
+				'--nv',
+				'-B',
+				f'{inputs_dir}:/INPUTS/',
+				'-B',
+				f'{self._outdir}:/OUTPUTS',
+				'-B',
+				f'{self._tempdir}:/tmp',
+				'-B',
+				f'{self._fs_license}:/APPS/freesurfer/license.txt',
+				f'{prequal_sif}',
+				'--save_component_pngs',
+				'--nonzero_shells',
+				'350,650,1350,2000',
+				'--subject',
+				self._sub,
+				'--project',
+				'Proj',
+				'--session',
+				self._ses
+				]
 
-					self._command = [
-						'selfie',
-						'--lock',
-						'--output-file', self._prov,
-						'singularity',
-						'run',
-						'-e',
-						'--contain',
-						'--nv',
-						'-B',
-						f'{inputs_dir}:/INPUTS/',
-						'-B',
-						f'{self._outdir}:/OUTPUTS',
-						'-B',
-						f'{self._tempdir}:/tmp',
-						'-B',
-						'/n/sw/ncf/apps/freesurfer/6.0.0/license.txt:/APPS/freesurfer/license.txt',
-						'-B',
-						'/n/sw/helmod-rocky8/apps/Core/cuda/9.1.85-fasrc01:/usr/local/cuda',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
-						'-B',
-						'/n/nrg_l3/Lab/users/nrgadmin/PreQual/src/CODE/dtiQA_v7/vis.py:/CODE/dtiQA_v7/vis.py',
-						'/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif',
-						'--save_component_pngs',
-						'j',
-						'--eddy_cuda',
-						'9.1',
-						'--num_threads',
-						'2',
-						'--denoise',
-						'off',
-						'--degibbs',
-						'off',
-						'--rician',
-						'off',
-						'--prenormalize',
-						'on',
-						'--correct_bias',
-						'on',
-						'--topup_first_b0s_only',
-						'--nonzero_shells',
-						'350,650,1350,2000',
-						'--subject',
-						self._sub,
-						'--project',
-						'SSBC',
-						'--session',
-						self._ses
-					]
+			for item in prequal_options:
+				self._command.append(item)
 
 		logdir = self.logdir()
 		logfile = os.path.join(logdir, 'dwiqc-prequal.log')

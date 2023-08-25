@@ -2,8 +2,6 @@ import shutil
 import os
 import time
 import sys
-sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
-from env_modules_python import module
 import dwiqc.tasks as tasks
 import logging
 import subprocess
@@ -23,17 +21,14 @@ class Task(tasks.BaseTask):
 
 	def build(self):
 
+		home_dir = os.path.expanduser("~")
+
+		fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
+
 		os.chdir(f"{self._outdir}/EDDY")
 
 		# define log file
 		logging.basicConfig(filename=f"{self._outdir}/logs/dwiqc-prequal.log", encoding='utf-8', level=logging.DEBUG)
-
-		logging.info('Loading FSL module: fsl/6.0.6.4-centos7_x64-ncf')
-
-		#load the fsl module
-		module('load','fsl/6.0.6.4-centos7_x64-ncf')
-
-		logging.info('module succesfully loaded!')
 
 		# copy the necessary file to EDDY directory
 
@@ -66,8 +61,7 @@ class Task(tasks.BaseTask):
 
 
 		eddy_quad = f"""singularity exec \
-		-B /n/home_fasse/dasay/eddy_quad_mofication/quad_mot.py:/APPS/fsl/fslpython/envs/fslpython/lib/python3.7/site-packages/eddy_qc/QUAD/quad_mot.py \
-		/n/sw/ncf/containers/masilab/prequal/1.0.8/prequal.sif \
+		{fsl_sif} \
 		/APPS/fsl/bin/eddy_quad \
 		{self._sub}_{self._ses} \
 		-idx index.txt \
@@ -163,8 +157,15 @@ class Task(tasks.BaseTask):
 		logging.info('successfully parsed json and wrote out results to eddy_metrics.json')
 
 	def extract_b0_vol(self):
+		home_dir = os.path.expanduser("~")
+		fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif') 
 		os.chdir(f"{self._outdir}/PREPROCESSED")
-		extract_command = "fslselectvols -i dwmri.nii.gz -o b0_volume --vols=0"
+		extract_command = f"""singularity exec \
+		{fsl_sif} \
+		/APPS/fsl/bin/fslselectvols \
+		-i dwmri.nii.gz \
+		-o b0_volume \
+		--vols=0"""
 		proc1 = subprocess.Popen(extract_command, shell=True, stdout=subprocess.PIPE)
 		proc1.communicate()
 

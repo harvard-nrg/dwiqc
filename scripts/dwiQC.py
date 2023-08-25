@@ -17,8 +17,6 @@ def main():
     parser = ap.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true',
         help='Enable verbose logging')
-    parser.add_argument('-c', '--xnat-config', default=config.xnat_download(),
-        help='dwiQC configuration file')
     parser.add_argument('--insecure', action='store_true',
         help='Disable SSL certificate verification')
     subparsers = parser.add_subparsers(help='sub-command help')
@@ -35,6 +33,8 @@ def main():
         help='XNAT MR Session name')
     parser_get.add_argument('--project',
         help='XNAT Project name')
+    parser_get.add_argument('--xnat-config', default=config.xnat_download(),
+        help='dwiqc XNAT configuration file')
     parser_get.add_argument('--bids-dir', required=True,
         help='Output BIDS directory')
     parser_get.add_argument('--xnat-alias',
@@ -53,7 +53,7 @@ def main():
 
     # process mode
     parser_process = subparsers.add_parser('process', help='process -h')
-    parser_process.add_argument('--partition', default='fasse_gpu',
+    parser_process.add_argument('--partition', required=True,
         help='Job scheduler partition')
     parser_process.add_argument('--scheduler', default=None,
         help='Choose a specific job scheduler')
@@ -61,7 +61,7 @@ def main():
         help='Rate limit the number of tasks executed in parallel (1=serial)')
     parser_process.add_argument('--sub', required=True,
         help='BIDS subject')
-    parser_process.add_argument('--ses',
+    parser_process.add_argument('--ses', required=True,
         help='BIDS session')
     parser_process.add_argument('--mod', default='dwi',
         help='BIDS modality')
@@ -73,15 +73,15 @@ def main():
         help='Resolution of output data. Defaut is resolution of input data.')
     parser_process.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
-    parser_process.add_argument('--prequal-config', default=False,
+    parser_process.add_argument('--prequal-config', default=config.prequal_command(),
         help='Config file for custom prequal command.')
-    parser_process.add_argument('--qsiprep-config', default=False,
+    parser_process.add_argument('--qsiprep-config', default=config.qsiprep_command(),
         help='Config file for custom qsiprep command.')
     parser_process.add_argument('--no-gpu', action='store_true',
         help='Run prequal and qsiprep without gpu functionality.')
     parser_process.add_argument('--sub-tasks', nargs='+', default=['prequal', 'qsiprep'],
         help='Run only certain sub tasks')
-    parser_process.add_argument('--fs-license',
+    parser_process.add_argument('--fs-license', required=True,
         help='Base64 encoded FreeSurfer license file')
     parser_process.add_argument('--xnat-alias',
         help='YAXIL authentication alias')
@@ -93,6 +93,8 @@ def main():
         help='XNAT password')
     parser_process.add_argument('--artifacts-dir',
         help='Location for generated assessors and resources')
+    parser_process.add_argument('--custom-eddy',
+        help='Feed in path to customized eddy parameters file for qsiprep.')
     parser_process.add_argument('--xnat-upload', action='store_true',
         help='Upload results to XNAT over REST API')
     parser_process.set_defaults(func=cli.process.do)
@@ -103,13 +105,15 @@ def main():
         help='XNAT MR Session name')
     parser_tandem.add_argument('--project',
         help='XNAT Project name')
+    parser_tandem.add_argument('--xnat-config', default=config.xnat_download(),
+        help='dwiqc XNAT configuration file')
     parser_tandem.add_argument('--bids-dir', required=True,
         help='Output BIDS directory')
     parser_tandem.add_argument('--run', default=1, type=int,
         help='BIDS run')
     parser_process.add_argument('--output-resolution',
         help='Resolution of output data. Defaut is resolution of input data.')
-    parser_tandem.add_argument('--partition', default='fasse_gpu',
+    parser_tandem.add_argument('--partition', required=True,
         help='Job scheduler partition')
     parser_tandem.add_argument('--scheduler', default=None,
         help='Choose a specific job scheduler')
@@ -117,15 +121,15 @@ def main():
         help='Rate limit the number of tasks executed in parallel (1=serial)')
     parser_tandem.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
-    parser_tandem.add_argument('--prequal-config', default=False,
+    parser_tandem.add_argument('--prequal-config', default=config.prequal_command(),
         help='Config file for custom prequal command.')
-    parser_tandem.add_argument('--qsiprep-config', default=False,
+    parser_tandem.add_argument('--qsiprep-config', default=config.qsiprep_command(),
         help='Config file for custom qsiprep command.')
     parser_tandem.add_argument('--no-gpu', action='store_true',
         help='Run prequal and qsiprep without gpu functionality.')
     parser_tandem.add_argument('--sub-tasks', nargs='+', default=['prequal', 'qsiprep'],
         help='Run only certain sub tasks')
-    parser_tandem.add_argument('--fs-license',
+    parser_tandem.add_argument('--fs-license', required=True,
         help='Base64 encoded FreeSurfer license')
     parser_tandem.add_argument('--xnat-alias',
         help='YAXIL authentication alias')
@@ -139,6 +143,8 @@ def main():
         help='Do not run xnattagger')
     parser_tandem.add_argument('--artifacts-dir',
         help='Location for generated assessors and resources')
+    parser_tandem.add_argument('--custom-eddy',
+        help='Feed in path to customized eddy parameters file for qsiprep.')
     parser_tandem.add_argument('--xnat-upload', action='store_true',
         help='Upload results to XNAT over REST API')
     parser_tandem.set_defaults(func=cli.tandem.do)
