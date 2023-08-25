@@ -44,6 +44,7 @@ DWI scan          run
 
 Running the pipeline
 --------------------
+
 For the time being, *DWIQC* can only be run outside of XNAT on a High Performance Computing system (or a beefed up local machine). Please see the developer documentation for `installation`_ details before proceeding.
 
 Overview

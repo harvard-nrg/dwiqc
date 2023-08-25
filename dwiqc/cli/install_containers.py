@@ -111,8 +111,6 @@ def do(args):
 
 	create_symlinks(args.install_location)
 
-	print('\n')
-
 	all_files = [file for file in os.listdir()]
 	if 'chromium.sif' in all_files and 'qsiprep.sif' in all_files and 'prequal_nrg.sif' in all_files:
 		logger.info(f'Containers successfully downloaded to {args.install_location}')
@@ -128,7 +126,10 @@ def create_symlinks(source):
 	os.chdir(source)
 	for file in os.listdir(source):
 		abs_path = os.path.abspath(file)
-		os.symlink(abs_path, f"{symlink_location}{file}")
+		try:
+			os.symlink(abs_path, f"{symlink_location}{file}")
+		except FileExistsError:
+			continue
 
 	
 
