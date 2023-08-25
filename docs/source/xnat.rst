@@ -1,7 +1,6 @@
 User Documentation
 =======================
 .. _XNAT: https://doi.org/10.1385/NI:5:1:11
-.. _command.json: https://github.com/harvard-nrg/anatqc/blob/xnat-1.7.6/command.json
 .. _T1w: https://tinyurl.com/hhru8ytz
 .. _prequal: https://github.com/MASILab/PreQual
 .. _qsiprep: https://qsiprep.readthedocs.io/en/latest/

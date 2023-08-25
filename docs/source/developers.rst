@@ -1,7 +1,6 @@
 Developer Documentation
 =======================
 .. _XNAT: https://xnat.org
-.. _command.json: https://github.com/harvard-nrg/anatqc/blob/xnat-1.7.6/command.json
 .. _Gradle: https://gradle.org/install/
 .. _pip: https://pip.pypa.io/en/stable/installation/
 .. _python: https://www.python.org/downloads/
