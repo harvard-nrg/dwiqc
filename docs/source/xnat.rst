@@ -44,7 +44,6 @@ DWI scan          run
 
 Running the pipeline
 --------------------
-
 For the time being, *DWIQC* can only be run outside of XNAT on a High Performance Computing system (or a beefed up local machine). Please see the developer documentation for `installation`_ details before proceeding.
 
 Overview
@@ -95,7 +94,7 @@ get: Required Arguments
 
 ``cd`` into the desired directory and execute ``pwd`` to get a directory's absolute path.
 
-3. ``--xnat-alias`` is the alias containing credentials associated with your XNAT project. It can be created in a few `steps <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_.
+3. ``--xnat-alias`` is the alias containing credentials associated with your XNAT instance. It can be created in a few `steps <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using yaxil.
 
 get: Executing the Command
 """"""""""""""""""""""""""
