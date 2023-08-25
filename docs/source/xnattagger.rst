@@ -48,7 +48,7 @@ Verify that it installed sucessfully:
 Configuring xnattagger
 ----------------------
 
-In order for *xnattagger* to work properly, it has to know what it's looking for, as it parses information about the scans. Particularly, it needs to know the series name and image type that correspond to the different modalities. That's where the *tagger.yaml* config file comes in. Take a look at the example below. Notice that each modality has a series description and image type associated with it.
+In order for *xnattagger* to work properly, it has to know what it's looking for as it parses information about the scans. Particularly, it needs to know the series name and image type that correspond to the different modalities. That's where the *tagger.yaml* config file comes in. Take a look at the example below. Notice that each modality has a series description and image type associated with it.
 
 .. code-block:: yaml
 
@@ -88,6 +88,31 @@ In order for *xnattagger* to work properly, it has to know what it's looking for
 	bold_AP:
 	    - series_description: ABCD_fMRI_DistortionMap_AP
 	      image_type: [ORIGINAL, PRIMARY, M, ND]
+
+You can find the series description and image type information in your XNAT instance. 
+
+| 1. Start by clicking on a project on your XNAT instance homepage.
+
+.. image:: images/xnat-projects.png
+
+| 2. Click on *Scan Type Cleanup* on the right side of the page.
+
+.. image:: images/scan-cleanup.png
+
+| 3. You will see a page that lists all of the series descriptions and image types that exist within the project. You will need to pull the information from here to populate your *tagger.yaml* file. 
+
+.. image:: images/all-types.png
+
+Let's look at the diffusion acquisition as an example. Notice that the series description in the *tagger.yaml* file above matches the *Scan Type* column in XNAT and the image type in *tagger.yaml* matches the *Image Type* in XNAT. Be sure to follow the same tokenizing convention when copying the *Image Type* from XNAT to the image_type in *tagger.yaml*. The "\\" should be replaced with a comma and a space. Here is how we would convert the information form XNAT to yaml format using our diffusion example:
+
+============================================================== ================================================
+XNAT                                                           tagger.yaml   
+============================================================== ================================================  
+**Scan Type**: ABCD_dMRI_lowSR                                 **series_description**: ABCD_dMRI_lowSR
+**Image Type**: ORIGINAL\\PRIMARY\\DIFFUSION\\NONE\\ND\\MOSAIC **image_type**: [ORIGINAL, PRIMARY, DIFFUSION, NONE, ND, MOSAIC]
+============================================================== ================================================
+
+Follow the same convention for all your modalities and you will be good to go!
 
 Running xnattagger
 ------------------

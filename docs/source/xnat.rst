@@ -81,11 +81,11 @@ get: Required Arguments
 
 *get* mode requires three arguments: `1) ---label` `2) ---bids-dir` `3) ---xnat-alias`
 
-1. ``--label`` refers to the XNAT MR Session ID, which is found under XNAT PROJECT ---> SUBJECT ---> MR_SESSION
+| 1. ``--label`` refers to the XNAT MR Session ID, which is found under XNAT PROJECT ---> SUBJECT ---> MR_SESSION
 
 .. image:: images/MR-Session.png
 
-2. ``--bids-dir`` should be the **absolute** path to the desired download directory. If the directory doesn't exist, it will be created.
+| 2. ``--bids-dir`` should be the **absolute** path to the desired download directory. If the directory doesn't exist, it will be created.
 
 .. code-block:: shell
 
@@ -93,7 +93,7 @@ get: Required Arguments
 
 ``cd`` into the desired directory and execute ``pwd`` to get a directory's absolute path.
 
-3. ``--xnat-alias`` is the alias containing credentials associated with your XNAT instance. It can be created in a few `steps <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using yaxil.
+| 3. ``--xnat-alias`` is the alias containing credentials associated with your XNAT instance. It can be created in a few `steps <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using yaxil.
 
 get: Executing the Command
 """"""""""""""""""""""""""
