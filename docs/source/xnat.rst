@@ -111,12 +111,12 @@ Command Example:
     dwiQC.py get --label PE201222_230719 --bids-dir /users/nrg/PE201222_230719 --xnat-alias ssbc
 
 .. note::
-    Ensure that every MR_Session has its own dedicated BIDS download directory. If not, *DWIQC* will not run properly. 
+    Ensure that every MR_Session has its own dedicated BIDS download directory. *DWIQC* will not run properly otherwise. 
 
 get: Expected Output
 """"""""""""""""""""
 
-After running *DWIQC* *get* you should see two new directories and one new file under your BIDS dir, similar to what's shown here:
+After running *DWIQC* *get* you should see two new directories and one new file under your BIDS dir similar to what's shown here:
 
 .. image:: images/get-output.png
 
@@ -132,7 +132,7 @@ get: Advanced Usage
 
 There are a few *get* mode optional arguments that are worth noting. 
 
-| 1. By default, *get* mode will run `xnattagger <xnattagger.html>`_ on the provided MR Session. If you'd like to turn off that functionality, simply pass the ``--no-tagger`` argument.
+| 1. By default, *get* mode will run `xnattagger <xnattagger.html>`_ on the provided MR Session. Pass the ``--no-tagger`` argument if you'd like to turn off that functionality.
 
 | 2. Related to xnattagger is the `--xnat-config` argument. This argument refers to a config file found `here <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/dwiqc.yaml>`_ which *DWIQC* uses to find the appropriately tagged scans in your XNAT project. The config file, written in the yaml format, uses regular expressions (regex) to find the desired scans. The expressions used in the default config file follow the convention depicted `above <#tagging-your-scans>`_. If your scans are tagged using a different convention, create a yaml file similar in structure to the example given here and pass it to ``--xnat-config`` in *get* mode. 
  
@@ -159,9 +159,7 @@ process mode
 process: Overview
 """""""""""""""""
 
-Testing a `link <#get-overview>`_
-
-With your data successfully downloaded using *get* mode (or organized in BIDS format through other means) you are ready to run *DWIQC*. We recommended running *DWIQC* in an HPC (High Performance Computing) environment rather than on a local machine. By default, *DWIQC* will run both `prequal`_ and `qsiprep`_ using gpu compute nodes. However, it is possible to turn off gpu-dependent features by using the ``--no-gpu`` argument. *DWIQC* may require up to 20GB of RAM if run on a local/non-gpu machine so please allocate resources appropriately. 
+With your data successfully downloaded using *get* mode (or organized in BIDS format through other means) you are ready to run *DWIQC*. We recommended running *DWIQC* in an HPC (High Performance Computing) environment rather than on a local machine. *DWIQC* will run both `prequal`_ and `qsiprep`_ using gpu compute nodes by default. However, it is possible to turn off gpu-dependent features by using the ``--no-gpu`` argument. *DWIQC* may require up to 20GB of RAM if run on a local/non-gpu machine so please allocate resources appropriately. 
 
 process: Required Arguments
 """""""""""""""""""""""""""
@@ -170,13 +168,13 @@ process: Required Arguments
 
 `1) ---sub` `2) ---ses` `3) ---bids-dir` `4) ---partition` `5) ---fs-license`
 
-| 1. ``--sub`` is the subject's identifier in the BIDS hierarchy. If you've used *get* mode to download your data it will be in the ``--bids-dir`` directory. In the case of the example we're using here, it would be PE201222. Remember not to include the "sub-"" prefix! 
+| 1. ``--sub`` is the subject's identifier in the BIDS hierarchy. If you've used *get* mode to download your data it will be in the ``--bids-dir`` directory. In the case of the example we're using here, it would be PE201222. Remember not to include the "sub-" prefix! 
 
-| 2. ``--ses`` is the specific session for your subject according to BIDS format. By default, get mode will place a session direcory one step below the sub-SUBJECT directory and combine the subject and session identifier from XNAT. The example above downloaded data under the XNAT label PE201222_230719, so the session directory will be called ses-PE201222230719. See example below. *get* mode will remove any non alpha-numeric characters in the ``--label`` argument when creating the session name.
+| 2. ``--ses`` is the specific session for your subject according to BIDS format. *get* mode will place a session direcory one step below the sub-SUBJECT directory and combine the subject and session identifier from XNAT. The example above downloaded data under the XNAT label PE201222_230719, so the session directory will be called ses-PE201222230719. See example below. *get* mode will remove any non alpha-numeric characters in the ``--label`` argument when creating the session name.
  
 .. image:: images/session-directory.png
 
-| 3. ``--bids-dir`` is the same directory passed to the ``bids-dir`` argument in *get* mode. Absolute path to the directory where the data is in BIDS format.
+| 3. ``--bids-dir`` is the same directory passed to the ``--bids-dir`` argument in *get* mode. It's the absolute path to the directory where the data is in BIDS format.
 
 | 4. ``--partition`` refers to the name of the partition or cluster where the sbatch jobs will be submitted to. This is generally just the name of your HPC system (e.g. fasse, fasse_gpu, Armis, etc.) 
 
@@ -189,7 +187,7 @@ Command Template:
 
 .. code-block:: shell
 
-    dwiQC.py process --sub <bids_subject> --ses <bids_session> --bids-dir <path_to_bids_dir> --partition <HPC_name> --fs-license <path_to_freesurfer_license>
+    dwiQC.py process --sub <BIDS_SUBJECT> --ses <BIDS_SESSION> --bids-dir <PATH_TO_BIDS_DIR> --partition <HPC_NAME> --fs-license <PATH_TO_FREESURFER_LICENSE>
 
 Command Example:
 
