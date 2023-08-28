@@ -67,7 +67,7 @@ def do(args):
 	chromium_bytes = os.path.getsize(f"{args.install_location}/chromium.sif")
 
 	if chromium_bytes != chromium_target_bytes:
-		logger.info("Chomium sif file did not download correctly. Delete and try again.")
+		logger.error("Chomium sif file did not download correctly. Delete and try again.")
 
 
 	### check if prequal already there
@@ -91,7 +91,7 @@ def do(args):
 	prequal_bytes = os.path.getsize(f"{args.install_location}/prequal_nrg.sif")
 
 	if prequal_target_bytes != prequal_bytes:
-		logger.info("Prequal sif file did not download correctly. Delete and try again.")
+		logger.error("Prequal sif file did not download correctly. Delete and try again.")
 
 	### check if qsiprep already there
 
@@ -114,7 +114,7 @@ def do(args):
 	qsiprep_bytes = os.path.getsize(f"{args.install_location}/qsiprep.sif")
 
 	if qsiprep_target_bytes != qsiprep_bytes:
-		logger.info("Qsiprep sif file did not download correctly. Delete and try again.")
+		logger.error("Qsiprep sif file did not download correctly. Delete and try again.")
 
 	### check if fsl already there
 
@@ -136,7 +136,7 @@ def do(args):
 
 	if fsl_target_bytes != fsl_bytes:
 		print('\n')
-		logger.info("FSL sif file did not download correctly. Delete and try again.")
+		logger.error("FSL sif file did not download correctly. Delete and try again.")
 
 
 	create_symlinks(args.install_location)
