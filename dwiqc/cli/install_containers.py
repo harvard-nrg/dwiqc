@@ -62,6 +62,14 @@ def do(args):
 
 		print("\n")
 
+	chromium_target_bytes = 281231360
+
+	chromium_bytes = os.path.getsize(f"{args.install_location}/chromium.sif")
+
+	if chromium_bytes != chromium_target_bytes:
+		logger.info("Chomium sif file did not download correctly. Delete and try again.")
+
+
 	### check if prequal already there
 
 	if os.path.isfile(f"{args.install_location}/prequal_nrg.sif"):
@@ -77,6 +85,13 @@ def do(args):
 		proc2.communicate()
 
 		print("\n")
+
+	prequal_target_bytes = 14161645568
+
+	prequal_bytes = os.path.getsize(f"{args.install_location}/prequal_nrg.sif")
+
+	if prequal_target_bytes != prequal_bytes:
+		logger.info("Prequal sif file did not download correctly. Delete and try again.")
 
 	### check if qsiprep already there
 
@@ -94,6 +109,13 @@ def do(args):
 
 		print('\n')
 
+	qsiprep_target_bytes = 8172097536
+
+	qsiprep_bytes = os.path.getsize(f"{args.install_location}/qsiprep.sif")
+
+	if qsiprep_target_bytes != qsiprep_bytes:
+		logger.info("Qsiprep sif file did not download correctly. Delete and try again.")
+
 	### check if fsl already there
 
 	if os.path.isfile(f"{args.install_location}/fsl_6.0.4.sif"):
@@ -107,6 +129,14 @@ def do(args):
 		download_fsl = f'curl -L -o {args.install_location}/fsl_6.0.4.sif {fsl_link}'
 		proc4 = subprocess.Popen(download_fsl, shell=True, stdout=subprocess.PIPE)
 		proc4.communicate()
+
+	fsl_target_bytes = 6803890176
+
+	fsl_bytes = os.path.getsize(f"{args.install_location}/fsl_6.0.4.sif")
+
+	if fsl_target_bytes != fsl_bytes:
+		print('\n')
+		logger.info("FSL sif file did not download correctly. Delete and try again.")
 
 
 	create_symlinks(args.install_location)
