@@ -209,4 +209,25 @@ Argument              Description                               Required
 ``-o``                Path to ``--dry-run`` json output file    No
 ===================== ========================================  ========
 
+Scripting for *xnattagger*
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can tag scans for all the subjects and projects in your XNAT instance through a combination of yaxil, *xnattagger* and the XNAT REST API. The example below (written in python) assumes that you've created an *xnat alias* (auth in the example) using yaxil and that your instance has three projects named: Michigan, Kansas and UCSD
+
+.. code-block:: python
+
+	import yaxil
+	import subprocess
+
+	projects = ["Michigan", "Kansas", "UCSD"]
+	
+	with yaxil.session(auth) as sess:
+		for project in projects:
+			for subject in sess.subjects(project=project):
+				for experiment in sess.experiments(subject=subject):
+					tagger = f'xnat_tagger.py --alias example --config /home/nrg/tagging.yaml --target-modality all --label {experiment}'
+					proc1 = subprocess.Popen(tagger, shell=True, stdout=subprocess.PIPE)
+					proc1.communicate()
+
+
 And that's it! Contact *info@neuroinfo.org* with any questions or suggestions.
