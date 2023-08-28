@@ -3,8 +3,6 @@
 import shutil
 import os
 import sys
-sys.path.insert(0, os.path.join(os.environ['MODULESHOME'], "init"))
-from env_modules_python import module
 import dwiqc.tasks as tasks
 import logging
 import subprocess

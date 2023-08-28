@@ -51,7 +51,7 @@ With *DWIQC* and it's necessary containers installed, you're ready to analyze so
 
 *DWIQC* was designed with the goal of speeding up the quality check workflow of diffusion weighted imaging data. Ideally, *DWIQC* would be run on subjects while the study is ongoing as to help researchers catch problems (excessive motion, acquisition issues, etc.) as they happen, rather than discovering them after the data has been collected and the problems cannot be rectified. That being said, running *DWIQC* on previously acquired data can certainly provide helpful information. 
 
-*DWIQC* is built on the `prequal`_ and `qsiprep`_ processing packages. Both of these tools are excellent in their own right. We found that by running both of them, we can maximize our understanding of the data quality and glean additional key insights. *DWIQC* was built completely in python and we welcome anyone to peruse the `codebase <https://github.com/harvard-nrg/dwiqc>`_ and make build suggestions (hello, pull requests!)
+*DWIQC* is built on the `prequal`_ and `qsiprep`_ processing packages. Both of these tools are excellent in their own right. We found that by running both of them, we can maximize our understanding of the data quality and glean additional key insights. *DWIQC* was built completely in python and we welcome anyone to peruse the `codebase <https://github.com/harvard-nrg/dwiqc>`_ and make build suggestions (hello, pull requests!).
 
 get, process and tandem modes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -67,12 +67,12 @@ get, process and tandem modes
 get mode
 ^^^^^^^^
 .. note::
-    *get* mode is only applicable if you have an XNAT instance you're going to interact with. If you're only going to use *DWIQC* outside of XNAT, please feel free to skip to the `process <#process-mode>`_ mode section. 
+    *get* mode is only applicable if you have an XNAT instance you're going to interact with. Please feel free to skip to the `process <#process-mode>`_ mode section if you're only going to use *DWIQC* outside of XNAT.
 
 get: Overview
 """""""""""""
 
-*get* mode functions as a way to download data from XNAT to your local compute environment. *get* mode's primary feature is the ability to download data and convert it to BIDS format. If you're unfamiliar with BIDS, take a look at the official `docs <https://bids-specification.readthedocs.io/en/stable/>`_.
+*get* mode functions as a way to download data from XNAT to your local compute environment. *get* mode's primary feature is the ability to download data and convert it to BIDS format. Take a look at the official `docs <https://bids-specification.readthedocs.io/en/stable/>`_ if you're unfamiliar with BIDS.
 
 Before using *get* mode, I strongly recommend creating an `xnat_auth alias <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using the excellent `yaxil <https://yaxil.readthedocs.io/en/latest/>`_ python library. It's not stictly necessary to do so, but it will make your life easier. Example code will use an xnat alias. yaxil comes as a part of the *DWIQC* `installation <developers.html#hpc-installation>`_ (yaxil is a *DWIQC* dependency). 
 
