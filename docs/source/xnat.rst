@@ -201,7 +201,7 @@ process: Expected Output
 
 *DWIQC* runtime varies based on available resources, size of data and desired processing steps. Users should expect one session to take 3-5 hours to complete prequal and 7-10 hours to complete qsiprep. Prequal and qsiprep are run in parallel, so total processing time rarely exceeds 10 hours. *DWIQC* also makes use of the FSL tool eddy quad. Eddy quad runs a series of quality assesment commands to generate images and quantitative metric tables. Eddy quad doesn't take more than 10 minutes to run in most cases. A successful *DWIQC* run will contain output from all three of these software packages. 
 
-Prequal Output:
+**Prequal Output:**
 
 To find the prequal pdf report, navigate to the ``--bids-dir`` directory you passed to *process* mode. The pdf will be located under several layers of directories:
 
@@ -209,7 +209,7 @@ derivatives ---> dwiqc-prequal ---> subject_dir ---> session_dir ---> sub_sessio
 
 Download an example :download:`here <examples/dtiQA.pdf>`.
 
-Qsiprep Output:
+**Qsiprep Output:**
 
 To find the qsiprep html report, navigate to the ``--bids-dir`` directory you passed to *process* mode. The html file will be located under several layers of directories:
 
@@ -217,7 +217,7 @@ derivatives ---> dwiqc-qsiprep ---> subject_dir ---> session_dir ---> sub_sessio
 
 Download an example :download:`here <examples/sub-MS881355-imbedded_images.html>`.
 
-Eddy Quad Output:
+**Eddy Quad Output:**
 
 To find the eddy quad pdf report, navigate to the ``--bids-dir`` directory you passed to *process* mode. The pdf file will be located under several layers of directories:
 
@@ -228,7 +228,7 @@ Download an example :download:`here <examples/qc.pdf>`.
 process: Common Errors
 """"""""""""""""""""""
 
-A somewhat common error (affects about 5% of subjects) is an Eddy Volume to Volume registration that looks something like this:
+A somewhat common error (affects about 5% of subjects) is an Eddy Volume to Volume registration error that looks something like this:
 
 .. image:: images/eddy-error.png
 
@@ -236,7 +236,7 @@ This error means that the FSL tool ``eddy``, which both prequal and qsiprep use 
 
 | 1. Exclude that session from the larger dataset. This approach ensures that all data meet the same standard of stringency. 
 
-| 2. Change what FSL considers to be an outlier. By default, *DWIQC* tells FSL that an outlier is anything more than 5 standard deviations from the mean. The user could change that to 6 standard deviations, which would increase the liklihood of running eddy successfully while keeping the same standard for all data. 
+| 2. Change what FSL considers to be an outlier. *DWIQC* tells FSL that an outlier is anything more than 5 standard deviations from the mean. The user could change that to 6 standard deviations, which would increase the liklihood of eddy running successfully while keeping the same standard for all data. 
 
 | 3. Change the number of standard deviations to 6 only for the subjects that are being affected. The theoretical implications of this approach (or any others) are not explored in depth here and it is left to the user to make informed decisions.
 
@@ -254,13 +254,13 @@ process: Advanced Usage
 
 Only a few of the many possible *process* mode arguments will be discussed here. 
 
-| 1. ``--qsiprep-config`` and ``--prequal-config`` allow you to customize the arguments passed to qsiprep and prequal. By default, these are the `qsiprep config <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/qsiprep.yaml>`_ and `prequal config <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/prequal.yaml>`_ arguments being passed. Using these config files as a template, you can customize your prequal and qsiprep commands. Example usage: ``--prequal-config /users/nrg/PE201222_230719/prequal.yaml``
+| 1. ``--qsiprep-config`` and ``--prequal-config`` allow you to customize the arguments passed to qsiprep and prequal. These are the default `qsiprep config <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/qsiprep.yaml>`_ and `prequal config <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/prequal.yaml>`_ arguments being passed. Using these config files as a template, you can customize your prequal and qsiprep commands. Example usage: ``--prequal-config /users/nrg/PE201222_230719/prequal.yaml``
 
 | 2. ``--xnat-upload`` indicates that the output from *DWIQC* should be uploaded to your XNAT project. ``--xnat-alias`` (see *get* mode) must be passed for this argument to work. Example usage: ``--xnat-upload`` (just passing the argument is sufficient)
 
 | 3. ``--output-resolution`` allows you to specify the resolution of images created by qsiprep. The default is the same as the input data. Example usage: ``--output-resolution 1.0``
 
-| 4. ``--no-gpu`` enables users without access to a gpu node to run *DWIQC*. Note that some advanced process features are not available without gpu computing. Example usage: ``--no-gpu`` (just passing the argument is sufficient)
+| 4. ``--no-gpu`` enables users without access to a gpu node to run *DWIQC*. Note that some advanced processing features are not available without gpu computing. Example usage: ``--no-gpu`` (just passing the argument is sufficient)
 
 | 5. ``--sub-tasks`` is used to run either just qsiprep or prequal. Example usage: ``--sub-tasks qsiprep``
 
@@ -346,7 +346,7 @@ Please see `get mode common errors <#get-common-errors>`_ and `process mode comm
 tandem: Advanced Usage
 """"""""""""""""""""""
 
-All the advanced usage arguments for *tandem* mode are the same as the *get* mode and *process* mode advanced usage arguments. They appear here as well for convinience.
+All the advanced usage arguments for *tandem* mode are the same as the *get* mode and *process* mode advanced usage arguments. They appear here as well for convenience.
 
 | 1. By default, *tandem* mode will run `xnattagger <xnattagger.html>`_ on the provided MR Session. If you'd like to turn off that functionality, simply pass the ``--no-tagger`` argument.
 
