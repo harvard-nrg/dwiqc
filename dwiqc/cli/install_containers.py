@@ -13,6 +13,7 @@ import subprocess
 import shutil
 from executors.models import Job, JobArray
 from bids import BIDSLayout
+from tenacity import retry, retry_if_exception_type, stop_after_attempt
 
 
 # This script will install the qsiprep, prequal and chromium sif files in the .config directory under the user's home directory.
@@ -56,15 +57,18 @@ def do(args):
 
 	else:
 
-		download_chromium = f'curl -L -o {args.install_location}/chromium.sif {chromium_link}'
-		proc1 = subprocess.Popen(download_chromium, shell=True, stdout=subprocess.PIPE)
-		proc1.communicate()
+		#download_chromium = f'curl -L -o {args.install_location}/chromium.sif {chromium_link}'
+		#proc1 = subprocess.Popen(download_chromium, shell=True, stdout=subprocess.PIPE)
+		#proc1.communicate()
+
+		chromium_location = f'{args.install_location}/chromium.sif'
+		download(chromium_link, chromium_location)
 
 		print("\n")
 
 	chromium_target_bytes = 281231360
 
-	chromium_bytes = os.path.getsize(f"{args.install_location}/chromium.sif")
+	chromium_bytes = os.path.getsize(chromium_location)
 
 	if chromium_bytes != chromium_target_bytes:
 		logger.error("Chomium sif file did not download correctly. Delete and try again.")
@@ -80,15 +84,18 @@ def do(args):
 
 		logger.info('installing prequal...')
 
-		download_prequal = f'curl -L -o {args.install_location}/prequal_nrg.sif {prequal_link}'
-		proc2 = subprocess.Popen(download_prequal, shell=True, stdout=subprocess.PIPE)
-		proc2.communicate()
+		#download_prequal = f'curl -L -o {args.install_location}/prequal_nrg.sif {prequal_link}'
+		#proc2 = subprocess.Popen(download_prequal, shell=True, stdout=subprocess.PIPE)
+		#proc2.communicate()
+
+		prequal_location = f'{args.install_location}/prequal.sif'
+		download(prequal_link, prequal_location)
 
 		print("\n")
 
 	prequal_target_bytes = 14161645568
 
-	prequal_bytes = os.path.getsize(f"{args.install_location}/prequal_nrg.sif")
+	prequal_bytes = os.path.getsize(prequal_location)
 
 	if prequal_target_bytes != prequal_bytes:
 		logger.error("Prequal sif file did not download correctly. Delete and try again.")
@@ -103,15 +110,18 @@ def do(args):
 	
 		logger.info('installing qsiprep...')
 
-		download_qsiprep = f'curl -L -o {args.install_location}/qsiprep.sif {qsiprep_link}'
-		proc3 = subprocess.Popen(download_qsiprep, shell=True, stdout=subprocess.PIPE)
-		proc3.communicate()
+		#download_qsiprep = f'curl -L -o {args.install_location}/qsiprep.sif {qsiprep_link}'
+		#proc3 = subprocess.Popen(download_qsiprep, shell=True, stdout=subprocess.PIPE)
+		#proc3.communicate()
+
+		qsiprep_location = f'{args.install_location}/chromium.sif'
+		download(qsiprep_link, qsiprep_location)
 
 		print('\n')
 
 	qsiprep_target_bytes = 8172097536
 
-	qsiprep_bytes = os.path.getsize(f"{args.install_location}/qsiprep.sif")
+	qsiprep_bytes = os.path.getsize(qsiprep_location)
 
 	if qsiprep_target_bytes != qsiprep_bytes:
 		logger.error("Qsiprep sif file did not download correctly. Delete and try again.")
@@ -126,13 +136,16 @@ def do(args):
 
 		logger.info('installing fsl...')
 
-		download_fsl = f'curl -L -o {args.install_location}/fsl_6.0.4.sif {fsl_link}'
-		proc4 = subprocess.Popen(download_fsl, shell=True, stdout=subprocess.PIPE)
-		proc4.communicate()
+		#download_fsl = f'curl -L -o {args.install_location}/fsl_6.0.4.sif {fsl_link}'
+		#proc4 = subprocess.Popen(download_fsl, shell=True, stdout=subprocess.PIPE)
+		#proc4.communicate()
+
+		fsl_location = f'{args.install_location}/fsl_6.0.4.sif'
+		download(fsl_link, fsl_location)
 
 	fsl_target_bytes = 6803890176
 
-	fsl_bytes = os.path.getsize(f"{args.install_location}/fsl_6.0.4.sif")
+	fsl_bytes = os.path.getsize(fsl_location)
 
 	if fsl_target_bytes != fsl_bytes:
 		print('\n')
@@ -181,6 +194,29 @@ def check_storage(directory):
 		logger.info(f'This directory has {avail_gigs}GB of available space.\nThe dwiqc containers will take up 30GB of storage.')
 		print("\n")
 		time.sleep(5)
+
+class PartialFileError(Exception):
+	pass
+
+@retry(
+	retry=retry_if_exception_type(PartialFileError),
+	stop=stop_after_attempt(50),
+	reraise=True
+)
+
+def download(url, output, retry=50):
+	cmd = [
+		'curl',
+		'-L',
+		'-C', '-',
+		'-o', output,
+		url
+	]
+	try:
+		subprocess.check_output(cmd)
+	except subprocess.CalledProcessError as e:
+		if e.returncode == 18:
+			raise PartialFileError(url)
 
 
 
