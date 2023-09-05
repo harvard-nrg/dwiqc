@@ -12,7 +12,8 @@ requires = [
     'selfie',
     'lxml',
     'numpy',
-    'dcm2niix'
+    'dcm2niix',
+    'tenacity'
 ]
 
 about = dict()
