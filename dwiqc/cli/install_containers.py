@@ -88,7 +88,7 @@ def do(args):
 		#proc2 = subprocess.Popen(download_prequal, shell=True, stdout=subprocess.PIPE)
 		#proc2.communicate()
 
-		prequal_location = f'{args.install_location}/prequal.sif'
+		prequal_location = f'{args.install_location}/prequal_nrg.sif'
 		download(prequal_link, prequal_location)
 
 		print("\n")
@@ -114,7 +114,7 @@ def do(args):
 		#proc3 = subprocess.Popen(download_qsiprep, shell=True, stdout=subprocess.PIPE)
 		#proc3.communicate()
 
-		qsiprep_location = f'{args.install_location}/chromium.sif'
+		qsiprep_location = f'{args.install_location}/qsiprep.sif'
 		download(qsiprep_link, qsiprep_location)
 
 		print('\n')
