@@ -68,7 +68,7 @@ def do(args):
 
 	chromium_target_bytes = 281231360
 
-	chromium_bytes = os.path.getsize(chromium_location)
+	chromium_bytes = os.path.getsize(f'{args.install_location}/chromium.sif')
 
 	if chromium_bytes != chromium_target_bytes:
 		logger.error("Chomium sif file did not download correctly. Delete and try again.")
@@ -95,7 +95,7 @@ def do(args):
 
 	prequal_target_bytes = 14161645568
 
-	prequal_bytes = os.path.getsize(prequal_location)
+	prequal_bytes = os.path.getsize(f"{args.install_location}/prequal_nrg.sif")
 
 	if prequal_target_bytes != prequal_bytes:
 		logger.error("Prequal sif file did not download correctly. Delete and try again.")
@@ -121,7 +121,7 @@ def do(args):
 
 	qsiprep_target_bytes = 8172097536
 
-	qsiprep_bytes = os.path.getsize(qsiprep_location)
+	qsiprep_bytes = os.path.getsize(f"{args.install_location}/qsiprep.sif")
 
 	if qsiprep_target_bytes != qsiprep_bytes:
 		logger.error("Qsiprep sif file did not download correctly. Delete and try again.")
@@ -145,7 +145,7 @@ def do(args):
 
 	fsl_target_bytes = 6803890176
 
-	fsl_bytes = os.path.getsize(fsl_location)
+	fsl_bytes = os.path.getsize(f'{args.install_location}/fsl_6.0.4.sif')
 
 	if fsl_target_bytes != fsl_bytes:
 		print('\n')
