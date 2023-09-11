@@ -52,7 +52,12 @@ def do(args):
     os.environ['XNAT_USER'] = auth.username
     os.environ['XNAT_PASS'] = auth.password
 
-    conf = yaml.safe_load(open(args.xnat_config)) # load 
+    conf = yaml.safe_load(open(args.xnat_config)) # load yaml config file
+
+    scan_labels = get_scans()
+
+
+'''
 
     # query dwi and T1w scans from XNAT
     with yaxil.session(auth) as ses:
@@ -85,7 +90,7 @@ def do(args):
                 run = anat_match.group('run')
                 run = re.sub('[^0-9]', '', run or '1')
                 scans[run]['anat'] = scan['id']
-
+'''
 
     logger.info(json.dumps(scans, indent=2))
 
@@ -106,6 +111,17 @@ def do(args):
             logger.info('getting anat run=%s, scan=%s', run, scansr['anat'])
             get_anat(args, auth, run, scansr['anat'], verbose=args.verbose)
 
+
+def get_scans(args, conf):
+    """
+    Dynamically create a list of all the modalities/scans listed in the config file
+    
+    """
+    
+    for scan_type in conf['dwiqc']:
+        print(scan_type)
+
+    sys.exit()
 
 
 def get_dwi(args, auth, run, scan, verbose=False):
@@ -259,6 +275,8 @@ def match(note, patterns):
         if m:
             return m
     return None
+
+
 
 
 
