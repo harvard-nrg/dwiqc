@@ -54,7 +54,7 @@ def do(args):
 
     conf = yaml.safe_load(open(args.xnat_config)) # load 
 
-    # query T1w and vNav scans from XNAT
+    # query dwi and T1w scans from XNAT
     with yaxil.session(auth) as ses:
         scans = col.defaultdict(dict)
         for scan in ses.scans(label=args.label, project=args.project):
@@ -62,6 +62,7 @@ def do(args):
             dwi_match = match(note, conf['dwiqc']['dwi']['tags'])
             pa_match = match(note, conf['dwiqc']['dwi_PA']['tags'])
             ap_match = match(note, conf['dwiqc']['dwi_AP']['tags'])
+            revpol_match = match(note, conf['dwiqc']['revpol']['tags'])
             anat_match = match(note, conf['dwiqc']['t1w']['tags'])
 
             if dwi_match:
@@ -76,6 +77,10 @@ def do(args):
                 run = ap_match.group('run')
                 run = re.sub('[^0-9]', '', run or '1')
                 scans[run]['ap'] = scan['id']
+            if revpol_match:
+                run = revpol_match.group('run')
+                run = re.sub('[^0-9]', '', run or '1')
+                scans[run]['revpol'] = scan['id']
             if anat_match:
                 run = anat_match.group('run')
                 run = re.sub('[^0-9]', '', run or '1')
