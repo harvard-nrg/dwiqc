@@ -13,8 +13,6 @@ from bids import BIDSLayout
 import xnattagger.config as config 
 
 
-#### Need to add support for downloading the T1w data as well. Primarily for qsiprep.
-
 logger = logging.getLogger(__name__)
 
 def do(args):
@@ -23,7 +21,7 @@ def do(args):
         yaxil.CHECK_CERTIFICATE = False
 
 
-    # call and run xnattagger on the diffusion data
+    # call and run xnattagger on the diffusion data if argument passed
 
     if args.run_tagger:
         run_xnattagger(args)
@@ -71,6 +69,12 @@ def do(args):
                 download_scan(args, auth, run, scansr[scan_label], scan_label, conf, verbose=args.verbose)
 
 def run_xnattagger(args):
+
+    """
+    This function will run xnattagger with the supplied (or default) config file
+
+    """
+
     logging.info('Running xnattagger...')
 
     with open(args.tagger_config) as fo:
@@ -129,6 +133,7 @@ def download_scan(args, auth, run, scan, config_label, input_config, verbose=Fal
 
     bids_suffix = suffix_mapping.get(bids_subdir, None)
 
+    # create config file for ArcGet.py
 
     config = {
         bids_subdir: {
@@ -141,6 +146,8 @@ def download_scan(args, auth, run, scan, config_label, input_config, verbose=Fal
         }
     }
 
+    # if phase encode direction and acquisition group are supplied, add them to config file
+
     if direction:
         config[bids_subdir][bids_suffix][0]['direction'] = direction
 
@@ -148,6 +155,8 @@ def download_scan(args, auth, run, scan, config_label, input_config, verbose=Fal
         config[bids_subdir][bids_suffix][0]['acquisition'] = acq
 
     config = yaml.safe_dump(config)
+
+    # create ArcGet.py command to download scan
     cmd = [
         'ArcGet.py',
         '--label', args.label,
@@ -172,6 +181,11 @@ def download_scan(args, auth, run, scan, config_label, input_config, verbose=Fal
         sp.check_output(cmd, input=config.encode('utf-8'))
 
 def match(note, patterns):
+
+    """
+    This function uses regular expression matching to match the tags in the scan note field to the config file
+
+    """
     for pattern in patterns:
         m = re.match(pattern, note, flags=re.IGNORECASE)
         if m:
