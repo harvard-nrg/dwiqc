@@ -4,7 +4,7 @@ init:
 test:
 	pipenv run py.test tests/test.py
 dist:
-	python setup.py sdist bdist_wheel --universal
+	python3 setup.py sdist bdist_wheel --universal
 publish:
 	pip install 'twine>=1.5.0'
 	python3 setup.py sdist bdist_wheel --universal

@@ -1,13 +1,16 @@
 dwiqc:
   dwi:
     tags:
-      - .*(^|\s)#dwi_main(?P<run>_\d+)?(\s|$).*
+      - .*(^|\s)#dwi_main_a(?P<run>_\d+)?(\s|$).*
   dwi_PA:
     tags:
       - .*(^|\s)#dwi_fmap_pa(?P<run>_\d+)?(\s|$).*
   dwi_AP:
     tags:
       - .*(^|\s)#dwi_fmap_ap(?P<run>_\d+)?(\s|$).*
+  revpol:
+    tags:
+      - .*(^|\s)#dwi_revpol(?P<run>_\d+)?(\s|$).*
   t1w:
     tags:
       - .*(^|\s)#t1w(?P<run>_\d+)?(\s|$).*

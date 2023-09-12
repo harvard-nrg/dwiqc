@@ -6,6 +6,7 @@ import logging
 import argparse as ap
 import os
 import dwiqc.config as config
+import xnattagger.config as tagger_config
 
 
 logger = logging.getLogger(__name__)
@@ -45,8 +46,10 @@ def main():
         help='XNAT username')
     parser_get.add_argument('--xnat-pass',
         help='XNAT password')
-    parser_get.add_argument('--no-tagger', action='store_true', default=False,
-        help='Do not run xnattagger')
+    parser_get.add_argument('--tagger-config', default=tagger_config.default(),
+        help='Path to xnattagger config file')
+    parser_get.add_argument('--run-tagger', action='store_true', default=False,
+        help='Run xnattagger')
     parser_get.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
     parser_get.set_defaults(func=cli.get.do)
@@ -139,8 +142,10 @@ def main():
         help='XNAT username')
     parser_tandem.add_argument('--xnat-pass',
         help='XNAT password')
-    parser_tandem.add_argument('--no-tagger', action='store_true', default=False,
-        help='Do not run xnattagger')
+    parser_tandem.add_argument('--tagger-config', default=tagger_config.default(),
+        help='Path to xnattagger config file')
+    parser_tandem.add_argument('--run-tagger', action='store_true', default=False,
+        help='Run xnattagger')
     parser_tandem.add_argument('--artifacts-dir',
         help='Location for generated assessors and resources')
     parser_tandem.add_argument('--custom-eddy',

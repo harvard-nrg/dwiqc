@@ -12,8 +12,6 @@ from xnattagger import Tagger
 from bids import BIDSLayout
 import xnattagger.config as config 
 
-tagger_conf = config.default()
-
 
 #### Need to add support for downloading the T1w data as well. Primarily for qsiprep.
 
@@ -27,16 +25,8 @@ def do(args):
 
     # call and run xnattagger on the diffusion data
 
-    if not args.no_tagger:
-
-        logger.info("running xnattagger...")
-
-        with open(tagger_conf) as fo:
-            filters = yaml.load(fo, Loader=yaml.SafeLoader)
-
-        tagger = Tagger(args.xnat_alias, filters, 'dwi', args.label)
-        tagger.generate_updates()
-        tagger.apply_updates()
+    if args.run_tagger:
+        run_xnattagger(args)
 
     logger.info('downloading data from xnat...')
 
@@ -54,197 +44,109 @@ def do(args):
 
     conf = yaml.safe_load(open(args.xnat_config)) # load yaml config file
 
-    scan_labels = get_scans()
-
-
-'''
+    scan_labels = get_scans(conf) ### get a list of the scan types/labels
 
     # query dwi and T1w scans from XNAT
     with yaxil.session(auth) as ses:
         scans = col.defaultdict(dict)
         for scan in ses.scans(label=args.label, project=args.project):
             note = scan['note']
-            dwi_match = match(note, conf['dwiqc']['dwi']['tags'])
-            pa_match = match(note, conf['dwiqc']['dwi_PA']['tags'])
-            ap_match = match(note, conf['dwiqc']['dwi_AP']['tags'])
-            revpol_match = match(note, conf['dwiqc']['revpol']['tags'])
-            anat_match = match(note, conf['dwiqc']['t1w']['tags'])
+            for scan_label in scan_labels:
+                is_match = match(note, conf['dwiqc'][scan_label]['tag'])
+                if is_match:
+                    run = is_match.group('run')
+                    run = re.sub('[^0-9]', '', run or '1') # get rid of any character that is not a digit between 0-9 and if run is None, make it 1.
+                    scans[run][scan_label] = scan['id']
 
-            if dwi_match:
-                run = dwi_match.group('run')
-                run = re.sub('[^0-9]', '', run or '1') # get rid of any character that is not a digit between 0-9 and if run is None, make it 1.
-                scans[run]['dwi'] = scan['id']
-            if pa_match:
-                run = pa_match.group('run')
-                run = re.sub('[^0-9]', '', run or '1')
-                scans[run]['pa'] = scan['id']
-            if ap_match:
-                run = ap_match.group('run')
-                run = re.sub('[^0-9]', '', run or '1')
-                scans[run]['ap'] = scan['id']
-            if revpol_match:
-                run = revpol_match.group('run')
-                run = re.sub('[^0-9]', '', run or '1')
-                scans[run]['revpol'] = scan['id']
-            if anat_match:
-                run = anat_match.group('run')
-                run = re.sub('[^0-9]', '', run or '1')
-                scans[run]['anat'] = scan['id']
-'''
-
+    logger.info('downloading the following scans:')
     logger.info(json.dumps(scans, indent=2))
 
 
     # iterate over the scans dictionary, search for the scans with the correct note/tag
 
     for run,scansr in scans.items():
-        if 'dwi' in scansr:
-            logger.info('getting dwi run=%s, scan=%s', run, scansr['dwi'])
-            get_dwi(args, auth, run, scansr['dwi'], verbose=args.verbose)
-        if 'pa' in scansr:
-            logger.info('getting pa fieldmap run=%s, scan=%s', run, scansr['pa'])
-            get_pa(args, auth, run, scansr['pa'], verbose=args.verbose)
-        if 'ap' in scansr:
-            logger.info('getting ap fieldmap run=%s, scan=%s', run, scansr['ap'])
-            get_ap(args, auth, run, scansr['ap'], verbose=args.verbose)
-        if 'anat' in scansr:
-            logger.info('getting anat run=%s, scan=%s', run, scansr['anat'])
-            get_anat(args, auth, run, scansr['anat'], verbose=args.verbose)
+        for scan_label in scan_labels:
+            if scan_label in scansr:
+                logger.info('getting run=%s, scan=%s', run, scansr[scan_label])
+                download_scan(args, auth, run, scansr[scan_label], scan_label, conf, verbose=args.verbose)
 
+def run_xnattagger(args):
+    logging.info('Running xnattagger...')
 
-def get_scans(args, conf):
+    with open(args.tagger_config) as fo:
+        filters = yaml.load(fo, Loader=yaml.SafeLoader)
+
+    tagger = Tagger(args.xnat_alias, filters, 'dwi', args.label)
+    tagger.generate_updates()
+    tagger.apply_updates()
+
+def get_scans(conf):
+
     """
-    Dynamically create a list of all the modalities/scans listed in the config file
+    Helper function to dynamically create a list of all the modalities/scans listed in the config file
     
     """
     
-    for scan_type in conf['dwiqc']:
-        print(scan_type)
+    scan_types = [scan_type for scan_type in conf['dwiqc']]
 
-    sys.exit()
+    return scan_types
+
+def download_scan(args, auth, run, scan, config_label, input_config, verbose=False):
+
+    """
+    Function that downloads an individual scan based on information from the config input file and command line arguments.
+   
+    """
+
+    # check for bids sub-directory specification in config file
+    try:
+        bids_subdir = input_config['dwiqc'][config_label]['bids_subdir'][0]
+    except KeyError:
+        logger.error('no bids sub-directory specified in config file. see documentation for details:\nhttps://dwiqc.readthedocs.io/en/latest/xnat.html#get-advanced-usage')
+        sys.exit(1)
+
+    # check for phase encode direction specification in config file
+    try:
+        direction = input_config['dwiqc'][config_label]['direction'][0]
+    except KeyError:
+        logger.warning('no phase encode direction specified. will not be included in BIDS filename')
+        direction = None
+
+    # check for acquisition specification in config file
+    try:
+        acq = input_config['dwiqc'][config_label]['acquisition_group'][0]
+    except KeyError:
+        logger.warning('no acquisition_group specified. will not be included in BIDS filename')
+        acq = None
+
+    ## determine and assign bids_suffix variable
+
+    suffix_mapping = {
+        'dwi': 'dwi',
+        'fmap': 'epi',
+        'anat': 'T1w',
+    }   
+
+    bids_suffix = suffix_mapping.get(bids_subdir, None)
 
 
-def get_dwi(args, auth, run, scan, verbose=False):
     config = {
-        'dwi': {
-            'dwi': [
-                {
-                    'run': int(run),
-                    'scan': scan
-                }
-            ]
-        }
-    }
-    config = yaml.safe_dump(config)
-    cmd = [
-        'ArcGet.py',
-        '--label', args.label,
-        '--output-dir', args.bids_dir,
-        '--output-format', 'bids',
-    ]
-    if args.project:
-        cmd.extend([
-            '--project', args.project
-        ])
-    if args.insecure:
-        cmd.extend([
-            '--insecure'
-        ])
-    cmd.extend([
-        '--config', '-'
-    ])
-    if verbose:
-        cmd.append('--debug')
-    logger.info(sp.list2cmdline(cmd))
-    if not args.dry_run:
-        sp.check_output(cmd, input=config.encode('utf-8'))
-
-
-def get_pa(args, auth, run, scan, verbose=False):
-    config = {
-        'fmap': {
-            'epi': [
-                {
-                    'run': int(run),
-                    'scan': scan,
-                    'direction': 'PA'
-                }
-            ]
-        }
-    }
-    config = yaml.safe_dump(config)
-    cmd = [
-        'ArcGet.py',
-        '--label', args.label,
-        '--output-dir', args.bids_dir,
-        '--output-format', 'bids',
-    ]
-    if args.project:
-        cmd.extend([
-            '--project', args.project
-        ])
-    if args.insecure:
-        cmd.extend([
-            '--insecure'
-        ])
-    cmd.extend([
-        '--config', '-'
-    ])
-    if verbose:
-        cmd.append('--debug')
-    logger.info(sp.list2cmdline(cmd))
-    if not args.dry_run:
-        sp.check_output(cmd, input=config.encode('utf-8'))
-
-
-def get_ap(args, auth, run, scan, verbose=False):
-    config = {
-        'fmap': {
-            'epi': [
+        bids_subdir: {
+            bids_suffix: [
                 {
                     'run': int(run),
                     'scan': scan,
-                    'direction': 'AP'
                 }
             ]
         }
     }
-    config = yaml.safe_dump(config)
-    cmd = [
-        'ArcGet.py',
-        '--label', args.label,
-        '--output-dir', args.bids_dir,
-        '--output-format', 'bids',
-    ]
-    if args.project:
-        cmd.extend([
-            '--project', args.project
-        ])
-    if args.insecure:
-        cmd.extend([
-            '--insecure'
-        ])
-    cmd.extend([
-        '--config', '-'
-    ])
-    if verbose:
-        cmd.append('--debug')
-    logger.info(sp.list2cmdline(cmd))
-    if not args.dry_run:
-        sp.check_output(cmd, input=config.encode('utf-8'))
 
- 
-def get_anat(args, auth, run, scan, verbose=False):
-    config = {
-        'anat': {
-            'T1w': [
-                {
-                    'run': int(run),
-                    'scan': scan
-                }
-            ]
-        }
-    }
+    if direction:
+        config[bids_subdir][bids_suffix][0]['direction'] = direction
+
+    if acq:
+        config[bids_subdir][bids_suffix][0]['acquisition'] = acq
+
     config = yaml.safe_dump(config)
     cmd = [
         'ArcGet.py',
@@ -275,9 +177,4 @@ def match(note, patterns):
         if m:
             return m
     return None
-
-
-
-
-
 
