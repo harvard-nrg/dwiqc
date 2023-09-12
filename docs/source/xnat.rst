@@ -18,14 +18,14 @@ For *DWIQC* to discover Diffusion and Fieldmap scans to process, you need to add
 Type      Example series                    Note
 ========= ================================  ===========================================================
 DWI       ``UKbioDiff_ABCDseq_ABCDdvs``     ``#DWI_MAIN_001, #DWI_MAIN_002, ..., #DWI_MAIN_N``
-PA_FMAP   ``UKbioDiff_ABCDseq_DistMap_PA``  ``#DWI_PA_001, #DWI_PA_002, ..., #DWI_PA_N``
-AP_FMAP   ``UKbioDiff_ABCDseq_DistMap_AP``  ``#DWI_AP_001, #DWI_AP_002, ..., #DWI_AP_N``
+PA_FMAP   ``UKbioDiff_ABCDseq_DistMap_PA``  ``#DWI_FMAP_PA_001, #DWI_FMAP_PA_002, ..., #DWI_FMAP_PA_N``
+AP_FMAP   ``UKbioDiff_ABCDseq_DistMap_AP``  ``#DWI_FMAP_AP_001, #DWI_FMAP_AP_002, ..., #DWI_FMAP_AP_N``
 ========= ================================  ===========================================================
 
 The image below displays an MR Session report page with populated notes.
 
 .. note::
-   Note that if a ``DWI`` scan has corresponding ``PA`` and ``AP`` scans, they should be assigned matching numbers. For example, ``#DWI_MAIN_001`` would correspond to ``#DWI_PA_001`` and ``#DWI_AP_001``.
+   Note that if a ``DWI`` scan has corresponding ``PA`` and ``AP`` scans, they should be assigned matching numbers. For example, ``#DWI_MAIN_001`` would correspond to ``#DWI_FMAP_PA_001`` and ``#DWI_FMAP_AP_001``.
 
 .. image:: images/xnat-scan-notes.png
 
