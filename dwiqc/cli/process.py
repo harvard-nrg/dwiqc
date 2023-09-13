@@ -36,8 +36,6 @@ def do(args):
         E = executors.probe(args.partition)
     jarray = JobArray(E)
 
-#   *************** INSERT CODE HERE THAT RUNS XNAT_TAGGER ***************
-
 
     # load data into pybids as layout
 
@@ -55,14 +53,12 @@ def do(args):
     try:
         ap_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='epi', direction='AP', run=args.run, return_type='filename').pop())
     except IndexError:
-        logger.error("No AP field map data found. Double check bids directory to verify. Exiting.")
-        sys.exit()
+        logger.warning("No AP field map data found. Double check bids directory to verify.")
 
     try:
         pa_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='epi', direction='PA', run=args.run, return_type='filename').pop())
     except IndexError:
-        logger.error("No PA field map data found. Double check bids directory to verify. Exiting.")
-        sys.exit()
+        logger.warning("No PA field map data found. Double check bids directory to verify.")
 
     json_file = os.path.basename(layout.get(subject=args.sub, extension='.json', suffix='dwi', run=args.run, return_type='filename').pop())
 
