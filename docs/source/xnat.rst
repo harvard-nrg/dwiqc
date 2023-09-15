@@ -31,7 +31,7 @@ The image below displays an MR Session report page with populated notes.
 
 xnattagger
 ------------
-xnattagger automates the process of tagging scans in your XNAT project. xnattagger runs by default in the *get* and *tandem* modes of *DWIQC*. The default tagging convention is the same as seen here (and above), but can be configured to user specifications. Please see the `xnattagger documentation <xnattagger.html>`_ for details. 
+xnattagger automates the process of tagging scans in your XNAT project. xnattagger can optionally be run in the *get* and *tandem* modes of *DWIQC* using the ``--run-tagger`` argument. The default tagging convention is the same as seen here (and above), but can be configured to user specifications. Please see the `xnattagger documentation <xnattagger.html>`_ for details. 
 
 ================= =======
 DWI scan          run
@@ -51,7 +51,7 @@ With *DWIQC* and it's necessary containers installed, you're ready to analyze so
 
 *DWIQC* was designed with the goal of speeding up the quality check workflow of diffusion weighted imaging data. Ideally, *DWIQC* would be run on subjects while the study is ongoing as to help researchers catch problems (excessive motion, acquisition issues, etc.) as they happen, rather than discovering them after the data has been collected and the problems cannot be rectified. That being said, running *DWIQC* on previously acquired data can certainly provide helpful information. 
 
-*DWIQC* is built on the `prequal`_ and `qsiprep`_ processing packages. Both of these tools are excellent in their own right. We found that by running both of them, we can maximize our understanding of the data quality and glean additional key insights. *DWIQC* was built completely in python and we welcome anyone to peruse the `codebase <https://github.com/harvard-nrg/dwiqc>`_ and make build suggestions (hello, pull requests!).
+*DWIQC* is built on the `prequal`_ and `qsiprep`_ processing packages. Both of these tools are excellent in their own right. We found that by running both of them, we can maximize our understanding of the data quality and glean additional key insights. Please take the necessary time to understand both tools and the theoretical approach they take to analyzing diffusion data. You may find that you only want to use one of them in your analysis (which is possible using the ``--sub-tasks`` command). *DWIQC* was built completely in python and we welcome anyone to peruse the `codebase <https://github.com/harvard-nrg/dwiqc>`_ and make build suggestions (hello, pull requests!).
 
 get, process and tandem modes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -67,7 +67,7 @@ get, process and tandem modes
 get mode
 ^^^^^^^^
 .. note::
-    *get* mode is only applicable if you have an XNAT instance you're going to interact with. Please feel free to skip to the `process <#process-mode>`_ mode section if you're only going to use *DWIQC* outside of XNAT.
+    *get* mode is only applicable if you have an XNAT instance (such as CBS Central) you're going to interact with. Please feel free to skip to the `process <#process-mode>`_ mode section if you're only going to use *DWIQC* outside of XNAT.
 
 get: Overview
 """""""""""""
@@ -76,10 +76,81 @@ get: Overview
 
 Before using *get* mode, I strongly recommend creating an `xnat_auth alias <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using the excellent `yaxil <https://yaxil.readthedocs.io/en/latest/>`_ python library. It's not stictly necessary to do so, but it will make your life easier. Example code will use an xnat alias. yaxil comes as a part of the *DWIQC* `installation <developers.html#hpc-installation>`_ (yaxil is a *DWIQC* dependency). 
 
+get: Config File
+""""""""""""""""
+
+Diffusion imaging is a burgeoning field with huge potential to deepen our understanding of the brain. While exciting, it also means that acquisition parameters, study design and theoretical analysis frameworks vary greatly. We've decided to make heavy use of yaml config files to accomadate as many approaches as possible. 
+
+.. code-block:: yaml
+
+    dwiqc:
+      dwi_main_a:
+        tag:
+          - .*(^|\s)#dwi_main_a(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - dwi
+        direction:
+          - AP
+        acquisition_group:
+          - A
+      dwi_main_b:
+        tag:
+          - .*(^|\s)#dwi_main_b(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - dwi
+        direction:
+          - AP
+        acquisition_group:
+          - B
+      dwi_main_c:
+        tag:
+          - .*(^|\s)#dwi_main_c(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - dwi
+        direction:
+          - PA
+        acquisition_group:
+          - C
+      revpol_a:
+        tag:
+          - .*(^|\s)#dwi_revpol_a(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - dwi
+        direction:
+          - PA
+        acquisition_group:
+          - A
+      revpol_b:
+        tag:
+          - .*(^|\s)#dwi_revpol_b(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - dwi
+        direction:
+          - PA
+        acquisition_group:
+          - B
+      revpol_c:
+        tag:
+          - .*(^|\s)#dwi_revpol_c(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - dwi
+        direction:
+          - AP
+        acquisition_group:
+          - C
+      t1w:
+        tag:
+          - .*(^|\s)ANAT_1.0_ADNI(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - anat
+
+Your config file 
+
 get: Required Arguments
 """""""""""""""""""""""
 
-*get* mode requires three arguments: `1) ---label` `2) ---bids-dir` `3) ---xnat-alias`
+
+*get* mode requires four arguments: `1) ---label` `2) ---bids-dir` `3) ---xnat-alias` `4) ---download-config`
 
 | 1. ``--label`` refers to the XNAT MR Session ID, which is found under XNAT PROJECT ---> SUBJECT ---> MR_SESSION
 
@@ -94,6 +165,9 @@ get: Required Arguments
 ``cd`` into the desired directory and execute ``pwd`` to get a directory's absolute path.
 
 | 3. ``--xnat-alias`` is the alias containing credentials associated with your XNAT instance. It can be created in a few `steps <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using yaxil.
+
+| 4. ``--download-config`` is the **absolute** path to the yaml config file that tells *DWIQC* which tags it should look for (see xnattagger docs for more tagging `details <xnattagger.html>`_). Your config file could look something like this:
+
 
 get: Executing the Command
 """"""""""""""""""""""""""
@@ -125,7 +199,7 @@ After running *DWIQC* *get* you should see two new directories and one new file 
 get: Common Errors
 """"""""""""""""""
 
-The most common *get* mode error stems from *DWIQC* being unable to locate and use dcm2niix. Make sure it's on your path! 
+The most common *get* mode error doesn't necessarily look like an error on the surface, meaning that there won't be an ERROR message that pops up in your terminal. Usually, the error will be discovered when you check your download directory and find that not all of your desired data was downloaded. This problem almost always stems from *get* mode being unable to find matches in the scans' note fields on XNAT. Check your configuration file and be sure that it matches the tagging convention you're using on XNAT.
 
 get: Advanced Usage
 """""""""""""""""""

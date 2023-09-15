@@ -41,8 +41,7 @@ def do(args):
 
     layout = BIDSLayout(args.bids_dir)
 
-    # grab the dwi and json files using pybids and os
-    # If diffusion files or fieldmap files don't exist, exit the program.
+    # verify the existence of diffusion data and/or fieldmaps
 
     try:
         dwi_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='dwi', run=args.run, return_type='filename').pop())

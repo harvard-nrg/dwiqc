@@ -61,19 +61,19 @@ In order for *xnattagger* to work properly, it has to know what it's looking for
   t1w:
       - series_description: ABCD_T1w_MPR_vNav
         image_type: [ORIGINAL, PRIMARY, M, ND, NORM]
-        tag: 'T1w'
+        tag: '#T1w'
   t1w_move:
       - series_description: ABCD_T1w_MPR_vNav_setter
         image_type: [ORIGINAL, PRIMARY, M, ND, MOSAIC]
-        tag: 'T1w_MOVE'
+        tag: '#T1w_MOVE'
   t2w:
       - series_description: ABCD_T2w_SPC_vNav
         image_type: [ORIGINAL, PRIMARY, M, ND, NORM]
-        tag: 'T2w'
+        tag: '#T2w'
   t2w_move:
       - series_description: ABCD_T2w_SPC_vNav_setter
         image_type: [ORIGINAL, PRIMARY, M, ND, MOSAIC]
-        tag: 'T2w_MOVE'
+        tag: '#T2w_MOVE'
   dwi:
       - series_description: ABCD_dMRI_lowSR
         image_type: [ORIGINAL, PRIMARY, DIFFUSION, NONE, ND, MOSAIC]

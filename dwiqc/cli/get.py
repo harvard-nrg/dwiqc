@@ -40,7 +40,7 @@ def do(args):
     os.environ['XNAT_USER'] = auth.username
     os.environ['XNAT_PASS'] = auth.password
 
-    conf = yaml.safe_load(open(args.xnat_config)) # load yaml config file
+    conf = yaml.safe_load(open(args.download_config)) # load yaml config file
 
     scan_labels = get_scans(conf) ### get a list of the scan types/labels
 
