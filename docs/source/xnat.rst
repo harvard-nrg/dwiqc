@@ -203,7 +203,7 @@ There are a couple *get* mode optional arguments that are worth noting.
 
 | 1. By default, *get* mode will run `xnattagger <xnattagger.html>`_ on the provided MR Session. Pass the ``--no-tagger`` argument if you'd like to turn off that functionality.
  
-| 2. If you would like to see what data will be downloaded from XNAT without actually downloading it, pass the ``--dry-run`` argument. You will also have to specify an output json file: ``-o test.json``. That json file will contain metadata about the scans *get* mode would download. This can be useful for testing.
+| 2. If you would like to see what data will be downloaded from XNAT without actually downloading it, pass the ``--dry-run`` argument.
 
 get: All Arguments
 """"""""""""""""""
@@ -218,7 +218,6 @@ Argument              Description                               Required
 ``--project``         Project Name                              No
 ``--no-tagger``       Turn off *xnattagger*                     No
 ``--dry-run``         Generate list of to-be-downloaded scans   No
-``-o``                Path to ``--dry-run`` json output file    No
 ===================== ========================================  ========
 
 process mode
