@@ -199,29 +199,27 @@ The most common *get* mode error doesn't necessarily look like an error on the s
 get: Advanced Usage
 """""""""""""""""""
 
-There are a few *get* mode optional arguments that are worth noting. 
+There are a couple *get* mode optional arguments that are worth noting. 
 
 | 1. By default, *get* mode will run `xnattagger <xnattagger.html>`_ on the provided MR Session. Pass the ``--no-tagger`` argument if you'd like to turn off that functionality.
-
-| 2. Related to xnattagger is the `--xnat-config` argument. This argument refers to a config file found `here <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/dwiqc.yaml>`_ which *DWIQC* uses to find the appropriately tagged scans in your XNAT project. The config file, written in the yaml format, uses regular expressions (regex) to find the desired scans. The expressions used in the default config file follow the convention depicted `above <#tagging-your-scans>`_. If your scans are tagged using a different convention, create a yaml file similar in structure to the example given here and pass it to ``--xnat-config`` in *get* mode. 
  
-| 3. If you would like to see what data will be downloaded from XNAT without actually downloading it, pass the ``--dry-run`` argument. You will also have to specify an output json file: ``-o test.json``. That json file will contain metadata about the scans *get* mode would download. This can be useful for testing.
+| 2. If you would like to see what data will be downloaded from XNAT without actually downloading it, pass the ``--dry-run`` argument. You will also have to specify an output json file: ``-o test.json``. That json file will contain metadata about the scans *get* mode would download. This can be useful for testing.
 
 get: All Arguments
 """"""""""""""""""
 
-==================== ========================================  ========
-Argument             Description                               Required
-==================== ========================================  ========
-``--label``          XNAT Session Label                        Yes
-``--bids-dir``       Path to BIDS download directory           Yes
-``--xnat-alias``     Alias for XNAT Project                    Yes
-``--project``        Project Name                              No
-``--xnat-config``    Configuration file for downloading scans  No
-``--no-tagger``      Turn off *xnattagger*                     No
-``--dry-run``        Generate list of to-be-downloaded scans   No
-``-o``               Path to ``--dry-run`` json output file    No
-==================== ========================================  ========
+===================== ========================================  ========
+Argument              Description                               Required
+===================== ========================================  ========
+``--label``           XNAT Session Label                        Yes
+``--bids-dir``        Path to BIDS download directory           Yes
+``--xnat-alias``      Alias for XNAT Project                    Yes
+``--download-config`` Configuration file for downloading scans  Yes
+``--project``         Project Name                              No
+``--no-tagger``       Turn off *xnattagger*                     No
+``--dry-run``         Generate list of to-be-downloaded scans   No
+``-o``                Path to ``--dry-run`` json output file    No
+===================== ========================================  ========
 
 process mode
 ^^^^^^^^^^^^
