@@ -3,17 +3,18 @@ xnattagger Documentation
 
 *xnattagger* is a python command line tool that labels or "tags" scans within an XNAT instance according to user specifications. 
 
-Tagging Convention Overview
----------------------------
+Possible Tagging Convention Overview
+------------------------------------
 
-"Tagging" refers to adding notes to your scans' notes field in XNAT. The example below shows the tag that will be added to the notes field for each of the different modalities using *xnattagger* along with some example series names for each modality.
+"Tagging" refers to adding notes to your scans' notes field in XNAT. The example below shows the tags that could be added to the notes field for each of the different modalities using *xnattagger* along with some example series names for each modality.
 
-=========== ================================  ==================================================
-Type        Example series                    Note
-=========== ================================  ==================================================
+=========== ================================  ===========================================================
+Type        Example series                    Tag Being Inserted Into Note Field
+=========== ================================  ===========================================================
 DWI         ``UKbioDiff_ABCDseq_ABCDdvs``     ``#DWI_MAIN_001, #DWI_MAIN_002, ..., #DWI_MAIN_N``
 DWI_PA_FMAP ``UKbioDiff_ABCDseq_DistMap_PA``  ``#DWI_PA_001, #DWI_PA_002, ..., #DWI_PA_N``
 DWI_AP_FMAP ``UKbioDiff_ABCDseq_DistMap_AP``  ``#DWI_AP_001, #DWI_AP_002, ..., #DWI_AP_N``
+DWI_REVPOL  ``CMRR_DiffPA_2mm_4b0``           ``#DWI_REVPOL_001``, ``#DWI_REVPOL_002``, ``#DWI_REVPOL_N``
 BOLD        ``ABCD_fMRI_rest_noPMU``          ``#BOLD_001, #BOLD_002, ..., #BOLD_N``
 BOLD_PA     ``ABCD_fMRI_DistortionMap_PA``    ``#BOLD_PA_001, #BOLD_PA_002, ..., #BOLD_PA_N``
 BOLD_AP     ``ABCD_fMRI_DistortionMap_AP``    ``#BOLD_AP_001, #BOLD_AP_002, ..., #BOLD_AP_N``
@@ -21,12 +22,12 @@ T1w         ``ABCD_T1w_MPR_vNav``             ``#T1w_001, #T1w_001, ..., #T1w_N`
 T1w_MOVE    ``ABCD_T1w_MPR_vNav_setter``      ``#T1w_MOVE_001, #T1w_MOVE_002, ..., #T1w_MOVE_N``
 T2w         ``ABCD_T2w_SPC_vNav``             ``#T2w_001, #T2w_002, ..., #T2w_N``
 T2w_MOVE    ``ABCD_T2w_SPC_vNav_setter``      ``#T2w_MOVE_001, #T2w_MOVE_002, ..., #T2w_MOVE_N``
-=========== ================================  ==================================================
+=========== ================================  ===========================================================
 
 The image below displays an MR Session report page with populated notes.
 
 .. note::
-   Note that if a ``DWI`` scan has corresponding ``PA`` and ``AP`` scans, they should be assigned matching numbers. For example, ``#DWI_MAIN_001`` would correspond to ``#DWI_PA_001`` and ``#DWI_AP_001``.
+   If a ``DWI`` scan has corresponding ``PA`` and ``AP`` scans, they should be assigned matching numbers. For example, ``#DWI_MAIN_001`` would correspond to ``#DWI_PA_001`` and ``#DWI_AP_001``. Some diffusion studies will not have dedicated fieldmaps and will use reverse polarity ("revpol") acquisitions instead. Since these "revpol" scans can be applied to several "main" diffusion scans, it is recommended that they be grouped in an an identifiable way. For example, adding a letter to the tag. See this `explanation <xnat.html#get-config-file>`_ for further details. The config `file <#tagger-yaml-file>`_ below also can serve as an example.
 
 .. image:: images/xnat-scan-notes.png
 
@@ -75,12 +76,33 @@ In order for *xnattagger* to work properly, it has to know what it's looking for
         image_type: [ORIGINAL, PRIMARY, M, ND, MOSAIC]
         tag: '#T2w_MOVE'
   dwi:
-      - series_description: ABCD_dMRI_lowSR
-        image_type: [ORIGINAL, PRIMARY, DIFFUSION, NONE, ND, MOSAIC]
-        tag: '#DWI_MAIN'
-      - series_description: UKbioDiff_ABCDseq_ABCDdvs
-        image_type: [ORIGINAL, PRIMARY, DIFFUSION, NONE, ND, MOSAIC]
-        tag: '#DWI_MAIN'
+      - series_description: CMRR_DiffAP_2mm_20dir_Set1
+        image_type: [ORIGINAL, PRIMARY, DIFFUSION, NONE, MB, ND, MOSAIC]
+        tag: '#DWI_MAIN_A_001'
+      - series_description: CMRR_DiffAP_2mm_20dir_Set2
+        image_type: [ORIGINAL, PRIMARY, DIFFUSION, NONE, MB, ND, MOSAIC]
+        tag: '#DWI_MAIN_A_002'
+      - series_description: CMRR_DiffAP_2mm_20dir_Set3
+        image_type: [ORIGINAL, PRIMARY, DIFFUSION, NONE, MB, ND, MOSAIC]
+        tag: '#DWI_MAIN_B_001'
+      - series_description: CMRR_DiffAP_2mm_20dir_Set4
+        image_type: [ORIGINAL, PRIMARY, DIFFUSION, NONE, MB, ND, MOSAIC]
+        tag: '#DWI_MAIN_B_002'
+      - series_description: Axial MB DTI PA (MSV21)
+        image_type: [ORIGINAL, PRIMARY, DIFFUSION, NONE, ND, NORM, MOSAIC]
+        tag: '#DWI_MAIN_C_001'
+  revpol:
+      - series_description: CMRR_DiffPA_2mm_4b0
+        image_type: [ORIGINAL, PRIMARY, M, MB, ND]
+        note: 'DIFF_2.0_4B0_Set12'
+        tag: '#DWI_REVPOL_A_001'
+      - series_description: CMRR_DiffPA_2mm_4b0
+        image_type: [ORIGINAL, PRIMARY, M, MB, ND]
+        note: DIFF_2.0_4B0_Set34
+        tag: '#DWI_REVPOL_B_001'
+      - series_description: Axial MB DTI AP (MSV21)
+        image_type: [ORIGINAL, PRIMARY, DIFFUSION, NONE, ND, NORM, MOSAIC]
+        tag: '#DWI_REVPOL_C_001'        
   dwi_PA:
       - series_description: ABCD_dMRI_DistortionMap_PA
         image_type: [ORIGINAL, PRIMARY, DIFFUSION, NONE, ND]
