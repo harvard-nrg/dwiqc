@@ -79,7 +79,20 @@ Before using *get* mode, I strongly recommend creating an `xnat_auth alias <http
 get: Config File
 """"""""""""""""
 
-Diffusion imaging is a burgeoning field with huge potential to deepen our understanding of the brain. While exciting, it also means that acquisition parameters, study design and theoretical analysis frameworks vary greatly. We've decided to make heavy use of yaml config files to accomadate as many approaches as possible. 
+Diffusion imaging is a burgeoning field with huge potential to deepen our understanding of the brain. While exciting, it also means that acquisition parameters, study designs, and theoretical analysis frameworks vary greatly. We've decided to make heavy use of yaml config files to accomodate as many approaches as possible. Take a look at the example config file below (`download it <https://raw.githubusercontent.com/harvard-nrg/dwiqc/main/example.yaml>`_ or copy/paste into text editor).
+
+This kind of config file could be used when the diffusion data is not acquired with dedicated fieldmaps. In this case, there are reverse polarity (labeled here as "revpol") or reverse phase encode direction scans (usually consisting of 4-8 volumes) being acquired that correspond with the "main" (or longer) diffusion scans that consist of many more volumes. During processing, volumes will be extracted from both the "revpol" and "main" scans to create fieldmaps with FSL's topup tool.
+
+Let's unpack this example config file a bit more. The top line with *"dwiqc"* should be left alone (*DWIQC* needs it there as a point of reference). *"dwi_main_a"* on line two is an example of what you might want to name a certain type of scan you've acquired, though the specific name here doesn't matter as long as it is unique. Nested underneath *"dwi_main_a"* on line three is the *"tag"* element. It should correspond to the tag you've inserted into the note field for a particular scan using *xnattagger* (or manually). In this example, *get* mode will look for **#dwi_main_a** (plus any number or other characters associated with it, case insensitive). As long as **#dwi_main_a** is found in the note field of a scan, it will be considered a match. 
+
+The rest of the elements found nested under *"dwi_main_a"* are used for generating BIDS-compliant file names and structure. *"bids_subdir"* on line five refers to the directory that a scan with the **#dwi_main_a** tag should be placed in. This element has significant implications for downstream processing. *Only scans that serve as dedicated fieldmaps should be placed into the BIDS fmap directory*. Otherwise, all scans, including reverse polarity scans, should be placed into the dwi directory. The *"direction"* element on line 7 refers to the phase encoding direction of the scan. It will either be *AP* or *PA*. 
+
+Finally, the *"acquisition_group"* element serves as a means of grouping "main" and "revpol" scans together. For example, a certain study may be acquiring 4 "main" diffusion scans and 2 "revpol" scans. As mentioned earlier, volumes will be extracted from both "revpol" scans and "main" scans to create fieldmaps. As such, you want to be sure that the correct "revpol" and "main" scans are grouped together. If the first acquired "revpol" scan corresponds to "main" scans 1 and 2, you wouldn't want that "revpol" scan to be used to create fieldmaps for "main" scans 3 and 4, or "main" scans 1 and 4, and so on. *"acquisition_group"* helps us pair scans together to ensure that field maps are being generated properly.
+
+Only the *"tag"* and *"bids_subdir"* elements are required in the config file. If you have no need for *"direction"* or *"acquisition_group"*, you don't have to use them!
+
+.. note::
+    Indentation, hyphens, and colons are very important to the yaml structure. Be sure to maintain the exact structure seen here when editing.
 
 .. code-block:: yaml
 
@@ -102,15 +115,6 @@ Diffusion imaging is a burgeoning field with huge potential to deepen our unders
           - AP
         acquisition_group:
           - B
-      dwi_main_c:
-        tag:
-          - .*(^|\s)#dwi_main_c(?P<run>_\d+)?(\s|$).*
-        bids_subdir:
-          - dwi
-        direction:
-          - PA
-        acquisition_group:
-          - C
       revpol_a:
         tag:
           - .*(^|\s)#dwi_revpol_a(?P<run>_\d+)?(\s|$).*
@@ -129,15 +133,6 @@ Diffusion imaging is a burgeoning field with huge potential to deepen our unders
           - PA
         acquisition_group:
           - B
-      revpol_c:
-        tag:
-          - .*(^|\s)#dwi_revpol_c(?P<run>_\d+)?(\s|$).*
-        bids_subdir:
-          - dwi
-        direction:
-          - AP
-        acquisition_group:
-          - C
       t1w:
         tag:
           - .*(^|\s)ANAT_1.0_ADNI(?P<run>_\d+)?(\s|$).*
