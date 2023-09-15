@@ -81,18 +81,20 @@ get: Config File
 
 Diffusion imaging is a burgeoning field with huge potential to deepen our understanding of the brain. While exciting, it also means that acquisition parameters, study designs, and theoretical analysis frameworks vary greatly. We've decided to make heavy use of yaml config files to accomodate as many approaches as possible. Take a look at the example config file below (`download it <https://raw.githubusercontent.com/harvard-nrg/dwiqc/main/example.yaml>`_ or copy/paste into text editor).
 
-This kind of config file could be used when the diffusion data is not acquired with dedicated fieldmaps. In this case, there are reverse polarity (labeled here as "revpol") or reverse phase encode direction scans (usually consisting of 4-8 volumes) being acquired that correspond with the "main" (or longer) diffusion scans that consist of many more volumes. During processing, volumes will be extracted from both the "revpol" and "main" scans to create fieldmaps with FSL's topup tool.
+This kind of config file could be used when the diffusion data is not acquired with dedicated fieldmaps. In this case, there are reverse polarity (labeled here as "revpol") or reverse phase encode direction scans (usually consisting of 4-8 volumes) being acquired that correspond with the "main" (or primary) diffusion scans that consist of many more volumes. During processing, volumes will be extracted from both the "revpol" and "main" scans to create fieldmaps with FSL's topup tool.
 
-Let's unpack this example config file a bit more. The top line with *"dwiqc"* should be left alone (*DWIQC* needs it there as a point of reference). *"dwi_main_a"* on line two is an example of what you might want to name a certain type of scan you've acquired, though the specific name here doesn't matter as long as it is unique. Nested underneath *"dwi_main_a"* on line three is the *"tag"* element. It should correspond to the tag you've inserted into the note field for a particular scan using *xnattagger* (or manually). In this example, *get* mode will look for **#dwi_main_a** (plus any number or other characters associated with it, case insensitive). As long as **#dwi_main_a** is found in the note field of a scan, it will be considered a match. 
+Let's unpack this example config file a bit more. The top line with *"dwiqc"* should be left alone (*DWIQC* needs it there as a point of reference). *"dwi_main_a"* on line 2 is an example of what you might want to name a certain type of scan you've acquired, though the specific name here doesn't matter as long as it is unique. Nested underneath *"dwi_main_a"* on line 3 is the *"tag"* element. It should correspond to the tag you've inserted into the note field for a particular scan using *xnattagger* (or manually). In this example, *get* mode will look for **#dwi_main_a** (plus any number or other characters associated with it, case insensitive). As long as **#dwi_main_a** is found in the note field of a scan, it will be considered a match. 
 
-The rest of the elements found nested under *"dwi_main_a"* are used for generating BIDS-compliant file names and structure. *"bids_subdir"* on line five refers to the directory that a scan with the **#dwi_main_a** tag should be placed in. This element has significant implications for downstream processing. *Only scans that serve as dedicated fieldmaps should be placed into the BIDS fmap directory*. Otherwise, all scans, including reverse polarity scans, should be placed into the dwi directory. The *"direction"* element on line 7 refers to the phase encoding direction of the scan. It will either be *AP* or *PA*. 
+The rest of the elements found nested under *"dwi_main_a"* are used for generating BIDS-compliant file names and structure. *"bids_subdir"* on line 5 refers to the directory that a scan with the **#dwi_main_a** tag should be placed in. This element has significant implications for downstream processing. *Scans that serve as fieldmaps, either dedicated or as "revpol", should be placed into the BIDS fmap directory*. Otherwise, all scans should be placed into the dwi directory. The *"direction"* element on line 7 refers to the phase encoding direction of the scan. It will either be *AP* or *PA*. 
 
-Finally, the *"acquisition_group"* element serves as a means of grouping "main" and "revpol" scans together. For example, a certain study may be acquiring 4 "main" diffusion scans and 2 "revpol" scans. As mentioned earlier, volumes will be extracted from both "revpol" scans and "main" scans to create fieldmaps. As such, you want to be sure that the correct "revpol" and "main" scans are grouped together. If the first acquired "revpol" scan corresponds to "main" scans 1 and 2, you wouldn't want that "revpol" scan to be used to create fieldmaps for "main" scans 3 and 4, or "main" scans 1 and 4, and so on. *"acquisition_group"* helps us pair scans together to ensure that field maps are being generated properly.
+Finally, the *"acquisition_group"* element serves as a means of grouping "main" and "revpol" scans together. For example, a certain study may be acquiring 4 "main" diffusion scans and 2 "revpol" scans. As mentioned earlier, volumes will be extracted from both "revpol" scans and "main" scans to create fieldmaps. As such, you want to be sure that the correct "revpol" and "main" scans are associated with each other. If the first acquired "revpol" scan corresponds to "main" scans 1 and 2, you wouldn't want that "revpol" scan to be used to create fieldmaps for "main" scans 3 and 4, or "main" scans 1 and 4, and so on. *"acquisition_group"* helps us pair scans together to ensure that field maps are being generated properly. In the example below, "main" and "revpol" scans are grouped by using the letters *A* and *B*, but you can use whatever convention you'd like as long as it's consistent.
 
 Only the *"tag"* and *"bids_subdir"* elements are required in the config file. If you have no need for *"direction"* or *"acquisition_group"*, you don't have to use them!
 
 .. note::
-    Indentation, hyphens, and colons are very important to the yaml structure. Be sure to maintain the exact structure seen here when editing.
+    Indentation, hyphens, spaces, and colons are very important to the yaml structure. Be sure to maintain the exact structure seen here when editing.
+
+Phew! I would recommend pulling up this example config file in a text editor and looking at it side-by-side with the above explanation.
 
 .. code-block:: yaml
 
@@ -119,7 +121,7 @@ Only the *"tag"* and *"bids_subdir"* elements are required in the config file. I
         tag:
           - .*(^|\s)#dwi_revpol_a(?P<run>_\d+)?(\s|$).*
         bids_subdir:
-          - dwi
+          - fmap
         direction:
           - PA
         acquisition_group:
@@ -128,7 +130,7 @@ Only the *"tag"* and *"bids_subdir"* elements are required in the config file. I
         tag:
           - .*(^|\s)#dwi_revpol_b(?P<run>_\d+)?(\s|$).*
         bids_subdir:
-          - dwi
+          - fmap
         direction:
           - PA
         acquisition_group:
@@ -138,8 +140,6 @@ Only the *"tag"* and *"bids_subdir"* elements are required in the config file. I
           - .*(^|\s)ANAT_1.0_ADNI(?P<run>_\d+)?(\s|$).*
         bids_subdir:
           - anat
-
-Your config file 
 
 get: Required Arguments
 """""""""""""""""""""""
@@ -161,7 +161,7 @@ get: Required Arguments
 
 | 3. ``--xnat-alias`` is the alias containing credentials associated with your XNAT instance. It can be created in a few `steps <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using yaxil.
 
-| 4. ``--download-config`` is the **absolute** path to the yaml config file that tells *DWIQC* which tags it should look for (see xnattagger docs for more tagging `details <xnattagger.html>`_). Your config file could look something like this:
+| 4. ``--download-config`` is the **absolute** path to the yaml config file that tells *DWIQC* which tags it should look for (see the `xnattagger docs <xnattagger.html>`_) and the `config file <#get-config-file>`_ section of get mode for more tagging details.
 
 
 get: Executing the Command
@@ -171,13 +171,13 @@ Command Template:
 
 .. code-block:: shell
 
-    dwiQC.py get --label <MR_SESSION> --bids-dir <PATH_TO_BIDS_DIR> --xnat-alias <ALIAS>
+    dwiQC.py get --label <MR_SESSION> --bids-dir <PATH_TO_BIDS_DIR> --xnat-alias <ALIAS> --download-config <PATH_TO_CONFIG_FILE>
 
 Command Example:
 
 .. code-block:: shell
 
-    dwiQC.py get --label PE201222_230719 --bids-dir /users/nrg/PE201222_230719 --xnat-alias ssbc
+    dwiQC.py get --label PE201222_230719 --bids-dir /users/nrg/PE201222_230719 --xnat-alias ssbc --download-config /users/nrg/dwiqc_config.yaml
 
 .. note::
     Ensure that every MR_Session has its own dedicated BIDS download directory. *DWIQC* will not run properly otherwise. 
@@ -194,7 +194,7 @@ After running *DWIQC* *get* you should see two new directories and one new file 
 get: Common Errors
 """"""""""""""""""
 
-The most common *get* mode error doesn't necessarily look like an error on the surface, meaning that there won't be an ERROR message that pops up in your terminal. Usually, the error will be discovered when you check your download directory and find that not all of your desired data was downloaded. This problem almost always stems from *get* mode being unable to find matches in the scans' note fields on XNAT. Check your configuration file and be sure that it matches the tagging convention you're using on XNAT.
+The most common *get* mode error doesn't necessarily look like an error on the surface, meaning that there won't be an **ERROR** message that pops up in your terminal. Usually, the error will be discovered when you check your download directory and find that not all of your desired data was downloaded. This problem almost always stems from *get* mode being unable to find matches in the scans' note fields on XNAT. Check your configuration file and be sure that it matches the tagging convention you're using on XNAT.
 
 get: Advanced Usage
 """""""""""""""""""
