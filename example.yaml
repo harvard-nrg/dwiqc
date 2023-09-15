@@ -1,0 +1,60 @@
+dwiqc:
+  dwi_main_a:
+    tag:
+      - .*(^|\s)#dwi_main_a(?P<run>_\d+)?(\s|$).*
+    bids_subdir:
+      - dwi
+    direction:
+      - AP
+    acquisition_group:
+      - A
+  dwi_main_b:
+    tag:
+      - .*(^|\s)#dwi_main_b(?P<run>_\d+)?(\s|$).*
+    bids_subdir:
+      - dwi
+    direction:
+      - AP
+    acquisition_group:
+      - B
+  dwi_main_c:
+    tag:
+      - .*(^|\s)#dwi_main_c(?P<run>_\d+)?(\s|$).*
+    bids_subdir:
+      - dwi
+    direction:
+      - PA
+    acquisition_group:
+      - C
+  revpol_a:
+    tag:
+      - .*(^|\s)#dwi_revpol_a(?P<run>_\d+)?(\s|$).*
+    bids_subdir:
+      - dwi
+    direction:
+      - PA
+    acquisition_group:
+      - A
+  revpol_b:
+    tag:
+      - .*(^|\s)#dwi_revpol_b(?P<run>_\d+)?(\s|$).*
+    bids_subdir:
+      - dwi
+    direction:
+      - PA
+    acquisition_group:
+      - B
+  revpol_c:
+    tag:
+      - .*(^|\s)#dwi_revpol_c(?P<run>_\d+)?(\s|$).*
+    bids_subdir:
+      - dwi
+    direction:
+      - AP
+    acquisition_group:
+      - C
+  t1w:
+    tag:
+      - .*(^|\s)ANAT_1.0_ADNI(?P<run>_\d+)?(\s|$).*
+    bids_subdir:
+      - anat
