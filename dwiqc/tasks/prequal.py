@@ -41,6 +41,8 @@ class Task(tasks.BaseTask):
 			pass
 		
 		all_files = self._layout.get(subject=self._sub, session=self._ses, run=self._run, return_type='filename') # get a list of all of the subject's files
+
+		print(all_files)
 		# copy the all the subject's files into the INPUTS directory
 		for file in all_files:
 			basename = os.path.basename(file)
