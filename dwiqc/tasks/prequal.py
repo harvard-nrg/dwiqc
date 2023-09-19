@@ -328,10 +328,105 @@ class Task(tasks.BaseTask):
 
 			self.uneven_main_and_fmaps(all_nii_files)
 
+		else:
+
+			self.even_main_and_fmaps(all_nii_files)
+
+	def even_main_and_fmaps(self, all_nii_files):
+		## try matching by acq group first
+
+		dwi_acqusition_groups, fmap_acquisition_groups = self.acquistion_group_match(all_nii_files)
+
+		if dwi_acqusition_groups and if fmap_acquisition_groups:
+			for fmap_key, fmap_value in fmap_acquisition_groups.items():
+				for dwi_key, dwi_value in dwi_acqusition_groups.items():
+					if fmap_value == dwi_value:
+						try:
+							json_file = fmap_key.replace('.nii.gz', '.json')
+						except FileNotFoundError:
+							json_file = fmap_key.replace('.nii', '.json')
+						new_dwi_key = os.path.basename(dwi_key)
+						self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{new_dwi_key}', json_file)
+
+		else:
+			logger.warning('No acquisition group specified. Searching based on run number.')
+
+		## if there's no acquisition data, search by run number
+
+			dwi_run_numbers, fmap_run_numbers = self.run_number_match(all_nii_files)
+
+			if not dwi_run_numbers or if not fmap_run_numbers:
+				raise DWISpecError('No run numbers could be identified. Please add to BIDS specification for fieldmap and main dwi scan matching.')
+
+			else:
+
+				for fmap_key, fmap_value in fmap_run_numbers.items():
+					for dwi_key, dwi_value in dwi_run_numbers.items():
+						if fmap_value == dwi_value:
+							try:
+								json_file = fmap_key.replace('.nii.gz', '.json')
+							except FileNotFoundError:
+								json_file = fmap_key.replace('.nii', '.json')
+							new_dwi_key = os.path.basename(dwi_key)
+							self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{new_dwi_key}', json_file)
+
+
 
 	def uneven_main_and_fmaps(self, all_nii_files):
 		"""
 		If there are not an even number of fmaps and main scans, add "IntendedFor" field to the fmap scans for all applicable main scans
+		"""
+		dwi_acqusition_groups, fmap_acquisition_groups = self.acquistion_group_match(all_nii_files)
+
+		if not dwi_acqusition_groups or if not fmap_acquisition_groups:
+			raise DWISpecError('Uneven number of fieldmaps and main scans and no acqusition group specified. Please add to BIDS file names and retry. Exiting')
+
+		## interate through all the fmap and dwi key-value pairs. if the values equal each other, insert into the fmap json file
+		# and IntendedFor field that points to the matched dwi scan
+
+		for fmap_key, fmap_value in fmap_acquisition_groups.items():
+			for dwi_key, dwi_value in dwi_acqusition_groups.items():
+				if fmap_value == dwi_value:
+					try:
+						json_file = fmap_key.replace('.nii.gz', '.json')
+					except FileNotFoundError:
+						json_file = fmap_key.replace('.nii', '.json')
+					new_dwi_key = os.path.basename(dwi_key)
+					self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{new_dwi_key}', json_file)
+
+
+
+	def run_number_match(self, all_nii_files):
+		"""
+		This method will attempt to match fmap and dwi scans based on their run number
+		"""
+
+		dwi_run_numbers = {}
+
+		fmap_run_numbers = {}
+
+		for scan in all_nii_files:
+
+			no_path_name = os.path.basename(scan)
+
+			pattern = r'run-(.*?)_'
+
+			run_number = self.match(pattern, no_path_name)
+
+			if run_number:
+				if 'dwi.nii' in no_path_name:
+					dwi_run_numbers[scan] = run_number
+				elif 'epi.nii' in no_path_name:
+					fmap_run_numbers[scan] = run_number
+
+			return dwi_run_numbers, fmap_run_numbers
+
+
+
+
+	def acquistion_group_match(self, all_nii_files):
+		"""
+		This helper method exists to match a given list of nii files (dwi and fmap scans) to each other based on acquisition group
 		"""
 		dwi_acqusition_groups = {}
 
@@ -351,22 +446,8 @@ class Task(tasks.BaseTask):
 				elif 'epi.nii' in no_path_name:
 					fmap_acquisition_groups[scan] = acq_value
 
-			else:
-				raise DWISpecError('Uneven number of fieldmaps and main scans and no acqusition group specified. Please add to BIDS file names and retry. Exiting')
+		return dwi_acqusition_groups, fmap_acquisition_groups
 
-		for fmap_key, fmap_value in fmap_acquisition_groups.items():
-			for dwi_key, dwi_value in dwi_acqusition_groups.items():
-				if fmap_value == dwi_value:
-					try:
-						json_file = fmap_key.replace('.nii.gz', '.json')
-					except FileNotFoundError:
-						json_file = fmap_key.replace('.nii', '.json')
-					new_dwi_key = os.path.basename(dwi_key)
-					self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{new_dwi_key}', json_file)
-
-
-
-		sys.exit()
 
 	def insert_json_value(self, key, value, json_file):
 		"""
@@ -391,10 +472,6 @@ class Task(tasks.BaseTask):
 			json.dump(data, file, indent=2)
 
 
-
-
-
-
 	def match(self, pattern, text):
 		"""
 		Check if a particular pattern exists inside some text using regex
@@ -408,30 +485,6 @@ class Task(tasks.BaseTask):
 
 		else:
 			return None
-
-
-
-
-		"""
-
-		fmap_json_files = self._layout.get(run=self._run, suffix='epi', extension='.json', return_type='filename')
-
-		dwi_file = os.path.basename(self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz', return_type='filename').pop())
-
-		intended_for = {"IntendedFor":f"ses-{self._ses}/dwi/{dwi_file}"}
-
-		for file in fmap_json_files:
-			with open(file, 'r+') as f:
-				file_data = json.load(f)
-				if "IntendedFor" in file_data:
-					continue
-				else:
-					file_data.update(intended_for)
-					f.seek(0)
-					json.dump(file_data, f, indent = 2)
-
-		"""
-
 
 	# build the prequal sbatch command and create job
 
@@ -447,7 +500,7 @@ class Task(tasks.BaseTask):
 			prequal_command = yaml.safe_load(open(self._prequal_config))
 		except yaml.parser.ParserError:
 			print("There's an issue with the prequal config file.\nMake sure it is a .yaml file with proper formatting.")
-			sys.exit()
+			sys.exit(1)
 		prequal_options = prequal_command['prequal']['shell']
 		if self._no_gpu:
 			if '--eddy_cuda' in prequal_options:
