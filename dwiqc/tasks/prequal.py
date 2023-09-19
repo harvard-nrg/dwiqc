@@ -13,6 +13,7 @@ import shutil
 from executors.models import Job
 import dwiqc.config as config
 import numpy as np
+from pprint import pprint
 
 
 logger = logging.getLogger(__name__)
@@ -40,9 +41,8 @@ class Task(tasks.BaseTask):
 		except FileExistsError:
 			pass
 		
-		all_files = self._layout.get(subject=self._sub, session=self._ses, run=self._run, return_type='filename') # get a list of all of the subject's files
+		all_files = self._layout.get(subject=self._sub, session=self._ses, return_type='filename') # get a list of all of the subject's files
 
-		print(all_files)
 		# copy the all the subject's files into the INPUTS directory
 		for file in all_files:
 			basename = os.path.basename(file)
@@ -62,7 +62,7 @@ class Task(tasks.BaseTask):
 		# get a list of all the fmap files that end with .json (this it's helpful to have a file with just one extension)
 
 		#layout = BIDSLayout(self._bids)
-		fmap_files = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='epi', extension='.json', return_type='filename')
+		fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.json', return_type='filename')
 
 		# get the basename of the file and then remove the extension
 		for fmap in fmap_files:
@@ -89,7 +89,7 @@ class Task(tasks.BaseTask):
 		dwi_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz')
 		#dwi_file = layout.get()[10]
 		if len(dwi_file) > 1:
-			raise DWISpecError('Found more than one dwi file. Please verify there are no duplicates.')
+			logger.warning('PREQUAL_WARNING: More than one main DWI scan detected. Ensure scans were acquired using the same parameters.')
 		if not dwi_file:
 			raise DWISpecError(f'No dwi scan found for subject {self._sub} session {self._ses} run {self._run}')
 		else:
@@ -232,62 +232,81 @@ class Task(tasks.BaseTask):
 	# dtiQA_config.csv
 
 	def create_csv(self, inputs_dir, dwi_file):
-
-
 		# grab TotalReadoutTime from json file
 
 		readout_time = dwi_file.get_metadata()['TotalReadoutTime']
 
-		# get phase encode directions of the PA and AP files
+		# create dictionary of all the scans (dwi or epi) matched with their primary phase encoding direction
+		phase_encode_pairs = {}
 
-		PA_dir, AP_dir = self.get_phase_encode()
+		# get all json files
 
+		filenames = self._layout.get(subject=self._sub, session=self._ses, extension='.json', return_type='filename')
 
-		# get all three json files (dwi, PA, AP)
+		remove_suffix = 'T1w.json'
 
-		filenames = self._layout.get(subject=self._sub, session=self._ses, run=self._run, extension='.json', return_type='filename')
+		filtered_filenames = [file for file in filenames if not file.endswith(remove_suffix)] # create new list w/o T1w json file
 
-		# remove the extension from each file name to prepare for writing into csv file
+		# get scan and phase encode direction pairs
 
-		no_ext = [os.path.splitext(os.path.basename(file))[0] for file in filenames]
+		for file in filtered_filenames:
+			phase_encode_pairs[file] = self.get_phase_encode(file)
 
-		# iterate through each file, checking for dwi, PA or AP in the file name. Check phase encoding direction for
-		# the PA and AP files. Assign a + or - depending on the direction
+		# remove the preceding path information and extension from each file name key to prepare for writing into csv file
 
-		for file in no_ext:
-			if file.endswith('dwi'):
-				dwi_line = f'{file},+,{readout_time}'
-			elif 'PA' in file:
-				if PA_dir == 'j':
-					PA_line = f'{file},+,{readout_time}'
-				else:
-					PA_line = f'{file},-,{readout_time}'
-			elif 'AP' in file:
-				if AP_dir == 'j':
-					AP_line = f'{file},+,{readout_time}'
-				else:
-					AP_line = f'{file},-,{readout_time}'
+		phase_encode_pairs_no_ext = {os.path.splitext(os.path.basename(key))[0]: value for key, value in phase_encode_pairs.items()}
+
+		# iterate through each file, and create a line to write to the csv file based on metadata
+
+		lines_to_write = []
+
+		# find out what the primary phase encode direction is
+
+		primary_phase_dir = self.get_primary_phase_dir(filtered_filenames)
+
+		for key, value in phase_encode_pairs_no_ext.items():
+			if value == primary_phase_dir:
+				new_line = f'{key},+,{readout_time}'
+			else:
+				new_line = f'{key},-,{readout_time}'
+
+			lines_to_write.append(new_line)
 
 		# write each of the created lines into a csv file
 
 		with open(f'{inputs_dir}/dtiQA_config.csv', 'w') as csv:
-			csv.write(f'{dwi_line}\n')
-			csv.write(f'{PA_line}\n')
-			csv.write(f'{AP_line}\n')
+			for line in lines_to_write:
+				csv.write(f'{line}\n')
 
 
+	def get_phase_encode(self, json_file):
 
-	def get_phase_encode(self):
-		PA_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='epi', direction='PA', extension='.nii.gz').pop()
+		with open(json_file, 'r') as foo:
+			data = json.load(foo)
 
-		PA_phase = PA_file.get_metadata()['PhaseEncodingDirection']
+		phase_dir = data['PhaseEncodingDirection']
 
-		AP_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='epi', direction='AP', extension='.nii.gz').pop()
+		return phase_dir
 
-		AP_phase = AP_file.get_metadata()['PhaseEncodingDirection']
+	def get_primary_phase_dir(self, file_list):
 
-		return PA_phase, AP_phase
+		# get all the phase encode directions as recorded in the json file of each 'main' dwi scan
 
+		all_main_dwi_scan_dirs = []
+		for file in file_list:
+			if file.endswith('dwi.json'):
+				phase_dir = self.get_phase_encode(file)
+				all_main_dwi_scan_dirs.append(phase_dir)
+
+		# verify that all values are the same. If they aren't the program will exit due to differing parameters
+		first_element = all_main_dwi_scan_dirs[0]
+
+		all_same_direction = all(element == first_element for element in all_main_dwi_scan_dirs)
+
+		if not all_same_direction:
+			raise DWISpecError('The primary phase encode direction differs across scans with the dwi suffix.\nVerify that scans were acquired with the same parameters. Exiting')
+		else:
+			return first_element
 
 # this method will add an "IntendedFor" key-value pair to the fieldmap scans
 
@@ -317,6 +336,7 @@ class Task(tasks.BaseTask):
 		self._tempdir = tempfile.gettempdir()
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
+		sys.exit()
 		home_dir = os.path.expanduser("~")
 		prequal_sif = os.path.join(home_dir, '.config/dwiqc/containers/prequal_nrg.sif')
 		try:
