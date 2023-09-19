@@ -14,6 +14,7 @@ from executors.models import Job
 import dwiqc.config as config
 import numpy as np
 from pprint import pprint
+import re
 
 
 logger = logging.getLogger(__name__)
@@ -312,6 +313,107 @@ class Task(tasks.BaseTask):
 
 	def add_intended_for(self):
 
+		# need to find a way to get the fmap and dwi files matched up. Should be flexible enough to work for dedicate fieldmaps,
+		# revpol scans, or single or multiple man scans
+
+		# get the number of "main" and "fmap" scans. If they don't match up, check for the existence of acq
+
+		dwi_files = self._layout.get(subject=self._sub, session=self._ses, suffix='dwi', extension='.nii.gz', return_type='filename')
+
+		fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')
+
+		all_nii_files = dwi_files + fmap_files
+
+		if len(dwi_files) != len(fmap_files):
+
+			self.uneven_main_and_fmaps(all_nii_files)
+
+
+	def uneven_main_and_fmaps(self, all_nii_files):
+		"""
+		If there are not an even number of fmaps and main scans, add "IntendedFor" field to the fmap scans for all applicable main scans
+		"""
+		dwi_acqusition_groups = {}
+
+		fmap_acquisition_groups = {}
+
+		for scan in all_nii_files:
+
+			no_path_name = os.path.basename(scan)
+
+			pattern = r'acq-(.*?)_'
+
+			acq_value = self.match(pattern, no_path_name)
+
+			if acq_value:
+				if 'dwi.nii' in no_path_name:
+					dwi_acqusition_groups[scan] = acq_value
+				elif 'epi.nii' in no_path_name:
+					fmap_acquisition_groups[scan] = acq_value
+
+			else:
+				raise DWISpecError('Uneven number of fieldmaps and main scans and no acqusition group specified. Please add to BIDS file names and retry. Exiting')
+
+		for fmap_key, fmap_value in fmap_acquisition_groups.items():
+			for dwi_key, dwi_value in dwi_acqusition_groups.items():
+				if fmap_value == dwi_value:
+					try:
+						json_file = fmap_key.replace('.nii.gz', '.json')
+					except FileNotFoundError:
+						json_file = fmap_key.replace('.nii', '.json')
+					new_dwi_key = os.path.basename(dwi_key)
+					self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{new_dwi_key}', json_file)
+
+
+
+		sys.exit()
+
+	def insert_json_value(self, key, value, json_file):
+		"""
+		This helper method will load in the given json file and check if the given key already exists.
+		If it does but it's not a list, it will be made into a list. 
+		The new value will be appended to the value list
+		If it doesn't exist, it will be added to the json file as a key-value pair
+		re-open the json file and write new contents
+		"""
+		with open(json_file, 'r') as f:
+			data = json.load(f)
+
+		if key in data:
+			if not isinstance(data[key], list):
+				data[key] = [data[key]]
+			data[key].append(value)
+
+		else:
+			data[key] = [value]
+		
+		with open(json_file, 'w') as file:
+			json.dump(data, file, indent=2)
+
+
+
+
+
+
+	def match(self, pattern, text):
+		"""
+		Check if a particular pattern exists inside some text using regex
+		"""
+
+		match = re.search(pattern, text)
+
+		if match:
+			result = match.group(1)
+			return result
+
+		else:
+			return None
+
+
+
+
+		"""
+
 		fmap_json_files = self._layout.get(run=self._run, suffix='epi', extension='.json', return_type='filename')
 
 		dwi_file = os.path.basename(self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz', return_type='filename').pop())
@@ -327,6 +429,8 @@ class Task(tasks.BaseTask):
 					file_data.update(intended_for)
 					f.seek(0)
 					json.dump(file_data, f, indent = 2)
+
+		"""
 
 
 	# build the prequal sbatch command and create job
