@@ -121,7 +121,7 @@ class Task(tasks.BaseTask):
 		self.create_csv(inputs_dir, dwi_file)
 
 		# call method that adds an "IntendedFor" key-value pair to json file (for fieldmaps)
-		self.add_intended_for()
+		#self.add_intended_for()
 
 		# call method that checks the manufacturer, scanner model and max bval. that will determine if --nonzero_shells argument needs to be passed to prequal
 		self.check_shells(dwi_file)
@@ -337,7 +337,7 @@ class Task(tasks.BaseTask):
 
 		dwi_acqusition_groups, fmap_acquisition_groups = self.acquistion_group_match(all_nii_files)
 
-		if dwi_acqusition_groups and if fmap_acquisition_groups:
+		if dwi_acqusition_groups and fmap_acquisition_groups:
 			for fmap_key, fmap_value in fmap_acquisition_groups.items():
 				for dwi_key, dwi_value in dwi_acqusition_groups.items():
 					if fmap_value == dwi_value:
@@ -355,7 +355,7 @@ class Task(tasks.BaseTask):
 
 			dwi_run_numbers, fmap_run_numbers = self.run_number_match(all_nii_files)
 
-			if not dwi_run_numbers or if not fmap_run_numbers:
+			if not dwi_run_numbers or not fmap_run_numbers:
 				raise DWISpecError('No run numbers could be identified. Please add to BIDS specification for fieldmap and main dwi scan matching.')
 
 			else:
@@ -378,7 +378,7 @@ class Task(tasks.BaseTask):
 		"""
 		dwi_acqusition_groups, fmap_acquisition_groups = self.acquistion_group_match(all_nii_files)
 
-		if not dwi_acqusition_groups or if not fmap_acquisition_groups:
+		if not dwi_acqusition_groups or not fmap_acquisition_groups:
 			raise DWISpecError('Uneven number of fieldmaps and main scans and no acqusition group specified. Please add to BIDS file names and retry. Exiting')
 
 		## interate through all the fmap and dwi key-value pairs. if the values equal each other, insert into the fmap json file
@@ -463,7 +463,10 @@ class Task(tasks.BaseTask):
 		if key in data:
 			if not isinstance(data[key], list):
 				data[key] = [data[key]]
-			data[key].append(value)
+
+			if value not in data[key]:
+				data[key].append(value)
+
 
 		else:
 			data[key] = [value]
