@@ -13,7 +13,8 @@ requires = [
     'lxml',
     'numpy',
     'dcm2niix',
-    'tenacity'
+    'tenacity',
+    'nibabel'
 ]
 
 about = dict()

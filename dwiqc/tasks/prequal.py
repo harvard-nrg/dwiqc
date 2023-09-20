@@ -13,6 +13,9 @@ import shutil
 from executors.models import Job
 import dwiqc.config as config
 import numpy as np
+from pprint import pprint
+import re
+import nibabel as nib
 
 
 logger = logging.getLogger(__name__)
@@ -40,7 +43,8 @@ class Task(tasks.BaseTask):
 		except FileExistsError:
 			pass
 		
-		all_files = self._layout.get(subject=self._sub, session=self._ses, run=self._run, return_type='filename') # get a list of all of the subject's files
+		all_files = self._layout.get(subject=self._sub, session=self._ses, return_type='filename') # get a list of all of the subject's files
+
 		# copy the all the subject's files into the INPUTS directory
 		for file in all_files:
 			basename = os.path.basename(file)
@@ -50,31 +54,52 @@ class Task(tasks.BaseTask):
 		self.create_bfiles(inputs_dir)
 		
 
-
-		## keeping this code here just in case the symlinks don't work
-			#shutil.copy(file, inputs)
-
-
 	# the fieldmap data needs accompanying 'dummy' bval and bvec files that consist of 0's
 	def create_bfiles(self, inputs_dir):
 		# get a list of all the fmap files that end with .json (this it's helpful to have a file with just one extension)
 
-		#layout = BIDSLayout(self._bids)
-		fmap_files = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='epi', extension='.json', return_type='filename')
+		fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')
+
+		if not fmap_files:
+			self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii', return_type='filename')
 
 		# get the basename of the file and then remove the extension
 		for fmap in fmap_files:
-			no_ext = os.path.splitext(os.path.basename(fmap))[0]
 
-			# create a .bval file with a single 0
+			basename = os.path.basename(fmap)
+
+			no_ext = basename.split('.', 1)[0]
+
+			# get the number of volumes in the data file
+
+			num_vols = nib.load(fmap).shape[3]
+
+			# create a .bval file same number of rows of 0 as there are volumes
 
 			with open(f'{inputs_dir}/{no_ext}.bval', 'w') as bval:
-				bval.write('0')
+				rows_written = 0
+				while rows_written < num_vols:
+					if rows_written == 0:
+						bval.write('0')
+					elif rows_written == num_vols - 1:
+						bval.write(' 0\n')
+					else:
+						bval.write(' 0')
+					rows_written += 1
 
-			# create .bvec file with 3 0's
+			# create .bvec file with 3 row 0's equal to the number of volumes
 
 			with open(f'{inputs_dir}/{no_ext}.bvec', 'w') as bvec:
-				bvec.write('0\n0\n0')
+				row_to_write = ''
+				# write the same number of 0's as there are volumes
+				for _ in range(num_vols):
+					row_to_write += '0 '
+				# remove any trailing whitespace
+				row_to_write = row_to_write.strip()
+
+				# add three rows to bvec file
+				for _ in range(3):		
+					bvec.write(f'{row_to_write}\n')
 
 		self.create_spec(inputs_dir)
 		
@@ -87,7 +112,7 @@ class Task(tasks.BaseTask):
 		dwi_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz')
 		#dwi_file = layout.get()[10]
 		if len(dwi_file) > 1:
-			raise DWISpecError('Found more than one dwi file. Please verify there are no duplicates.')
+			logger.warning('PREQUAL_WARNING: More than one main DWI scan detected. Ensure scans were acquired using the same parameters.')
 		if not dwi_file:
 			raise DWISpecError(f'No dwi scan found for subject {self._sub} session {self._ses} run {self._run}')
 		else:
@@ -118,7 +143,7 @@ class Task(tasks.BaseTask):
 		self.create_csv(inputs_dir, dwi_file)
 
 		# call method that adds an "IntendedFor" key-value pair to json file (for fieldmaps)
-		self.add_intended_for()
+		#self.add_intended_for()
 
 		# call method that checks the manufacturer, scanner model and max bval. that will determine if --nonzero_shells argument needs to be passed to prequal
 		self.check_shells(dwi_file)
@@ -230,83 +255,261 @@ class Task(tasks.BaseTask):
 	# dtiQA_config.csv
 
 	def create_csv(self, inputs_dir, dwi_file):
-
-
 		# grab TotalReadoutTime from json file
 
 		readout_time = dwi_file.get_metadata()['TotalReadoutTime']
 
-		# get phase encode directions of the PA and AP files
+		# create dictionary of all the scans (dwi or epi) matched with their primary phase encoding direction
+		phase_encode_pairs = {}
 
-		PA_dir, AP_dir = self.get_phase_encode()
+		# get all json files
 
+		filenames = self._layout.get(subject=self._sub, session=self._ses, extension='.json', return_type='filename')
 
-		# get all three json files (dwi, PA, AP)
+		remove_suffix = 'T1w.json'
 
-		filenames = self._layout.get(subject=self._sub, session=self._ses, run=self._run, extension='.json', return_type='filename')
+		filtered_filenames = [file for file in filenames if not file.endswith(remove_suffix)] # create new list w/o T1w json file
 
-		# remove the extension from each file name to prepare for writing into csv file
+		# get scan and phase encode direction pairs
 
-		no_ext = [os.path.splitext(os.path.basename(file))[0] for file in filenames]
+		for file in filtered_filenames:
+			phase_encode_pairs[file] = self.get_phase_encode(file)
 
-		# iterate through each file, checking for dwi, PA or AP in the file name. Check phase encoding direction for
-		# the PA and AP files. Assign a + or - depending on the direction
+		# remove the preceding path information and extension from each file name key to prepare for writing into csv file
 
-		for file in no_ext:
-			if file.endswith('dwi'):
-				dwi_line = f'{file},+,{readout_time}'
-			elif 'PA' in file:
-				if PA_dir == 'j':
-					PA_line = f'{file},+,{readout_time}'
-				else:
-					PA_line = f'{file},-,{readout_time}'
-			elif 'AP' in file:
-				if AP_dir == 'j':
-					AP_line = f'{file},+,{readout_time}'
-				else:
-					AP_line = f'{file},-,{readout_time}'
+		phase_encode_pairs_no_ext = {os.path.splitext(os.path.basename(key))[0]: value for key, value in phase_encode_pairs.items()}
+
+		# iterate through each file, and create a line to write to the csv file based on metadata
+
+		lines_to_write = []
+
+		# find out what the primary phase encode direction is
+
+		primary_phase_dir = self.get_primary_phase_dir(filtered_filenames)
+
+		for key, value in phase_encode_pairs_no_ext.items():
+			if value == primary_phase_dir:
+				new_line = f'{key},+,{readout_time}'
+			else:
+				new_line = f'{key},-,{readout_time}'
+
+			lines_to_write.append(new_line)
 
 		# write each of the created lines into a csv file
 
 		with open(f'{inputs_dir}/dtiQA_config.csv', 'w') as csv:
-			csv.write(f'{dwi_line}\n')
-			csv.write(f'{PA_line}\n')
-			csv.write(f'{AP_line}\n')
+			for line in lines_to_write:
+				csv.write(f'{line}\n')
 
 
+	def get_phase_encode(self, json_file):
 
-	def get_phase_encode(self):
-		PA_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='epi', direction='PA', extension='.nii.gz').pop()
+		with open(json_file, 'r') as foo:
+			data = json.load(foo)
 
-		PA_phase = PA_file.get_metadata()['PhaseEncodingDirection']
+		phase_dir = data['PhaseEncodingDirection']
 
-		AP_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='epi', direction='AP', extension='.nii.gz').pop()
+		return phase_dir
 
-		AP_phase = AP_file.get_metadata()['PhaseEncodingDirection']
+	def get_primary_phase_dir(self, file_list):
 
-		return PA_phase, AP_phase
+		# get all the phase encode directions as recorded in the json file of each 'main' dwi scan
 
+		all_main_dwi_scan_dirs = []
+		for file in file_list:
+			if file.endswith('dwi.json'):
+				phase_dir = self.get_phase_encode(file)
+				all_main_dwi_scan_dirs.append(phase_dir)
+
+		# verify that all values are the same. If they aren't the program will exit due to differing parameters
+		first_element = all_main_dwi_scan_dirs[0]
+
+		all_same_direction = all(element == first_element for element in all_main_dwi_scan_dirs)
+
+		if not all_same_direction:
+			raise DWISpecError('The primary phase encode direction differs across scans with the dwi suffix.\nVerify that scans were acquired with the same parameters. Exiting')
+		else:
+			return first_element
 
 # this method will add an "IntendedFor" key-value pair to the fieldmap scans
 
 	def add_intended_for(self):
 
-		fmap_json_files = self._layout.get(run=self._run, suffix='epi', extension='.json', return_type='filename')
+		# need to find a way to get the fmap and dwi files matched up. Should be flexible enough to work for dedicate fieldmaps,
+		# revpol scans, or single or multiple man scans
 
-		dwi_file = os.path.basename(self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz', return_type='filename').pop())
+		# get the number of "main" and "fmap" scans. If they don't match up, check for the existence of acq
 
-		intended_for = {"IntendedFor":f"ses-{self._ses}/dwi/{dwi_file}"}
+		dwi_files = self._layout.get(subject=self._sub, session=self._ses, suffix='dwi', extension='.nii.gz', return_type='filename')
 
-		for file in fmap_json_files:
-			with open(file, 'r+') as f:
-				file_data = json.load(f)
-				if "IntendedFor" in file_data:
-					continue
-				else:
-					file_data.update(intended_for)
-					f.seek(0)
-					json.dump(file_data, f, indent = 2)
+		fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')
 
+		all_nii_files = dwi_files + fmap_files
+
+		if len(dwi_files) != len(fmap_files):
+
+			self.uneven_main_and_fmaps(all_nii_files)
+
+		else:
+
+			self.even_main_and_fmaps(all_nii_files)
+
+	def even_main_and_fmaps(self, all_nii_files):
+		## try matching by acq group first
+
+		dwi_acqusition_groups, fmap_acquisition_groups = self.acquistion_group_match(all_nii_files)
+
+		if dwi_acqusition_groups and fmap_acquisition_groups:
+			for fmap_key, fmap_value in fmap_acquisition_groups.items():
+				for dwi_key, dwi_value in dwi_acqusition_groups.items():
+					if fmap_value == dwi_value:
+						try:
+							json_file = fmap_key.replace('.nii.gz', '.json')
+						except FileNotFoundError:
+							json_file = fmap_key.replace('.nii', '.json')
+						new_dwi_key = os.path.basename(dwi_key)
+						self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{new_dwi_key}', json_file)
+
+		else:
+			logger.warning('No acquisition group specified. Searching based on run number.')
+
+		## if there's no acquisition data, search by run number
+
+			dwi_run_numbers, fmap_run_numbers = self.run_number_match(all_nii_files)
+
+			if not dwi_run_numbers or not fmap_run_numbers:
+				raise DWISpecError('No run numbers could be identified. Please add to BIDS specification for fieldmap and main dwi scan matching.')
+
+			else:
+
+				for fmap_key, fmap_value in fmap_run_numbers.items():
+					for dwi_key, dwi_value in dwi_run_numbers.items():
+						if fmap_value == dwi_value:
+							try:
+								json_file = fmap_key.replace('.nii.gz', '.json')
+							except FileNotFoundError:
+								json_file = fmap_key.replace('.nii', '.json')
+							new_dwi_key = os.path.basename(dwi_key)
+							self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{new_dwi_key}', json_file)
+
+
+
+	def uneven_main_and_fmaps(self, all_nii_files):
+		"""
+		If there are not an even number of fmaps and main scans, add "IntendedFor" field to the fmap scans for all applicable main scans
+		"""
+		dwi_acqusition_groups, fmap_acquisition_groups = self.acquistion_group_match(all_nii_files)
+
+		if not dwi_acqusition_groups or not fmap_acquisition_groups:
+			raise DWISpecError('Uneven number of fieldmaps and main scans and no acqusition group specified. Please add to BIDS file names and retry. Exiting')
+
+		## interate through all the fmap and dwi key-value pairs. if the values equal each other, insert into the fmap json file
+		# and IntendedFor field that points to the matched dwi scan
+
+		for fmap_key, fmap_value in fmap_acquisition_groups.items():
+			for dwi_key, dwi_value in dwi_acqusition_groups.items():
+				if fmap_value == dwi_value:
+					try:
+						json_file = fmap_key.replace('.nii.gz', '.json')
+					except FileNotFoundError:
+						json_file = fmap_key.replace('.nii', '.json')
+					new_dwi_key = os.path.basename(dwi_key)
+					self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{new_dwi_key}', json_file)
+
+
+
+	def run_number_match(self, all_nii_files):
+		"""
+		This method will attempt to match fmap and dwi scans based on their run number
+		"""
+
+		dwi_run_numbers = {}
+
+		fmap_run_numbers = {}
+
+		for scan in all_nii_files:
+
+			no_path_name = os.path.basename(scan)
+
+			pattern = r'run-(.*?)_'
+
+			run_number = self.match(pattern, no_path_name)
+
+			if run_number:
+				if 'dwi.nii' in no_path_name:
+					dwi_run_numbers[scan] = run_number
+				elif 'epi.nii' in no_path_name:
+					fmap_run_numbers[scan] = run_number
+
+			return dwi_run_numbers, fmap_run_numbers
+
+
+
+
+	def acquistion_group_match(self, all_nii_files):
+		"""
+		This helper method exists to match a given list of nii files (dwi and fmap scans) to each other based on acquisition group
+		"""
+		dwi_acqusition_groups = {}
+
+		fmap_acquisition_groups = {}
+
+		for scan in all_nii_files:
+
+			no_path_name = os.path.basename(scan)
+
+			pattern = r'acq-(.*?)_'
+
+			acq_value = self.match(pattern, no_path_name)
+
+			if acq_value:
+				if 'dwi.nii' in no_path_name:
+					dwi_acqusition_groups[scan] = acq_value
+				elif 'epi.nii' in no_path_name:
+					fmap_acquisition_groups[scan] = acq_value
+
+		return dwi_acqusition_groups, fmap_acquisition_groups
+
+
+	def insert_json_value(self, key, value, json_file):
+		"""
+		This helper method will load in the given json file and check if the given key already exists.
+		If it does but it's not a list, it will be made into a list. 
+		The new value will be appended to the value list
+		If it doesn't exist, it will be added to the json file as a key-value pair
+		re-open the json file and write new contents
+		"""
+		with open(json_file, 'r') as f:
+			data = json.load(f)
+
+		if key in data:
+			if not isinstance(data[key], list):
+				data[key] = [data[key]]
+
+			if value not in data[key]:
+				data[key].append(value)
+
+
+		else:
+			data[key] = [value]
+		
+		with open(json_file, 'w') as file:
+			json.dump(data, file, indent=2)
+
+
+	def match(self, pattern, text):
+		"""
+		Check if a particular pattern exists inside given text using regex
+		"""
+
+		match = re.search(pattern, text)
+
+		if match:
+			result = match.group(1)
+			return result
+
+		else:
+			return None
 
 	# build the prequal sbatch command and create job
 
@@ -321,7 +524,7 @@ class Task(tasks.BaseTask):
 			prequal_command = yaml.safe_load(open(self._prequal_config))
 		except yaml.parser.ParserError:
 			print("There's an issue with the prequal config file.\nMake sure it is a .yaml file with proper formatting.")
-			sys.exit()
+			sys.exit(1)
 		prequal_options = prequal_command['prequal']['shell']
 		if self._no_gpu:
 			if '--eddy_cuda' in prequal_options:
