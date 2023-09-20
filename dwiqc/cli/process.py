@@ -72,7 +72,7 @@ def do(args):
     prequal_outdir = None
     if 'prequal' in args.sub_tasks:
         logger.debug('building prequal task')
-        prequal_outdir = os.path.join(args.bids_dir, 'derivatives', 'dwiqc-prequal', f'sub-{args.sub}', f'ses-{args.ses}', basename, 'OUTPUTS')
+        prequal_outdir = os.path.join(args.bids_dir, 'derivatives', 'dwiqc-prequal', f'sub-{args.sub}', f'ses-{args.ses}', 'OUTPUTS')
         prequal_task = prequal.Task(
             sub=args.sub,
             ses=args.ses,
@@ -92,7 +92,7 @@ def do(args):
     # qsiprep job
     qsiprep_outdir = None
     if 'qsiprep' in args.sub_tasks:
-        qsiprep_outdir = os.path.join(args.bids_dir, 'derivatives', 'dwiqc-qsiprep', f'sub-{args.sub}', f'ses-{args.ses}', basename, 'qsiprep_output')
+        qsiprep_outdir = os.path.join(args.bids_dir, 'derivatives', 'dwiqc-qsiprep', f'sub-{args.sub}', f'ses-{args.ses}', 'qsiprep_output')
         qsiprep_trick = tempfile.TemporaryDirectory(dir='/tmp', suffix='.qsiprep')
         #os.symlink(qsiprep_outdir, f"{qsiprep_trick}/q")
         qsiprep_task = qsiprep.Task(
