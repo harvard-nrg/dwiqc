@@ -65,7 +65,7 @@ class Task(tasks.BaseTask):
 
 		# get the basename of the file and then remove the extension
 		for fmap in fmap_files:
-			
+
 			basename = os.path.basename(fmap)
 
 			no_ext = basename.split('.', 1)[0]
@@ -77,15 +77,15 @@ class Task(tasks.BaseTask):
 			# create a .bval file same number of rows of 0 as there are volumes
 
 			with open(f'{inputs_dir}/{no_ext}.bval', 'w') as bval:
-				rows_written = 0
-				while rows_written < num_vols:
-					bval.write('0\n')
-					rows_written += 1
+				bval.write('0\n')
 
 			# create .bvec file with 3 0's
 
 			with open(f'{inputs_dir}/{no_ext}.bvec', 'w') as bvec:
-				bvec.write('0\n0\n0\n')
+				rows_written = 0
+				while rows_written < num_vols:
+					bvec.write('0\n')
+					rows_written += 1
 
 		self.create_spec(inputs_dir)
 		
