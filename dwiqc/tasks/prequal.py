@@ -77,15 +77,18 @@ class Task(tasks.BaseTask):
 			# create a .bval file same number of rows of 0 as there are volumes
 
 			with open(f'{inputs_dir}/{no_ext}.bval', 'w') as bval:
-				bval.write('0\n')
+				rows_written = 0
+				while rows_written < num_vols:
+					if rows_written == 0:
+						bval.write('0')
+					else:
+						bval.write(' 0')
+					rows_written += 1
 
 			# create .bvec file with 3 0's
 
 			with open(f'{inputs_dir}/{no_ext}.bvec', 'w') as bvec:
-				rows_written = 0
-				while rows_written < num_vols:
-					bvec.write('0\n')
-					rows_written += 1
+				bvec.write('0\n0\n0\n')
 
 		self.create_spec(inputs_dir)
 		
