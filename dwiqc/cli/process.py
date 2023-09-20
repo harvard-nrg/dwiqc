@@ -52,12 +52,14 @@ def do(args):
     try:
         ap_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='epi', direction='AP', run=args.run, return_type='filename').pop())
     except IndexError:
-        logger.warning("No AP field map data found. Double check bids directory to verify.")
+        #logger.warning("No AP field map data found. Double check bids directory to verify.")
+        pass
 
     try:
         pa_file = os.path.basename(layout.get(subject=args.sub, extension='.nii.gz', suffix='epi', direction='PA', run=args.run, return_type='filename').pop())
     except IndexError:
-        logger.warning("No PA field map data found. Double check bids directory to verify.")
+        #logger.warning("No PA field map data found. Double check bids directory to verify.")
+        pass
 
     json_file = os.path.basename(layout.get(subject=args.sub, extension='.json', suffix='dwi', run=args.run, return_type='filename').pop())
 

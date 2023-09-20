@@ -15,6 +15,7 @@ import dwiqc.config as config
 import numpy as np
 from pprint import pprint
 import re
+import nibabel as nib
 
 
 logger = logging.getLogger(__name__)
@@ -53,31 +54,35 @@ class Task(tasks.BaseTask):
 		self.create_bfiles(inputs_dir)
 		
 
-
-		## keeping this code here just in case the symlinks don't work
-			#shutil.copy(file, inputs)
-
-
 	# the fieldmap data needs accompanying 'dummy' bval and bvec files that consist of 0's
 	def create_bfiles(self, inputs_dir):
 		# get a list of all the fmap files that end with .json (this it's helpful to have a file with just one extension)
 
-		#layout = BIDSLayout(self._bids)
-		fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.json', return_type='filename')
+		fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')
+
+		if not fmap_files:
+			self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii', return_type='filename')
 
 		# get the basename of the file and then remove the extension
 		for fmap in fmap_files:
 			no_ext = os.path.splitext(os.path.basename(fmap))[0]
 
-			# create a .bval file with a single 0
+			# get the number of volumes in the data file
+
+			num_vols = nib.load(fmap).shape[3]
+
+			# create a .bval file same number of rows of 0 as there are volumes
 
 			with open(f'{inputs_dir}/{no_ext}.bval', 'w') as bval:
-				bval.write('0')
+				rows_written = 0
+				while rows_written < 4:
+					bval.write('0\n')
+					rows_written += 1
 
 			# create .bvec file with 3 0's
 
 			with open(f'{inputs_dir}/{no_ext}.bvec', 'w') as bvec:
-				bvec.write('0\n0\n0')
+				bvec.write('0\n0\n0\n')
 
 		self.create_spec(inputs_dir)
 		
@@ -477,7 +482,7 @@ class Task(tasks.BaseTask):
 
 	def match(self, pattern, text):
 		"""
-		Check if a particular pattern exists inside some text using regex
+		Check if a particular pattern exists inside given text using regex
 		"""
 
 		match = re.search(pattern, text)
