@@ -81,14 +81,25 @@ class Task(tasks.BaseTask):
 				while rows_written < num_vols:
 					if rows_written == 0:
 						bval.write('0')
+					elif rows_written == num_vols - 1:
+						bval.write(' 0\n')
 					else:
 						bval.write(' 0')
 					rows_written += 1
 
-			# create .bvec file with 3 0's
+			# create .bvec file with 3 row 0's equal to the number of volumes
 
 			with open(f'{inputs_dir}/{no_ext}.bvec', 'w') as bvec:
-				bvec.write('0\n0\n0\n')
+				row_to_write = ''
+				# write the same number of 0's as there are volumes
+				for _ in range(num_vols):
+					row_to_write += '0 '
+				# remove any trailing whitespace
+				row_to_write = row_to_write.strip()
+
+				# add three rows to bvec file
+				for _ in range(3):		
+					bvec.write(f'{row_to_write}\n')
 
 		self.create_spec(inputs_dir)
 		
@@ -507,6 +518,7 @@ class Task(tasks.BaseTask):
 		self._tempdir = tempfile.gettempdir()
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
+		sys.exit()
 		home_dir = os.path.expanduser("~")
 		prequal_sif = os.path.join(home_dir, '.config/dwiqc/containers/prequal_nrg.sif')
 		try:
