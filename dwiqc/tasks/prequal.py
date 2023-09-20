@@ -65,7 +65,10 @@ class Task(tasks.BaseTask):
 
 		# get the basename of the file and then remove the extension
 		for fmap in fmap_files:
-			no_ext = os.path.splitext(os.path.basename(fmap))[0]
+			
+			basename = os.path.basename(fmap)
+
+			no_ext = basename.split('.', 1)[0]
 
 			# get the number of volumes in the data file
 
@@ -75,7 +78,7 @@ class Task(tasks.BaseTask):
 
 			with open(f'{inputs_dir}/{no_ext}.bval', 'w') as bval:
 				rows_written = 0
-				while rows_written < 4:
+				while rows_written < num_vols:
 					bval.write('0\n')
 					rows_written += 1
 
