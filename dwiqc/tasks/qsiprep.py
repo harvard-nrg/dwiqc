@@ -14,6 +14,7 @@ import shutil
 from executors.models import Job
 import dwiqc.config as config
 import numpy as np
+from pprint import pprint
 
 home_dir = os.path.expanduser("~")
 qsiprep_sif = os.path.join(home_dir, '.config/dwiqc/containers/qsiprep.sif')
@@ -79,6 +80,9 @@ class Task(tasks.BaseTask):
 		parameterize_dirs = false
 
 		[monitoring]"""
+
+
+		os.makedirs(f"{home_dir}/.nipype", exist_ok=True)
 
 		with open(f"{home_dir}/.nipype/nipype.cfg", "w") as file:
 			file.write(nipype)
@@ -238,6 +242,12 @@ class Task(tasks.BaseTask):
 
 		all_nii_files = dwi_files + fmap_files
 
+		pprint(f'DWI: {dwi_files}')
+
+		pprint(f'FMAP: {fmap_files}')
+
+		sys.exit()
+
 		if len(dwi_files) != len(fmap_files):
 
 			self.uneven_main_and_fmaps(all_nii_files)
@@ -246,9 +256,63 @@ class Task(tasks.BaseTask):
 
 			self.even_main_and_fmaps(all_nii_files)
 
+	def uneven_main_and_fmaps(self, all_nii_files):
+		pass
+
+	def even_main_and_fmaps(self, all_nii_files):
+		pass
 
 	def extract_vols(self):
 		pass
+
+	def acquistion_group_match(self, all_nii_files):
+		"""
+		This helper method exists to match a given list of nii files (dwi and fmap scans) to each other based on acquisition group
+		"""
+		dwi_acqusition_groups = {}
+
+		fmap_acquisition_groups = {}
+
+		for scan in all_nii_files:
+
+			no_path_name = os.path.basename(scan)
+
+			pattern = r'acq-(.*?)_'
+
+			acq_value = self.match(pattern, no_path_name)
+
+			if acq_value:
+				if 'dwi.nii' in no_path_name:
+					dwi_acqusition_groups[scan] = acq_value
+				elif 'epi.nii' in no_path_name:
+					fmap_acquisition_groups[scan] = acq_value
+
+		return dwi_acqusition_groups, fmap_acquisition_groups
+
+	def run_number_match(self, all_nii_files):
+		"""
+		This method will attempt to match fmap and dwi scans based on their run number
+		"""
+
+		dwi_run_numbers = {}
+
+		fmap_run_numbers = {}
+
+		for scan in all_nii_files:
+
+			no_path_name = os.path.basename(scan)
+
+			pattern = r'run-(.*?)_'
+
+			run_number = self.match(pattern, no_path_name)
+
+			if run_number:
+				if 'dwi.nii' in no_path_name:
+					dwi_run_numbers[scan] = run_number
+				elif 'epi.nii' in no_path_name:
+					fmap_run_numbers[scan] = run_number
+
+			return dwi_run_numbers, fmap_run_numbers
 
 	# create qsiprep command to be executed
 
@@ -256,6 +320,7 @@ class Task(tasks.BaseTask):
 		self.create_eddy_params()
 		self.create_nipype()
 		self.check_output_resolution()
+		self.check_fieldmaps()
 		try:
 			qsiprep_command = yaml.safe_load(open(self._qsiprep_config))
 		except yaml.parser.ParserError:
