@@ -338,7 +338,7 @@ class Task(tasks.BaseTask):
 		# need to find a way to get the fmap and dwi files matched up. Should be flexible enough to work for dedicate fieldmaps,
 		# revpol scans, or single or multiple man scans
 
-		# get the number of "main" and "fmap" scans. If they don't match up, check for the existence of acq
+		# get the number of "main" and "fmap" scans. Call different methods based on those numbers
 
 		dwi_files = self._layout.get(subject=self._sub, session=self._ses, suffix='dwi', extension='.nii.gz', return_type='filename')
 

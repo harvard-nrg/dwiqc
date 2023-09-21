@@ -85,16 +85,16 @@ class Task(tasks.BaseTask):
 
 
 	def create_spec(self):
-		dwi_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz')
+		dwi_file = self._layout.get(subject=self._sub, session=self._ses, suffix='dwi', extension='.nii.gz')
 		#dwi_file = layout.get()[10]
 		if len(dwi_file) > 1:
-			raise DWISpecError('Found more than one dwi file. Please verify there are no duplicates.')
+			logger.warning('QSIPREP_WARNING: More than one main DWI scan detected. Ensure scans were acquired using the same parameters.')
 		if not dwi_file:
-			raise DWISpecError(f'No dwi scan found for subject {self._sub} session {self._ses} run {self._run}')
+			raise DWISpecError(f'No dwi scan found for subject {self._sub} session {self._ses}')
 		else:
 			dwi_file = dwi_file.pop()
 
-		json_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.json', return_type='filename').pop()
+		json_file = self._layout.get(subject=self._sub, session=self._ses, suffix='dwi', extension='.json', return_type='filename').pop()
 
 		# Grab the slice timing info
 		slice_timing = dwi_file.get_metadata()['SliceTiming']
@@ -224,6 +224,31 @@ class Task(tasks.BaseTask):
 				json.dump(params_file, f)
 		else:
 			print('Custom eddy_params file being fed in by user.')
+
+	def check_fieldmaps(self):
+		"""
+		This method checks if there are dedicated fieldmaps for each "main" diffusion scan. If not, it will extract volumes from each main scan
+		and place them into the fmap directory. Then an "IntendedFor" key-value pair will be added into the json file of the newly created fmap file
+		(and any fmap files that already existed)
+		"""
+
+		dwi_files = self._layout.get(subject=self._sub, session=self._ses, suffix='dwi', extension='.nii.gz', return_type='filename')
+
+		fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')
+
+		all_nii_files = dwi_files + fmap_files
+
+		if len(dwi_files) != len(fmap_files):
+
+			self.uneven_main_and_fmaps(all_nii_files)
+
+		else:
+
+			self.even_main_and_fmaps(all_nii_files)
+
+
+	def extract_vols(self):
+		pass
 
 	# create qsiprep command to be executed
 

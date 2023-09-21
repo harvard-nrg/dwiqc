@@ -73,11 +73,11 @@ class Task(tasks.BaseTask):
 		-s {self._outdir}/{spec_file} \
 		-v"""
 
-
+		"""
 		if os.path.isdir(f'{self._sub}_{self._ses}.qc'):
 			logging.warning('Output directory already exists. Removing and trying again.')
 			shutil.rmtree(f'{self._sub}_{self._ses}.qc')
-
+		"""
 
 		logging.info('Running eddy_quad...')
 		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
