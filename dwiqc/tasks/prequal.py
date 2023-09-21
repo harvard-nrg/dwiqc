@@ -171,6 +171,8 @@ class Task(tasks.BaseTask):
 
 		spec_file = f"{inputs_dir}/even_slices_slspec.txt"
 
+		self._spec = f"{inputs_dir}/even_slices_slspec.txt"
+
 		with open(spec_file, 'w') as fp:
 			for sublist in slspec:
 				fp.write(' '.join(str(item) for item in sublist))
@@ -178,7 +180,7 @@ class Task(tasks.BaseTask):
 
 		os.makedirs(self._outdir)
 		shutil.copy(f"{inputs_dir}/even_slices_slspec.txt", self._outdir)
-		self._spec = "even"
+		#self._spec = "even"
 
 
 	# helper method that generates slspec file for an acquisition with an odd number of slices
@@ -221,11 +223,13 @@ class Task(tasks.BaseTask):
 
 		spec_file = f"{inputs_dir}/odd_slices_slspec.txt"
 
+		self._spec = f"{inputs_dir}/odd_slices_slspec.txt"
+
 		np.savetxt(spec_file, all_cols, fmt=['%d', '%d', '%d'])
 
 		os.makedirs(self._outdir)
 		shutil.copy(f"{inputs_dir}/odd_slices_slspec.txt", self._outdir)
-		self._spec = "odd"
+		#self._spec = "odd"
 
 	# this method will grab the manufacturer name and model and the max bval value. 
 	# if it is a Siemens Skyra and the max bval is 2000, the non-zero_shells argument needs to be passed to prequal
@@ -496,6 +500,24 @@ class Task(tasks.BaseTask):
 		with open(json_file, 'w') as file:
 			json.dump(data, file, indent=2)
 
+	def calc_mporder(self):
+		## if --no-gpu argument is passed, make mporder equal to 1
+		if self._no_gpu:
+			mporder = 1
+			return mporder
+
+		# need to get the length of the SliceTiming File (i.e. number of slices) divided by the "MultibandAccelerationFactor". From there, 
+		# divide that number by 3. That's the number passed to mporder.
+
+		# this will grab the dwi file, pop it off the list, get the slice timing metadata, then grab the length of the slice timing array
+		num_slices = len(self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz').pop().get_metadata()['SliceTiming'])
+
+		multiband_factor = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz').pop().get_metadata()['MultibandAccelerationFactor']
+
+		mporder = (num_slices / multiband_factor) // 3
+
+		return int(mporder)
+
 
 	def match(self, pattern, text):
 		"""
@@ -518,6 +540,7 @@ class Task(tasks.BaseTask):
 		self._tempdir = tempfile.gettempdir()
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
+		mporder = self.calc_mporder()
 		home_dir = os.path.expanduser("~")
 		prequal_sif = os.path.join(home_dir, '.config/dwiqc/containers/prequal_nrg.sif')
 		try:
@@ -563,6 +586,9 @@ class Task(tasks.BaseTask):
 			for item in prequal_options:
 				self._command.append(item)
 
+			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=5+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
+			self._command.append(eddy_args)
+
 		elif self._nonzero_shells == True:
 			self._command = [
 				'selfie',
@@ -595,6 +621,9 @@ class Task(tasks.BaseTask):
 
 			for item in prequal_options:
 				self._command.append(item)
+
+			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=5+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
+			self._command.append(eddy_args)
 
 		logdir = self.logdir()
 		logfile = os.path.join(logdir, 'dwiqc-prequal.log')
