@@ -171,7 +171,7 @@ class Task(tasks.BaseTask):
 
 		spec_file = f"{inputs_dir}/even_slices_slspec.txt"
 
-		self._spec = f"{inputs_dir}/even_slices_slspec.txt"
+		self._spec = "even_slices_slspec.txt"
 
 		with open(spec_file, 'w') as fp:
 			for sublist in slspec:
@@ -223,7 +223,7 @@ class Task(tasks.BaseTask):
 
 		spec_file = f"{inputs_dir}/odd_slices_slspec.txt"
 
-		self._spec = f"{inputs_dir}/odd_slices_slspec.txt"
+		self._spec = "odd_slices_slspec.txt"
 
 		np.savetxt(spec_file, all_cols, fmt=['%d', '%d', '%d'])
 
@@ -586,7 +586,7 @@ class Task(tasks.BaseTask):
 			for item in prequal_options:
 				self._command.append(item)
 
-			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=5+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec={self._spec}+--slm=linear'
+			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=5+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=INPUTS/{self._spec}+--slm=linear'
 			self._command.append(eddy_args)
 
 		elif self._nonzero_shells == True:
@@ -622,7 +622,7 @@ class Task(tasks.BaseTask):
 			for item in prequal_options:
 				self._command.append(item)
 
-			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=5+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec={self._spec}+--slm=linear'
+			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=5+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=INPUTS/{self._spec}+--slm=linear'
 			self._command.append(eddy_args)
 
 		logdir = self.logdir()
