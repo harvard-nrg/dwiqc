@@ -16,6 +16,7 @@ import dwiqc.config as config
 import numpy as np
 from pprint import pprint
 import re
+import shutil
 
 
 home_dir = os.path.expanduser("~")
@@ -316,6 +317,23 @@ class Task(tasks.BaseTask):
 
 		proc1 = subprocess.Popen(extract_command, shell=True, stdout=subprocess.PIPE)
 		proc1.communicate()
+
+		# create an output file path for the new fmap's json file
+
+		try:
+			fmap_json_file_path = epi_output_path.replace('.nii.gz', '.json')
+		except FileNotFoundError:
+			fmap_json_file_path = epi_output_path.replace('.nii', '.json')
+
+		# find the main dwi json file that needs to be copied
+
+		try:
+			dwi_json_file_path = dwi_full_path.replace('.nii.gz', '.json')
+		except FileNotFoundError:
+			dwi_json_file_path = dwi_full_path.replace('.nii', '.json')
+
+
+		shutil.copy(dwi_json_file_path, fmap_json_file_path)
 
 
 	def insert_json_value(self, key, value, json_file):
