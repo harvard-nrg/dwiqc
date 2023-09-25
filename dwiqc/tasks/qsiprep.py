@@ -302,13 +302,15 @@ class Task(tasks.BaseTask):
 		# provide name of output file
 
 		epi_output = dwi_full_path.replace('_dwi.', '_epi.')
+
+		epi_output_path = epi_output.replace('/dwi/', '/fmap/')
 		
 		extract_command = f""" singularity exec \
 		{fsl_sif} \
 		/APPS/fsl/bin/select_dwi_vols \
 		{dwi_full_path} \
 		{bval} \
-		{epi_output} \
+		{epi_output_path} \
 		0
 		"""
 
