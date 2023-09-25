@@ -350,7 +350,7 @@ class Task(tasks.BaseTask):
 
 		all_nii_files = dwi_files + fmap_files
 
-		if len(dwi_files) != len(fmap_files):
+		if len(dwi_files)*2 != len(fmap_files):
 
 			self.uneven_main_and_fmaps(all_nii_files)
 

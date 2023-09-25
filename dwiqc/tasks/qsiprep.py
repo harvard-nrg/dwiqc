@@ -244,7 +244,7 @@ class Task(tasks.BaseTask):
 
 		all_nii_files = dwi_files + fmap_files
 
-		if len(dwi_files) != len(fmap_files):
+		if len(dwi_files)*2 != len(fmap_files):
 
 			self.uneven_main_and_fmaps(all_nii_files)
 
@@ -262,18 +262,15 @@ class Task(tasks.BaseTask):
 		if not dwi_acq_groups or not fmap_acq_groups:
 			raise DWISpecError('Uneven number of fieldmaps and main scans and no acqusition group specified. Please add to BIDS file names and retry. Exiting')
 
-
-		print(dwi_acq_groups, fmap_acq_groups)
-
-		sys.exit()
-
-
 		## interate through all the fmap and dwi key-value pairs. if the values equal each other, insert into the fmap json file
 		# and IntendedFor field that points to the matched dwi scan
 
-		for fmap_key, fmap_value in fmap_acquisition_groups.items():
-			for dwi_key, dwi_value in dwi_acqusition_groups.items():
+		for fmap_key, fmap_value in fmap_acq_groups.items():
+			for dwi_key, dwi_value in dwi_acq_groups.items():
 				if fmap_value == dwi_value:
+					print(f'DWI: {dwi_key}')
+					print(f'FMAP: {fmap_key}')
+					sys.exit()
 					try:
 						json_file = fmap_key.replace('.nii.gz', '.json')
 					except FileNotFoundError:
