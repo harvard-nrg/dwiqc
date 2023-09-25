@@ -15,6 +15,8 @@ from executors.models import Job
 import dwiqc.config as config
 import numpy as np
 from pprint import pprint
+import re
+
 
 home_dir = os.path.expanduser("~")
 qsiprep_sif = os.path.join(home_dir, '.config/dwiqc/containers/qsiprep.sif')
