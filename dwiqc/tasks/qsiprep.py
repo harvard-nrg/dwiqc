@@ -256,19 +256,11 @@ class Task(tasks.BaseTask):
 
 	def uneven_main_and_fmaps(self, all_nii_files, dwi_files):
 		"""
-		First, this function will create a fieldmap file from each "main" dwi scan. It will also create a json file for
-		said new fieldmap and add the 'IntendedFor' field.
-		Next will attempt to match fmap and main dwi runs together by acquisition group, exit if unable to. It will then
+		First, this function will attempt to match fmap and main dwi runs together by acquisition group, exit if unable to. It will then
 		add the necessary 'IntendedFor' field to the json of the supplied fmap
+		Next, this function will create a fieldmap file from each "main" dwi scan. It will also create a json file for
+		said new fieldmap and add the 'IntendedFor' field.
 		"""
-
-		for dwi_file in dwi_files:
-			dwi_basename = os.path.basename(dwi_file)
-
-			self.extract_vols(dwi_file, dwi_basename)
-
-		sys.exit()
-
 
 		dwi_acq_groups, fmap_acq_groups = self.acquistion_group_match(all_nii_files)
 
@@ -287,6 +279,13 @@ class Task(tasks.BaseTask):
 						json_file = fmap_key.replace('.nii', '.json')
 					new_dwi_key = os.path.basename(dwi_key)
 					self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{new_dwi_key}', json_file)
+
+		for dwi_file in dwi_files:
+			dwi_basename = os.path.basename(dwi_file)
+
+			self.extract_vols(dwi_file, dwi_basename)
+
+		sys.exit()
 
 	def even_main_and_fmaps(self, all_nii_files):
 		pass
@@ -334,6 +333,10 @@ class Task(tasks.BaseTask):
 
 
 		shutil.copy(dwi_json_file_path, fmap_json_file_path)
+
+		## Add IntendedFor to the new json files
+
+		self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{dwi_basename}', fmap_json_file_path)
 
 
 	def insert_json_value(self, key, value, json_file):
