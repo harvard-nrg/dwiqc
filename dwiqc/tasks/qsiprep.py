@@ -288,7 +288,14 @@ class Task(tasks.BaseTask):
 		sys.exit()
 
 	def even_main_and_fmaps(self, all_nii_files):
+		"""
+		If there are two fieldmaps for even main dwi scan, then there just needs to be IntendedFor added to each fmap json file
+		This method may not be completely necessary...
+		"""
+
 		pass
+
+
 
 	def extract_vols(self, dwi_full_path, dwi_basename):
 
