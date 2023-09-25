@@ -259,7 +259,7 @@ class Task(tasks.BaseTask):
 		"""
 		dwi_acq_groups, fmap_acq_groups = self.acquistion_group_match(all_nii_files)
 
-		if not dwi_acqusition_groups or not fmap_acquisition_groups:
+		if not dwi_acq_groups or not fmap_acq_groups:
 			raise DWISpecError('Uneven number of fieldmaps and main scans and no acqusition group specified. Please add to BIDS file names and retry. Exiting')
 
 
