@@ -285,7 +285,6 @@ class Task(tasks.BaseTask):
 
 			self.extract_vols(dwi_file, dwi_basename)
 
-		sys.exit()
 
 	def even_main_and_fmaps(self, all_nii_files):
 		"""
