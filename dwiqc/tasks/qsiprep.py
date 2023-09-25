@@ -359,6 +359,20 @@ class Task(tasks.BaseTask):
 
 			return dwi_run_numbers, fmap_run_numbers
 
+	def match(self, pattern, text):
+		"""
+		Check if a particular pattern exists inside given text using regex
+		"""
+
+		match = re.search(pattern, text)
+
+		if match:
+			result = match.group(1)
+			return result
+
+		else:
+			return None
+
 	# create qsiprep command to be executed
 
 	def build(self):
