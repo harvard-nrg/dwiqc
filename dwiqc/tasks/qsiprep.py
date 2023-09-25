@@ -20,6 +20,7 @@ import re
 
 home_dir = os.path.expanduser("~")
 qsiprep_sif = os.path.join(home_dir, '.config/dwiqc/containers/qsiprep.sif')
+fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
 
 
 logger = logging.getLogger(__name__)
@@ -246,17 +247,28 @@ class Task(tasks.BaseTask):
 
 		if len(dwi_files)*2 != len(fmap_files):
 
-			self.uneven_main_and_fmaps(all_nii_files)
+			self.uneven_main_and_fmaps(all_nii_files, dwi_files)
 
 		else:
 
 			self.even_main_and_fmaps(all_nii_files)
 
-	def uneven_main_and_fmaps(self, all_nii_files):
+	def uneven_main_and_fmaps(self, all_nii_files, dwi_files):
 		"""
-		This function will attempt to match fmap and main dwi runs together first by acquisition group, then by run number.
-		If it is unable to match, it will exit. Otherwise, fieldmaps will be created using the select_dwi_vols FSL command. 
+		First, this function will create a fieldmap file from each "main" dwi scan. It will also create a json file for
+		said new fieldmap and add the 'IntendedFor' field.
+		Next will attempt to match fmap and main dwi runs together by acquisition group, exit if unable to. It will then
+		add the necessary 'IntendedFor' field to the json of the supplied fmap
 		"""
+
+		for dwi_file in dwi_files:
+			dwi_basename = os.path.basename(dwi_file)
+
+			self.extract_vols(dwi_file, dwi_basename)
+
+		sys.exit()
+
+
 		dwi_acq_groups, fmap_acq_groups = self.acquistion_group_match(all_nii_files)
 
 		if not dwi_acq_groups or not fmap_acq_groups:
@@ -268,9 +280,6 @@ class Task(tasks.BaseTask):
 		for fmap_key, fmap_value in fmap_acq_groups.items():
 			for dwi_key, dwi_value in dwi_acq_groups.items():
 				if fmap_value == dwi_value:
-					print(f'DWI: {dwi_key}')
-					print(f'FMAP: {fmap_key}')
-					sys.exit()
 					try:
 						json_file = fmap_key.replace('.nii.gz', '.json')
 					except FileNotFoundError:
@@ -281,8 +290,31 @@ class Task(tasks.BaseTask):
 	def even_main_and_fmaps(self, all_nii_files):
 		pass
 
-	def extract_vols(self):
-		pass
+	def extract_vols(self, dwi_full_path, dwi_basename):
+
+		# provide path to bval file
+
+		try:
+			bval = dwi_full_path.replace('.nii.gz', '.bval')
+		except FileNotFoundError:
+			bval = dwi_full_path.replace('.nii', '.bval')
+
+		# provide name of output file
+
+		epi_output = dwi_full_path.replace('_dwi.', '_epi.')
+		
+		extract_command = f""" singularity exec \
+		{fsl_sif}
+		/APPS/fsl/bin/select_dwi_vols \
+		{dwi_full_path} \
+		{bval} \
+		{epi_output} \
+		0
+		"""
+
+		proc1 = subprocess.Popen(extract_command, shell=True, stdout=subprocess.PIPE)
+		proc1.communicate()
+
 
 	def insert_json_value(self, key, value, json_file):
 		"""
