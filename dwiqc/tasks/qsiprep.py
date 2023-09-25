@@ -242,12 +242,6 @@ class Task(tasks.BaseTask):
 
 		all_nii_files = dwi_files + fmap_files
 
-		pprint(f'DWI: {dwi_files}')
-
-		pprint(f'FMAP: {fmap_files}')
-
-		sys.exit()
-
 		if len(dwi_files) != len(fmap_files):
 
 			self.uneven_main_and_fmaps(all_nii_files)
@@ -257,13 +251,64 @@ class Task(tasks.BaseTask):
 			self.even_main_and_fmaps(all_nii_files)
 
 	def uneven_main_and_fmaps(self, all_nii_files):
-		pass
+		"""
+		This function will attempt to match fmap and main dwi runs together first by acquisition group, then by run number.
+		If it is unable to match, it will exit. Otherwise, fieldmaps will be created using the select_dwi_vols FSL command. 
+		"""
+		dwi_acq_groups, fmap_acq_groups = self.acquistion_group_match(all_nii_files)
+
+		if not dwi_acqusition_groups or not fmap_acquisition_groups:
+			raise DWISpecError('Uneven number of fieldmaps and main scans and no acqusition group specified. Please add to BIDS file names and retry. Exiting')
+
+
+		print(dwi_acq_groups, fmap_acq_groups)
+
+		sys.exit()
+
+
+		## interate through all the fmap and dwi key-value pairs. if the values equal each other, insert into the fmap json file
+		# and IntendedFor field that points to the matched dwi scan
+
+		for fmap_key, fmap_value in fmap_acquisition_groups.items():
+			for dwi_key, dwi_value in dwi_acqusition_groups.items():
+				if fmap_value == dwi_value:
+					try:
+						json_file = fmap_key.replace('.nii.gz', '.json')
+					except FileNotFoundError:
+						json_file = fmap_key.replace('.nii', '.json')
+					new_dwi_key = os.path.basename(dwi_key)
+					self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{new_dwi_key}', json_file)
 
 	def even_main_and_fmaps(self, all_nii_files):
 		pass
 
 	def extract_vols(self):
 		pass
+
+	def insert_json_value(self, key, value, json_file):
+		"""
+		This helper method will load in the given json file and check if the given key already exists.
+		If it does but it's not a list, it will be made into a list. 
+		The new value will be appended to the value list
+		If it doesn't exist, it will be added to the json file as a key-value pair
+		re-open the json file and write new contents
+		"""
+		with open(json_file, 'r') as f:
+			data = json.load(f)
+
+		if key in data:
+			if not isinstance(data[key], list):
+				data[key] = [data[key]]
+
+			if value not in data[key]:
+				data[key].append(value)
+
+
+		else:
+			data[key] = [value]
+		
+		with open(json_file, 'w') as file:
+			json.dump(data, file, indent=2)
 
 	def acquistion_group_match(self, all_nii_files):
 		"""
@@ -380,6 +425,7 @@ class Task(tasks.BaseTask):
 				error=logfile
 			)
 
-
+class DWISpecError(Exception):
+	pass
 
 
