@@ -1,7 +1,6 @@
 qsiprep:
   shell:
     - '--separate-all-dwis'
-    - '--recon-spec'
     - '--notrack'
     - '--n_cpus'
     - '2'
