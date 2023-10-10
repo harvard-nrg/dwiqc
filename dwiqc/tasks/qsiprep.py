@@ -14,9 +14,14 @@ import shutil
 from executors.models import Job
 import dwiqc.config as config
 import numpy as np
+from pprint import pprint
+import re
+import shutil
+
 
 home_dir = os.path.expanduser("~")
 qsiprep_sif = os.path.join(home_dir, '.config/dwiqc/containers/qsiprep.sif')
+fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
 
 
 logger = logging.getLogger(__name__)
@@ -80,21 +85,24 @@ class Task(tasks.BaseTask):
 
 		[monitoring]"""
 
+
+		os.makedirs(f"{home_dir}/.nipype", exist_ok=True)
+
 		with open(f"{home_dir}/.nipype/nipype.cfg", "w") as file:
 			file.write(nipype)
 
 
 	def create_spec(self):
-		dwi_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz')
+		dwi_file = self._layout.get(subject=self._sub, session=self._ses, suffix='dwi', extension='.nii.gz')
 		#dwi_file = layout.get()[10]
 		if len(dwi_file) > 1:
-			raise DWISpecError('Found more than one dwi file. Please verify there are no duplicates.')
+			logger.warning('QSIPREP_WARNING: More than one main DWI scan detected. Ensure scans were acquired using the same parameters.')
 		if not dwi_file:
-			raise DWISpecError(f'No dwi scan found for subject {self._sub} session {self._ses} run {self._run}')
+			raise DWISpecError(f'No dwi scan found for subject {self._sub} session {self._ses}')
 		else:
 			dwi_file = dwi_file.pop()
 
-		json_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.json', return_type='filename').pop()
+		json_file = self._layout.get(subject=self._sub, session=self._ses, suffix='dwi', extension='.json', return_type='filename').pop()
 
 		# Grab the slice timing info
 		slice_timing = dwi_file.get_metadata()['SliceTiming']
@@ -225,12 +233,213 @@ class Task(tasks.BaseTask):
 		else:
 			print('Custom eddy_params file being fed in by user.')
 
+	def check_fieldmaps(self):
+		"""
+		This method checks if there are dedicated fieldmaps for each "main" diffusion scan. If not, it will extract volumes from each main scan
+		and place them into the fmap directory. Then an "IntendedFor" key-value pair will be added into the json file of the newly created fmap file
+		(and any fmap files that already existed)
+		"""
+
+		dwi_files = self._layout.get(subject=self._sub, session=self._ses, suffix='dwi', extension='.nii.gz', return_type='filename')
+
+		fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')
+
+		all_nii_files = dwi_files + fmap_files
+
+		if len(dwi_files)*2 != len(fmap_files):
+
+			self.uneven_main_and_fmaps(all_nii_files, dwi_files)
+
+		else:
+
+			self.even_main_and_fmaps(all_nii_files)
+
+	def uneven_main_and_fmaps(self, all_nii_files, dwi_files):
+		"""
+		First, this function will attempt to match fmap and main dwi runs together by acquisition group, exit if unable to. It will then
+		add the necessary 'IntendedFor' field to the json of the supplied fmap
+		Next, this function will create a fieldmap file from each "main" dwi scan. It will also create a json file for
+		said new fieldmap and add the 'IntendedFor' field.
+		"""
+
+		dwi_acq_groups, fmap_acq_groups = self.acquistion_group_match(all_nii_files)
+
+		if not dwi_acq_groups or not fmap_acq_groups:
+			raise DWISpecError('Uneven number of fieldmaps and main scans and no acqusition group specified. Please add to BIDS file names and retry. Exiting')
+
+		## interate through all the fmap and dwi key-value pairs. if the values equal each other, insert into the fmap json file
+		# and IntendedFor field that points to the matched dwi scan
+
+		for fmap_key, fmap_value in fmap_acq_groups.items():
+			for dwi_key, dwi_value in dwi_acq_groups.items():
+				if fmap_value == dwi_value:
+					try:
+						json_file = fmap_key.replace('.nii.gz', '.json')
+					except FileNotFoundError:
+						json_file = fmap_key.replace('.nii', '.json')
+					new_dwi_key = os.path.basename(dwi_key)
+					self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{new_dwi_key}', json_file)
+
+		for dwi_file in dwi_files:
+			dwi_basename = os.path.basename(dwi_file)
+
+			self.extract_vols(dwi_file, dwi_basename)
+
+
+	def even_main_and_fmaps(self, all_nii_files):
+		"""
+		If there are two fieldmaps for even main dwi scan, then there just needs to be IntendedFor added to each fmap json file
+		This method may not be completely necessary...
+		"""
+
+		pass
+
+
+
+	def extract_vols(self, dwi_full_path, dwi_basename):
+
+		# provide path to bval file
+
+		try:
+			bval = dwi_full_path.replace('.nii.gz', '.bval')
+		except FileNotFoundError:
+			bval = dwi_full_path.replace('.nii', '.bval')
+
+		# provide name of output file
+
+		epi_output = dwi_full_path.replace('_dwi.', '_epi.')
+
+		epi_output_path = epi_output.replace('/dwi/', '/fmap/')
+		
+		extract_command = f""" singularity exec \
+		{fsl_sif} \
+		/APPS/fsl/bin/select_dwi_vols \
+		{dwi_full_path} \
+		{bval} \
+		{epi_output_path} \
+		0
+		"""
+
+		proc1 = subprocess.Popen(extract_command, shell=True, stdout=subprocess.PIPE)
+		proc1.communicate()
+
+		# create an output file path for the new fmap's json file
+
+		try:
+			fmap_json_file_path = epi_output_path.replace('.nii.gz', '.json')
+		except FileNotFoundError:
+			fmap_json_file_path = epi_output_path.replace('.nii', '.json')
+
+		# find the main dwi json file that needs to be copied
+
+		try:
+			dwi_json_file_path = dwi_full_path.replace('.nii.gz', '.json')
+		except FileNotFoundError:
+			dwi_json_file_path = dwi_full_path.replace('.nii', '.json')
+
+
+		shutil.copy(dwi_json_file_path, fmap_json_file_path)
+
+		## Add IntendedFor to the new json files
+
+		self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{dwi_basename}', fmap_json_file_path)
+
+
+	def insert_json_value(self, key, value, json_file):
+		"""
+		This helper method will load in the given json file and check if the given key already exists.
+		If it does but it's not a list, it will be made into a list. 
+		The new value will be appended to the value list
+		If it doesn't exist, it will be added to the json file as a key-value pair
+		re-open the json file and write new contents
+		"""
+		with open(json_file, 'r') as f:
+			data = json.load(f)
+
+		if key in data:
+			if not isinstance(data[key], list):
+				data[key] = [data[key]]
+
+			if value not in data[key]:
+				data[key].append(value)
+
+
+		else:
+			data[key] = [value]
+		
+		with open(json_file, 'w') as file:
+			json.dump(data, file, indent=2)
+
+	def acquistion_group_match(self, all_nii_files):
+		"""
+		This helper method exists to match a given list of nii files (dwi and fmap scans) to each other based on acquisition group
+		"""
+		dwi_acqusition_groups = {}
+
+		fmap_acquisition_groups = {}
+
+		for scan in all_nii_files:
+
+			no_path_name = os.path.basename(scan)
+
+			pattern = r'acq-(.*?)_'
+
+			acq_value = self.match(pattern, no_path_name)
+
+			if acq_value:
+				if 'dwi.nii' in no_path_name:
+					dwi_acqusition_groups[scan] = acq_value
+				elif 'epi.nii' in no_path_name:
+					fmap_acquisition_groups[scan] = acq_value
+
+		return dwi_acqusition_groups, fmap_acquisition_groups
+
+	def run_number_match(self, all_nii_files):
+		"""
+		This method will attempt to match fmap and dwi scans based on their run number
+		"""
+
+		dwi_run_numbers = {}
+
+		fmap_run_numbers = {}
+
+		for scan in all_nii_files:
+
+			no_path_name = os.path.basename(scan)
+
+			pattern = r'run-(.*?)_'
+
+			run_number = self.match(pattern, no_path_name)
+
+			if run_number:
+				if 'dwi.nii' in no_path_name:
+					dwi_run_numbers[scan] = run_number
+				elif 'epi.nii' in no_path_name:
+					fmap_run_numbers[scan] = run_number
+
+			return dwi_run_numbers, fmap_run_numbers
+
+	def match(self, pattern, text):
+		"""
+		Check if a particular pattern exists inside given text using regex
+		"""
+
+		match = re.search(pattern, text)
+
+		if match:
+			result = match.group(1)
+			return result
+
+		else:
+			return None
+
 	# create qsiprep command to be executed
 
 	def build(self):
 		self.create_eddy_params()
 		self.create_nipype()
 		self.check_output_resolution()
+		self.check_fieldmaps()
 		try:
 			qsiprep_command = yaml.safe_load(open(self._qsiprep_config))
 		except yaml.parser.ParserError:
@@ -290,6 +499,7 @@ class Task(tasks.BaseTask):
 				error=logfile
 			)
 
-
+class DWISpecError(Exception):
+	pass
 
 
