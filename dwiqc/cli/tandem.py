@@ -41,9 +41,13 @@ def do(args):
         with open(tagger_conf) as fo:
             filters = yaml.load(fo, Loader=yaml.SafeLoader)
 
-        tagger = Tagger(args.xnat_alias, filters, 'dwi', args.label)
-        tagger.generate_updates()
-        tagger.apply_updates()
+        tagger_dwi = Tagger(args.xnat_alias, filters, 'dwi', args.label)
+        tagger_dwi.generate_updates()
+        tagger_dwi.apply_updates()
+
+        tagger_t1 = Tagger(args.xnat_alias, filters, 't1', args.label)
+        tagger_t1.generate_updates()
+        tagger_t1.apply_updates()        
 
     logger.info('downloading data from xnat...')
 
