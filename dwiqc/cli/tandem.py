@@ -27,11 +27,14 @@ def do(args):
 
 
     
-    tagger_conf = config.default()
+    if not args.tagger_config:
+        tagger_conf = config.default()
+    else:
+        tagger_conf = args.tagger_config
 
     # call and run xnattagger on the diffusion data
 
-    if not args.no_tagger:
+    if args.run_tagger:
 
         logger.info("running xnattagger...")
 
