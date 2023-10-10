@@ -64,6 +64,8 @@ def do(args):
     logger.info('downloading the following scans:')
     logger.info(json.dumps(scans, indent=2))
 
+    subject_label = scan['subject_label']
+
 
     # iterate over the scans dictionary, search for the scans with the correct note/tag
 
@@ -97,7 +99,7 @@ def run_xnattagger(args):
     tagger_dwi = Tagger(args.xnat_alias, filters, 'dwi', args.label)
     tagger_dwi.generate_updates()
     tagger_dwi.apply_updates()
-    
+
     tagger_t1 = Tagger(args.xnat_alias, filters, 't1', args.label)
     tagger_t1.generate_updates()
     tagger_t1.apply_updates()
