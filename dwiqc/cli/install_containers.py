@@ -33,6 +33,8 @@ fsl_link = 'https://www.dropbox.com/scl/fi/qboi0izu211j8fd5ffyym/fsl_6.0.4.sif?r
 
 qsiprep_link = 'https://www.dropbox.com/scl/fi/s8asxwmykyw7paqdcnaev/qsiprep.sif?rlkey=lnuffrzn9mf894q6j9tl2l2mc&dl=1'
 
+containers = ['chromium.sif','prequal_nrg.sif', 'qsiprep.sif', 'fsl_6.0.4.sif']
+
 
 
 home_dir = os.path.expanduser("~")
@@ -168,10 +170,13 @@ def create_symlinks(source):
 
 	os.chdir(source)
 	for file in os.listdir(source):
-		abs_path = os.path.abspath(file)
-		try:
-			os.symlink(abs_path, f"{symlink_location}{file}")
-		except FileExistsError:
+		if file in containers:
+			abs_path = os.path.abspath(file)
+			try:
+				os.symlink(abs_path, f"{symlink_location}{file}")
+			except FileExistsError:
+				continue
+		else:
 			continue
 
 	
