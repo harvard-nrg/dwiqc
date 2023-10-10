@@ -108,7 +108,7 @@ def main():
         help='XNAT MR Session name')
     parser_tandem.add_argument('--project',
         help='XNAT Project name')
-    parser_tandem.add_argument('--xnat-config', default=config.xnat_download(),
+    parser_tandem.add_argument('--download-config', required=True,
         help='dwiqc XNAT configuration file')
     parser_tandem.add_argument('--bids-dir', required=True,
         help='Output BIDS directory')
