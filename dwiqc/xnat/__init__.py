@@ -31,8 +31,10 @@ class Report:
             'prequal': None,
             'qsiprep': None,
         }
+
+        # build path to output directories
         for task in self.dirs.keys():
-            d = os.path.join(
+            dirname = os.path.join(
                 self.bids,
                 'derivatives',
                 'dwiqc-' + task,
@@ -48,9 +50,12 @@ class Report:
 
             self.basename = self.strip_extension(json_file)
 
-            dirname = os.path.join(d, self.basename)
+            #dirname = os.path.join(d, self.basename)
             if os.path.exists(dirname):
                 self.dirs[task] = dirname
+            else:
+                raise AssessmentError('Output structure does not match default DWIQC structure.\nShould be: derivatives/dwiqc-`task`/sub-`SUB`/ses-`SES')
+
         logger.debug('prequal dir: %s', self.dirs['prequal'])
         logger.debug('qsiprep dir: %s', self.dirs['qsiprep'])
 
@@ -161,44 +166,38 @@ class Report:
             {
                 'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub + '-imbedded_images.html'),
                 'dest': os.path.join('qsiprep-html', '{0}_qsiprep.html'.format(aid))
-            },
-            {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_carpetplot.svg'),
-                'dest': os.path.join('carpet-plot', '{0}_carpetplot.svg'.format(aid))
-            },
-            {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_t1_2_mni.svg'),
-                'dest': os.path.join('t1-registration', '{0}_t1_registration.svg'.format(aid))
-            },
-            {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_seg_brainmask.svg'),
-                'dest': os.path.join('seg-brainmask', '{0}_seg_brainmask.svg'.format(aid))
-            },
-            {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_dwi_denoise_ses_' + self.ses + '_run_' + str(self.run) + '_dwi_wf_denoising.svg'),
-                'dest': os.path.join('denoise', '{0}_denoise.svg'.format(aid))
-            },
-            {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_final_denoise_wf_biascorr.svg'),
-                'dest': os.path.join('bias-corr', '{0}_bias_correction.svg'.format(aid))
-            },
-            {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_desc-resampled_b0ref.svg'),
-                'dest': os.path.join('b0-ref', '{0}_b0_reference.svg'.format(aid))
-            },
-            {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_sampling_scheme.gif'),
-                'dest': os.path.join('sampling-scheme', '{0}_sampling_scheme.gif'.format(aid))
-            },
-            {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_desc-sdc_b0.svg'),
-                'dest': os.path.join('distortion', '{0}_distortion.svg'.format(aid))
-            },
-            {
-                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep',  self.sub, 'figures', self.sub + '_ses-' + self.ses + '_run-' + str(self.run) + '_coreg.svg'),
-                'dest': os.path.join('coreg', '{0}_coreg.svg'.format(aid))
             }
         ]
+
+        file_endings = {
+            '_carpetplot.svg': 'carpet-plot',
+            '_t1_2_mni.svg': 't1-registration',
+            '_seg_brainmask.svg': 'seg-brainmask',
+            '_dwi_wf_denoising.svg': 'denoise',
+            '_final_denoise_wf_biascorr.svg': 'bias-corr',
+            '_desc-resampled_b0ref.svg': 'b0-ref',
+            '_sampling_scheme.gif': 'sampling-scheme',
+            '_desc-sdc_b0.svg': 'distortion',
+            '_coreg.svg': 'coreg'
+        }
+
+        qsiprep_source_dir = os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep', self.sub, 'figures')
+
+        resources_dir = os.path.join(output, 'resources')
+        os.makedirs(resources_dir, exist_ok=True)
+
+        for ending, dirname in file_endings.items():
+            matches = []
+            for file in os.listdir(qsiprep_source_dir):
+                if file.endswith(ending):
+                    matches.append(file)
+
+            os.makedirs(f'{resources_dir}/{dirname}', exist_ok=True)
+
+            for match in matches:
+                shutil.copy(f'{qsiprep_source_dir}/{match}', f'{resources_dir}/{dirname}')
+
+
 
         # get all the b-shell values from eddy-quad
         shells = list()
