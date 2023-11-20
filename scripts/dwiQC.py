@@ -73,7 +73,7 @@ def main():
     parser_process.add_argument('--bids-dir', required=True,
         help='BIDS root directory')
     parser_process.add_argument('--output-resolution-process',
-        help='Resolution of output data. Defaut is resolution of input data.')
+        help='Resolution of output data. Default is resolution of input data.')
     parser_process.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
     parser_process.add_argument('--prequal-config', default=config.prequal_command(),
@@ -115,7 +115,7 @@ def main():
     parser_tandem.add_argument('--run', default=1, type=int,
         help='BIDS run')
     parser_process.add_argument('--output-resolution',
-        help='Resolution of output data. Defaut is resolution of input data.')
+        help='Resolution of output data. Default is resolution of input data.')
     parser_tandem.add_argument('--partition', required=True,
         help='Job scheduler partition')
     parser_tandem.add_argument('--scheduler', default=None,
