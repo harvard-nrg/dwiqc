@@ -11,19 +11,31 @@ from executors.models import Job
 
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, parent=None, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, container_dir=None, parent=None, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
+		self._container_dir = container_dir
 		super().__init__(outdir, tempdir, pipenv)
 
 
 	def build(self):
 
-		home_dir = os.path.expanduser("~")
 
-		fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
+		if self._container_dir:
+			try:
+
+				fsl_sif = f'{self._container_dir}/fsl_6.0.4.sif'
+			except FileNotFoundError:
+				logger.error(f'{self._container_dir}/fsl_6.0.4.sif does not exist. Verify the path and file name.')
+				sys.exit(1)
+
+		else:
+
+			home_dir = os.path.expanduser("~")
+
+			fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
 
 		os.chdir(f"{self._outdir}/EDDY")
 

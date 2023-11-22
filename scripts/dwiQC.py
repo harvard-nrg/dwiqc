@@ -100,6 +100,8 @@ def main():
         help='Feed in path to customized eddy parameters file for qsiprep.')
     parser_process.add_argument('--xnat-upload', action='store_true',
         help='Upload results to XNAT over REST API')
+    parser_process.add_argument('--container-dir',
+        help='Pass path to downloaded DWIQC containers')
     parser_process.set_defaults(func=cli.process.do)
 
     # tandem mode
@@ -152,6 +154,8 @@ def main():
         help='Feed in path to customized eddy parameters file for qsiprep.')
     parser_tandem.add_argument('--xnat-upload', action='store_true',
         help='Upload results to XNAT over REST API')
+    parser_tandem.add_argument('--container-dir',
+        help='Pass path to downloaded DWIQC containers')  
     parser_tandem.set_defaults(func=cli.tandem.do)
     args = parser.parse_args()
 

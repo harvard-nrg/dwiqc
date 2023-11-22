@@ -19,28 +19,42 @@ import re
 import shutil
 
 
-home_dir = os.path.expanduser("~")
-qsiprep_sif = os.path.join(home_dir, '.config/dwiqc/containers/qsiprep.sif')
-fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
-
-
 logger = logging.getLogger(__name__)
 
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config, fs_license, custom_eddy=False, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config, fs_license, container_dir=None, custom_eddy=False, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
 		self._qsiprep_config = qsiprep_config
 		self._fs_license = fs_license
+		self._container_dir = container_dir
 		self._custom_eddy = custom_eddy
 		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
 		self._output_resolution = output_resolution
 		super().__init__(outdir, tempdir, pipenv)
 
+
+	def check_container_path(self):
+		if self._container_dir:
+			try:
+				self._qsiprep_sif = f'{self._container_dir}/qsiprep.sif'
+			except FileNotFoundError:
+				logger.error(f'{self._container_dir}/qsiprep.sif does not exist. Verify the path and file name.')
+				sys.exit(1)
+			try:
+				self._fsl_sif = f'{self._container_dir}/fsl_6.0.4.sif'
+			except FileNotFoundError:
+				logger.error(f'{self._container_dir}/fsl_6.0.4.sif does not exist. Verify the path and file name.')
+				sys.exit(1)
+
+		else:
+			home_dir = os.path.expanduser("~")
+			self._qsiprep_sif = os.path.join(home_dir, '.config/dwiqc/containers/qsiprep.sif')
+			self._fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
 
 
 	def calc_mporder(self):
@@ -312,7 +326,7 @@ class Task(tasks.BaseTask):
 		epi_output_path = epi_output.replace('/dwi/', '/fmap/')
 		
 		extract_command = f""" singularity exec \
-		{fsl_sif} \
+		{self._fsl_sif} \
 		/APPS/fsl/bin/select_dwi_vols \
 		{dwi_full_path} \
 		{bval} \
@@ -436,6 +450,7 @@ class Task(tasks.BaseTask):
 	# create qsiprep command to be executed
 
 	def build(self):
+		self.check_container_path()
 		self.create_eddy_params()
 		self.create_nipype()
 		self.check_output_resolution()
@@ -454,7 +469,7 @@ class Task(tasks.BaseTask):
 			'singularity',
 			'run',
 			'--nv',
-			qsiprep_sif,			
+			self._qsiprep_sif,			
 			self._bids,
 			self._outdir,
 			'participant',

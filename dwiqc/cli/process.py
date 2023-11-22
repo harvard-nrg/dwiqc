@@ -80,6 +80,7 @@ def do(args):
             bids=args.bids_dir,
             outdir=prequal_outdir,
             fs_license = args.fs_license,
+            container_dir = args.container_dir,
             prequal_config=args.prequal_config,
             no_gpu=args.no_gpu,
             tempdir=tempfile.gettempdir(),
@@ -103,6 +104,7 @@ def do(args):
             outdir=qsiprep_outdir,
             qsiprep_config=args.qsiprep_config,
             fs_license=args.fs_license,
+            container_dir = args.container_dir,
             custom_eddy=args.custom_eddy,
             no_gpu=args.no_gpu,
             tempdir=tempfile.gettempdir(),
@@ -168,6 +170,7 @@ def prequal_eddy(args, prequal_outdir):
             run=args.run,
             bids=args.bids_dir,
             outdir=prequal_outdir,
+            container_dir = args.container_dir,
             tempdir=tempfile.gettempdir(),
         )
 

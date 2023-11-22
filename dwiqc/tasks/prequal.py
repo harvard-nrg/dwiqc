@@ -24,13 +24,14 @@ logger = logging.getLogger(__name__)
 # pull in some parameters from the BaseTask class in the __init__.py directory
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, prequal_config, fs_license, no_gpu=False, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, prequal_config, fs_license, container_dir=None, no_gpu=False, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
 		self._prequal_config = prequal_config
 		self._fs_license = fs_license
+		self._container_dir = container_dir
 		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
 		super().__init__(outdir, tempdir, pipenv)
@@ -541,8 +542,15 @@ class Task(tasks.BaseTask):
 		inputs_dir = f'{self._tempdir}/INPUTS/'
 		self.copy_inputs(inputs_dir)
 		mporder = self.calc_mporder()
-		home_dir = os.path.expanduser("~")
-		prequal_sif = os.path.join(home_dir, '.config/dwiqc/containers/prequal_nrg.sif')
+		if self._container_dir:
+			try:
+				prequal_sif = f'{self._container_dir}/prequal_nrg.sif'
+			except FileNotFoundError:
+				logger.error(f'{self._container_dir}/prequal_nrg.sif does not exist. Verify the path and file name.')
+				sys.exit(1)
+		else:
+			home_dir = os.path.expanduser("~")
+			prequal_sif = os.path.join(home_dir, '.config/dwiqc/containers/prequal_nrg.sif')
 		try:
 			prequal_command = yaml.safe_load(open(self._prequal_config))
 		except yaml.parser.ParserError:
