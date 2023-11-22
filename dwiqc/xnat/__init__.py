@@ -190,12 +190,15 @@ class Report:
             matches = []
             for file in os.listdir(qsiprep_source_dir):
                 if file.endswith(ending):
-                    matches.append(file)
+                    if file not in matches:
+                        matches.append(file)
+                    else:
+                        continue
 
             os.makedirs(f'{resources_dir}/{dirname}', exist_ok=True)
 
             for match in matches:
-                shutil.copy(f'{qsiprep_source_dir}/{match}', f'{resources_dir}/{dirname}')
+                shutil.copy(f'{qsiprep_source_dir}/{match}', f'{resources_dir}/{dirname}/{aid}{ending}')
 
 
 
