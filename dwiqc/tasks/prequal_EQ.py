@@ -61,6 +61,7 @@ class Task(tasks.BaseTask):
 
 
 		eddy_quad = f"""singularity exec \
+		--pwd {self._outdir}/EDDY \
 		{fsl_sif} \
 		/APPS/fsl/bin/eddy_quad \
 		{self._sub}_{self._ses} \
