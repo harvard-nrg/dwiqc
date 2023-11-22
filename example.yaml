@@ -30,7 +30,7 @@ dwiqc:
     tag:
       - .*(^|\s)#dwi_revpol_a(?P<run>_\d+)?(\s|$).*
     bids_subdir:
-      - dwi
+      - fmap
     direction:
       - PA
     acquisition_group:
@@ -39,7 +39,7 @@ dwiqc:
     tag:
       - .*(^|\s)#dwi_revpol_b(?P<run>_\d+)?(\s|$).*
     bids_subdir:
-      - dwi
+      - fmap
     direction:
       - PA
     acquisition_group:
@@ -48,7 +48,7 @@ dwiqc:
     tag:
       - .*(^|\s)#dwi_revpol_c(?P<run>_\d+)?(\s|$).*
     bids_subdir:
-      - dwi
+      - fmap
     direction:
       - AP
     acquisition_group:
