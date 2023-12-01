@@ -25,7 +25,6 @@ class Task(tasks.BaseTask):
 
 		if self._container_dir:
 			try:
-
 				fsl_sif = f'{self._container_dir}/fsl_6.0.4.sif'
 			except FileNotFoundError:
 				logger.error(f'{self._container_dir}/fsl_6.0.4.sif does not exist. Verify the path and file name.')
