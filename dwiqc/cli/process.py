@@ -67,9 +67,6 @@ def do(args):
 
     os.system('mkdir -p $TMPDIR')
 
-    bind_environmentals()
-
-
     # prequal job
     prequal_outdir = None
     if 'prequal' in args.sub_tasks:
