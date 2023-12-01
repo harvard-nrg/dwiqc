@@ -22,6 +22,8 @@ class Task(tasks.BaseTask):
 
 	def build(self):
 
+		self.bind_environmentals()
+
 
 		if self._container_dir:
 			try:
@@ -179,5 +181,10 @@ class Task(tasks.BaseTask):
 		proc1 = subprocess.Popen(extract_command, shell=True, stdout=subprocess.PIPE)
 		proc1.communicate()
 
+	def bind_environmentals(self):
+	
+		bind = [self._outdir, self._tempdir, self._fs_license]
+		
+		os.environ["SINGULARITY_BIND"] = ','.join(bind)
 
 

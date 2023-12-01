@@ -447,9 +447,16 @@ class Task(tasks.BaseTask):
 		else:
 			return None
 
+	def bind_environmentals(self):
+	
+		bind = [self._outdir, self._tempdir, self._fs_license]
+		
+		os.environ["SINGULARITY_BIND"] = ','.join(bind)
+
 	# create qsiprep command to be executed
 
 	def build(self):
+		self.bind_environmentals()
 		self.check_container_path()
 		self.create_eddy_params()
 		self.create_nipype()
