@@ -82,6 +82,8 @@ class Task(tasks.BaseTask):
 
 	def check_output_resolution(self):
 		if not self._output_resolution:
+			print(self._sub, self._ses, self._run)
+			sys.exit()
 			t1_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='T1w', extension='.nii.gz', return_type='filename').pop()
 
 			self._output_resolution = str(nib.load(t1_file).header['pixdim'][1])
