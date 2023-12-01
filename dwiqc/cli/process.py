@@ -191,10 +191,6 @@ def qsiprep_eddy(args, qsiprep_outdir):
 
         eq_task.build()
 
-def bind_environmentals():
-    
-    bind = [self._outdir, self._tempdir, self._fs_license]
-    os.environ["SINGULARITY_BIND"] = ','.join(bind)
 
 def copy_qsiprep_output(args, qsiprep_outdir):
     final_qsiprep_outdir = os.path.join(args.bids_dir, 'derivatives', 'dwiqc-qsiprep', f'sub-{args.sub}', f'ses-{args.ses}', basename, 'qsiprep_output')
