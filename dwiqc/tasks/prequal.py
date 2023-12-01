@@ -537,6 +537,7 @@ class Task(tasks.BaseTask):
 	# build the prequal sbatch command and create job
 
 	def build(self):
+		self.bind_environmentals()
 		self.add_intended_for()
 		self._tempdir = tempfile.gettempdir()
 		inputs_dir = f'{self._tempdir}/INPUTS/'
