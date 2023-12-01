@@ -99,6 +99,7 @@ class Task(tasks.BaseTask):
 
 		[monitoring]"""
 
+		home_dir = os.path.expanduser("~")
 
 		os.makedirs(f"{home_dir}/.nipype", exist_ok=True)
 
