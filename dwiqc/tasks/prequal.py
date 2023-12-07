@@ -64,9 +64,6 @@ class Task(tasks.BaseTask):
 		if not fmap_files:
 			self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii', return_type='filename')
 
-		print(fmap_files)
-		sys.exit()
-
 		# get the basename of the file and then remove the extension
 		for fmap in fmap_files:
 
@@ -75,8 +72,10 @@ class Task(tasks.BaseTask):
 			no_ext = basename.split('.', 1)[0]
 
 			# get the number of volumes in the data file
-
-			num_vols = nib.load(fmap).shape[3]
+			try:
+				num_vols = nib.load(fmap).shape[3]
+			except IndexError:
+				num_vols = 1
 
 			# create a .bval file same number of rows of 0 as there are volumes
 
