@@ -64,6 +64,9 @@ class Task(tasks.BaseTask):
 		if not fmap_files:
 			self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii', return_type='filename')
 
+		print(fmap_files)
+		sys.exit()
+
 		# get the basename of the file and then remove the extension
 		for fmap in fmap_files:
 
