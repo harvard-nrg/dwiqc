@@ -315,6 +315,9 @@ class Task(tasks.BaseTask):
 
 		# provide path to bval file
 
+		print(f'dwi_full_path: {dwi_full_path}')
+		print(f'dwi_basename: {dwi_basename}')
+
 		try:
 			bval = dwi_full_path.replace('.nii.gz', '.bval')
 		except FileNotFoundError:
@@ -457,6 +460,22 @@ class Task(tasks.BaseTask):
 	# create qsiprep command to be executed
 
 	def build(self):
+		print(self._sub)
+		print(self._ses)
+		print(self._run)
+		print(self._bids)
+		print(self._qsiprep_config)
+		print(self._fs_license)
+		print(self._container_dir)
+		print(self._custom_eddy)
+		print(self._no_gpu)
+		print(self._layout)
+		print(self._output_resolution)
+		print(self._outdir)
+		print(self._tempdir)
+		print(self._fs_license)
+		sys.exit()
+
 		self.bind_environmentals()
 		self.check_container_path()
 		self.create_eddy_params()
