@@ -14,7 +14,8 @@ requires = [
     'numpy',
     'dcm2niix',
     'tenacity',
-    'nibabel'
+    'nibabel',
+    'dipy'
 ]
 
 about = dict()
