@@ -1,4 +1,3 @@
-
 #### load necessary libraries
 
 import subprocess
@@ -17,7 +16,8 @@ import numpy as np
 from pprint import pprint
 import re
 import shutil
-
+from dipy.io import read_bvals_bvecs
+from dipy.core.gradients import gradient_table
 
 logger = logging.getLogger(__name__)
 
@@ -315,9 +315,6 @@ class Task(tasks.BaseTask):
 
 		# provide path to bval file
 
-		print(f'dwi_full_path: {dwi_full_path}')
-		print(f'dwi_basename: {dwi_basename}')
-
 		try:
 			bval = dwi_full_path.replace('.nii.gz', '.bval')
 		except FileNotFoundError:
@@ -329,17 +326,8 @@ class Task(tasks.BaseTask):
 
 		epi_output_path = epi_output.replace('/dwi/', '/fmap/')
 		
-		extract_command = f""" singularity exec \
-		{self._fsl_sif} \
-		/APPS/fsl/bin/select_dwi_vols \
-		{dwi_full_path} \
-		{bval} \
-		{epi_output_path} \
-		0
-		"""
+		self.run_extract(dwi_full_path, bval, epi_output_path)
 
-		proc1 = subprocess.Popen(extract_command, shell=True, stdout=subprocess.PIPE)
-		proc1.communicate()
 
 		# create an output file path for the new fmap's json file
 
@@ -355,12 +343,59 @@ class Task(tasks.BaseTask):
 		except FileNotFoundError:
 			dwi_json_file_path = dwi_full_path.replace('.nii', '.json')
 
-
 		shutil.copy(dwi_json_file_path, fmap_json_file_path)
 
 		## Add IntendedFor to the new json files
 
 		self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{dwi_basename}', fmap_json_file_path)
+
+	def run_extract(self, dwi_full_path, bval_path, epi_out_path):
+
+		#module('load','fsl/6.0.4-ncf')
+
+		#print(self._fsl_sif)
+
+		#extract_command = f"singularity exec {self._fsl_sif} /APPS/fsl/bin/select_dwi_vols {dwi_full_path} {bval_path} {epi_out_path} 0"
+
+		#extract_command = f'select_dwi_vols {dwi_full_path} {bval_path} {epi_out_path} 0'
+
+		#proc1 = subprocess.check_output(extract_command, shell=True, stderr=subprocess.STDOUT, text=True)
+
+		#logger.info(proc1)
+
+		bvec_path = bval_path.replace('.bval', '.bvec')
+
+		bvals, bvecs = read_bvals_bvecs(bval_path, bvec_path)
+
+		list_of_bvals = []
+
+		gtab = gradient_table(bvals, bvecs)
+
+		for val in gtab.bvals:
+			list_of_bvals.append(str(val))
+
+		b0_volumes = []
+
+		for idx, bval in enumerate(list_of_bvals):
+			if bval == '0.0':
+				b0_volumes.append(str(idx))
+
+		b0_string = ','.join(b0_volumes)
+
+		#extract_command = f"singularity exec {self._fsl_sif} /APPS/fsl/bin/fslselectvols -i {dwi_full_path} -o {epi_out_path} --vols={b0_string}"
+
+		os.makedirs(self._outdir, exist_ok=True)
+
+		try:
+
+			extract_command = f"singularity exec /{self._fsl_sif} /APPS/fsl/bin/fslselectvols -i {dwi_full_path} -o {epi_out_path} --vols={b0_string}"
+
+			proc1 = subprocess.check_output(extract_command, shell=True, stderr=subprocess.STDOUT, text=True)
+
+		except subprocess.CalledProcessError as e:
+			print(e.stdout)
+
+		#logger.info(proc1)
 
 
 	def insert_json_value(self, key, value, json_file):
