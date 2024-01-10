@@ -366,10 +366,6 @@ class Task(tasks.BaseTask):
 
 		dwi_acqusition_groups, fmap_acquisition_groups = self.acquistion_group_match(all_nii_files)
 
-		print(dwi_acqusition_groups)
-		print(fmap_acquisition_groups)
-		sys.exit()
-
 		if dwi_acqusition_groups and fmap_acquisition_groups:
 			for fmap_key, fmap_value in fmap_acquisition_groups.items():
 				for dwi_key, dwi_value in dwi_acqusition_groups.items():
