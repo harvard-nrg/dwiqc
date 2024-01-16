@@ -548,7 +548,7 @@ class Task(tasks.BaseTask):
 		self.bind_environmentals()
 		self.add_intended_for()
 		self._tempdir = tempfile.gettempdir()
-		inputs_dir = f'{self._tempdir}/INPUTS/'
+		inputs_dir = f'{self._tempdir}/INPUTS/{self._ses}'
 		self.copy_inputs(inputs_dir)
 		mporder = self.calc_mporder()
 		if self._container_dir:
