@@ -6,3 +6,4 @@ index.txt
 dwmri.bval
 dwmri.bvec
 topup_field.nii.gz
+acqparams.txt
