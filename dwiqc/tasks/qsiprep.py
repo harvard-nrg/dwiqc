@@ -351,18 +351,6 @@ class Task(tasks.BaseTask):
 
 	def run_extract(self, dwi_full_path, bval_path, epi_out_path):
 
-		#module('load','fsl/6.0.4-ncf')
-
-		#print(self._fsl_sif)
-
-		#extract_command = f"singularity exec {self._fsl_sif} /APPS/fsl/bin/select_dwi_vols {dwi_full_path} {bval_path} {epi_out_path} 0"
-
-		#extract_command = f'select_dwi_vols {dwi_full_path} {bval_path} {epi_out_path} 0'
-
-		#proc1 = subprocess.check_output(extract_command, shell=True, stderr=subprocess.STDOUT, text=True)
-
-		#logger.info(proc1)
-
 		bvec_path = bval_path.replace('.bval', '.bvec')
 
 		bvals, bvecs = read_bvals_bvecs(bval_path, bvec_path)
@@ -382,7 +370,6 @@ class Task(tasks.BaseTask):
 
 		b0_string = ','.join(b0_volumes)
 
-		#extract_command = f"singularity exec {self._fsl_sif} /APPS/fsl/bin/fslselectvols -i {dwi_full_path} -o {epi_out_path} --vols={b0_string}"
 
 		os.makedirs(self._outdir, exist_ok=True)
 
@@ -394,8 +381,6 @@ class Task(tasks.BaseTask):
 
 		except subprocess.CalledProcessError as e:
 			print(e.stdout)
-
-		#logger.info(proc1)
 
 
 	def insert_json_value(self, key, value, json_file):
