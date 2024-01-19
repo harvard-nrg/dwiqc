@@ -71,7 +71,7 @@ class Task(tasks.BaseTask):
 
 		# copy and rename bval file from qsiprep output dir
 
-		self.copy_file(f'{self._outdir}/sub-{self._sub}/ses-{self._ses}/dwi/sub-{self._sub}_ses-{self._ses}_acq-A_run-1_space-T1w_desc-preproc_dwi.bval', eddy_quad_dir)
+		self.copy_file(f'{self._outdir}/qsiprep/sub-{self._sub}/ses-{self._ses}/dwi/sub-{self._sub}_ses-{self._ses}_acq-A_run-1_space-T1w_desc-preproc_dwi.bval', eddy_quad_dir)
 
 		self.rename_file(f'{eddy_quad_dir}/sub-{self._sub}_ses-{self._ses}_acq-A_run-1_space-T1w_desc-preproc_dwi.bval', f'{eddy_quad_dir}/{self._sub}.bval')
 
@@ -113,7 +113,7 @@ class Task(tasks.BaseTask):
 	def rename_file(self, old_name, new_name):
 		os.rename(old_name, new_name)
 
-	def run_eddy_quad():
+	def run_eddy_quad(self):
 		command = f"""singularity exec \
 		--pwd {eddy_quad_dir} \
 		{self._fsl_sif} \
