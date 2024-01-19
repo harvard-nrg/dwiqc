@@ -98,8 +98,6 @@ class Task(tasks.BaseTask):
 
 		self.parse_json(eddy_results_dir)
 
-		self.extract_b0_vol()
-
 
 	def bind_environmentals(self):
 	
