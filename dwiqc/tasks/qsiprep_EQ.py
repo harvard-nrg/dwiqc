@@ -59,7 +59,7 @@ class Task(tasks.BaseTask):
 
 		for file in os.listdir(f'{qsiprep_work_dir}/gather_inputs'):
 			if file.endswith('.txt') and file.startswith('eddy'):
-				shutil.copy(f'{hmc_dir}/gather_inputs/{file}', eddy_quad_dir)
+				shutil.copy(f'{qsiprep_work_dir}/gather_inputs/{file}', eddy_quad_dir)
 
 		# copy topup_imain_corrected_avg_trans_mask_trans.nii.gz from pre_eddy_b0_ref_wf/synthstrip_wf/mask_to_original_grid
 
