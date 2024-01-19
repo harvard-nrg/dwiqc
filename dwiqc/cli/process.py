@@ -110,6 +110,8 @@ def do(args):
             pipenv='/sw/apps/qsiprep'
         )
         os.environ['OPENBLAS_NUM_THREADS'] = '1'
+        print(qsiprep_taks)
+        sys.exit()
         logger.info(json.dumps(qsiprep_task.command, indent=1))
         #check_for_output(args, qsiprep_outdir)
         jarray.add(qsiprep_task.job)
