@@ -92,7 +92,7 @@ class Task(tasks.BaseTask):
 
 		# run eddy_quad on output
 
-		self.run_eddy_quad()
+		self.run_eddy_quad(eddy_quad_dir)
 
 		eddy_results_dir = f'{eddy_quad_dir}/{self._sub}_{self._ses}.qc'
 
@@ -113,7 +113,7 @@ class Task(tasks.BaseTask):
 	def rename_file(self, old_name, new_name):
 		os.rename(old_name, new_name)
 
-	def run_eddy_quad(self):
+	def run_eddy_quad(self, eddy_quad_dir):
 		command = f"""singularity exec \
 		--pwd {eddy_quad_dir} \
 		{self._fsl_sif} \
