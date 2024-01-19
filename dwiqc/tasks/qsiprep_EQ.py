@@ -86,8 +86,8 @@ class Task(tasks.BaseTask):
 		os.chdir(eddy_quad_dir)
 
 		for file in os.listdir():
-			if file.startswith("eddy_results"):
-				new_name = file.replace("eddy_results", f"{self._sub}_{self._ses}")
+			if file.startswith("eddy_corrected"):
+				new_name = file.replace("eddy_corrected", f"{self._sub}_{self._ses}")
 				self.rename_file(file, new_name)
 
 		# run eddy_quad on output
