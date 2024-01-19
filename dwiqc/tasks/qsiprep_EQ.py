@@ -52,7 +52,8 @@ class Task(tasks.BaseTask):
 		# copy over all files from eddy directory
 
 		for file in os.listdir(f'{qsiprep_work_dir}/eddy'):
-			shutil.copy(f'{qsiprep_work_dir}/eddy/{file}', eddy_quad_dir)
+			if file.startswith('eddy'):
+				shutil.copy(f'{qsiprep_work_dir}/eddy/{file}', eddy_quad_dir)
 
 		# copy all files that end with txt and start with eddy in gather_inputs
 
