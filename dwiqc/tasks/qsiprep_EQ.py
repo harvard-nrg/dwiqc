@@ -79,7 +79,7 @@ class Task(tasks.BaseTask):
 
 		for file in os.listdir(self._bids):
 			if 'slspec' in file and file.endswith('.txt'):
-				self._spec_file = file
+				self._spec_file = f'{self._bids}/{file}'
 
 		# rename all the files in eddy_quad_dir that start with "eddy_results"
 
