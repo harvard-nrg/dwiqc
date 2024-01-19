@@ -134,7 +134,7 @@ class Task(tasks.BaseTask):
 			shutil.rmtree(f'{self._sub}_{self._ses}.qc')
 
 		logging.info('Running eddy_quad...')
-		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
+		proc1 = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
 		proc1.communicate()
 		code = proc1.returncode
 
