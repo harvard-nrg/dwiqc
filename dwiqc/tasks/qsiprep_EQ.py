@@ -51,6 +51,8 @@ class Task(tasks.BaseTask):
 
 		# copy over all files from eddy directory
 
+		print('making it here')
+
 		for file in os.listdir(f'{qsiprep_work_dir}/eddy'):
 			if os.path.isfile(file):
 				print(file)
