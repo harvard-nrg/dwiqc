@@ -7,8 +7,6 @@ import subprocess
 import json
 from executors.models import Job
 
-old_out = sys.stdout
-
 
 class Task(tasks.BaseTask):
 	def __init__(self, sub, ses, run, bids, outdir, container_dir=None, parent=None, tempdir=None, pipenv=None):
@@ -29,7 +27,7 @@ class Task(tasks.BaseTask):
 			try:
 				self._fsl_sif = f'{self._container_dir}/fsl_6.0.4.sif'
 			except FileNotFoundError:
-				logger.error(f'{self._container_dir}/fsl_6.0.4.sif does not exist. Verify the path and file name.')
+				logging.error(f'{self._container_dir}/fsl_6.0.4.sif does not exist. Verify the path and file name.')
 				sys.exit(1)
 
 		else:
@@ -49,7 +47,7 @@ class Task(tasks.BaseTask):
 
 		os.makedirs(eddy_quad_dir, exist_ok=True)
 
-		logger.info('copying qsiprep output files for eddy quad')
+		logging.info('copying qsiprep output files for eddy quad')
 
 		# copy over all files from eddy directory
 
