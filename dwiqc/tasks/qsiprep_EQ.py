@@ -53,6 +53,7 @@ class Task(tasks.BaseTask):
 
 		for file in os.listdir(f'{qsiprep_work_dir}/eddy'):
 			if os.path.isfile(file):
+				print(file)
 				shutil.copy(f'{qsiprep_work_dir}/eddy/{file}', eddy_quad_dir)
 
 		# copy all files that end with txt and start with eddy in gather_inputs
