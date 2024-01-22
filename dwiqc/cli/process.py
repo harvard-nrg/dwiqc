@@ -111,7 +111,6 @@ def do(args):
         )
         os.environ['OPENBLAS_NUM_THREADS'] = '1'
         logger.info(json.dumps(qsiprep_task.command, indent=1))
-        sys.exit()
         #check_for_output(args, qsiprep_outdir)
         jarray.add(qsiprep_task.job)
 
@@ -125,7 +124,7 @@ def do(args):
         failed = len(jarray.failed)
         complete = len(jarray.complete)
         prequal_eddy(args, prequal_outdir)
-        #qsiprep_eddy(args, qsiprep_outdir)
+        qsiprep_eddy(args, qsiprep_outdir)
         browser.snapshot(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html", f"{qsiprep_outdir}/qsiprep/qsiprep.pdf")
         browser.imbed_images(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html")
         if failed:
@@ -184,6 +183,7 @@ def qsiprep_eddy(args, qsiprep_outdir):
             run=args.run,
             bids=args.bids_dir,
             outdir=qsiprep_outdir,
+            container_dir = args.container_dir,
             tempdir=tempfile.gettempdir(),
         )
 
