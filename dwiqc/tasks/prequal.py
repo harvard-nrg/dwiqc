@@ -16,6 +16,7 @@ import numpy as np
 from pprint import pprint
 import re
 import nibabel as nib
+from datetime import datetime
 
 
 logger = logging.getLogger(__name__)
@@ -34,15 +35,20 @@ class Task(tasks.BaseTask):
 		self._container_dir = container_dir
 		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
+		self._date = datetime.today().strftime('%Y-%m-%d')
 		super().__init__(outdir, tempdir, pipenv)
 
 
 	# create an INPUTS dir next to the OUTPUTS dir
 	def copy_inputs(self, inputs_dir):
+		"""
 		try:
 			os.makedirs(inputs_dir)
 		except FileExistsError:
 			pass
+		"""
+
+		os.makedirs(inputs_dir, exist_ok=True)
 		
 		all_files = self._layout.get(subject=self._sub, session=self._ses, return_type='filename') # get a list of all of the subject's files
 
@@ -548,7 +554,7 @@ class Task(tasks.BaseTask):
 		self.bind_environmentals()
 		self.add_intended_for()
 		self._tempdir = tempfile.gettempdir()
-		inputs_dir = f'{self._tempdir}/INPUTS/{self._ses}'
+		inputs_dir = f'{self._tempdir}/PREQUAL_INPUTS_{self._date}/{self._ses}'
 		self.copy_inputs(inputs_dir)
 		mporder = self.calc_mporder()
 		if self._container_dir:
