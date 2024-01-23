@@ -111,15 +111,15 @@ class Report:
 
         # compile a list of files to be added to xnat:out section
 	
-        # pull images from eddy_quad output
+        # pull images from qsiprep eddy_quad output
 
         resources = [
             {
-                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{no_prefix_sub}_{self.ses}.qc', 'qc.pdf'),
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep', 'EDDY', f'{no_prefix_sub}_{self.ses}.qc', 'qc.pdf'),
                 'dest': os.path.join('eddy_pdf', '{0}_eddy_quad_qc.pdf'.format(aid))
             },
             {
-                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', 'motion_plot.png'),
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep', 'EDDY', 'motion_plot.png'),
                 'dest': os.path.join('motion-plot', '{0}_motion_plot.png'.format(aid))
             },
 
@@ -204,7 +204,7 @@ class Report:
 
         # get all the b-shell values from eddy-quad
         shells = list()
-        qcdir = os.path.join(self.dirs['prequal'], 'OUTPUTS', 'EDDY', f'{no_prefix_sub}_{self.ses}.qc')
+        qcdir = os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep', 'EDDY', f'{no_prefix_sub}_{self.ses}.qc')
         for filename in os.listdir(qcdir):
             fullfile = os.path.join(qcdir, filename)
             match = re.match('avg_b(\d+).png', filename)
@@ -233,8 +233,9 @@ class Report:
         # add <eddy_quad> element
         eddy_quad_elm = etree.SubElement(root, 'eddy_quad')
         fname = os.path.join(
-            self.dirs['prequal'],
-            'OUTPUTS',
+            self.dirs['qsiprep'],
+            'qsiprep_output',
+            'qsiprep',
             'EDDY',
             'eddy_metrics.json'
         )

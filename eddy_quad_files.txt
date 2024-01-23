@@ -1,0 +1,9 @@
+These are the files that eddy quad uses from prequal
+
+dwmri.nii.gz -- 
+slspec.txt -- slice spec file
+index.txt
+dwmri.bval
+dwmri.bvec
+topup_field.nii.gz
+acqparams.txt

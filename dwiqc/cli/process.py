@@ -124,7 +124,7 @@ def do(args):
         failed = len(jarray.failed)
         complete = len(jarray.complete)
         prequal_eddy(args, prequal_outdir)
-        #qsiprep_eddy(args, qsiprep_outdir)
+        qsiprep_eddy(args, qsiprep_outdir)
         browser.snapshot(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html", f"{qsiprep_outdir}/qsiprep/qsiprep.pdf")
         browser.imbed_images(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html")
         if failed:
@@ -183,6 +183,7 @@ def qsiprep_eddy(args, qsiprep_outdir):
             run=args.run,
             bids=args.bids_dir,
             outdir=qsiprep_outdir,
+            container_dir = args.container_dir,
             tempdir=tempfile.gettempdir(),
         )
 
