@@ -105,8 +105,6 @@ class Task(tasks.BaseTask):
 		pattern = re.compile(r'^dwi_preproc_ses.*')
 		for file in os.listdir(input_dir):
 			if pattern.match(file):
-				print(file)
-				sys.exit()
 				return file
 
 
