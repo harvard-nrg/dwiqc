@@ -40,9 +40,7 @@ class Task(tasks.BaseTask):
 
 		# Define working directory for the subject
 
-		qsiprep_wf_dir = f'{self._tempdir}/qsiprep_wf/single_subject_{self._sub}_wf'
-
-		dwi_preproc_string = self.match_preproc_string(qsiprep_wf_dir)
+		dwi_preproc_string = self.match_preproc_string(f'{self._tempdir}/qsiprep_wf/single_subject_{self._sub}_wf')
 
 		qsiprep_work_dir = f'{self._tempdir}/qsiprep_wf/single_subject_{self._sub}_wf/{dwi_preproc_string}/hmc_sdc_wf'
 
@@ -103,7 +101,7 @@ class Task(tasks.BaseTask):
 
 		self.parse_json(eddy_results_dir)
 
-	def match_preproc_string(input_dir):
+	def match_preproc_string(self, input_dir):
 		pattern = re.compile(r'^dwi_preproc_ses')
 		for file in os.listdir():
 			if pattern.match(file):
