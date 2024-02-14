@@ -106,7 +106,7 @@ class Task(tasks.BaseTask):
 		self.parse_json(eddy_results_dir)
 
 	def match_bval(self, dir_path):
-		pattern = re.compile(r'^sub-{self._sub}_ses-{self._ses}.*^bval')
+		pattern = re.compile(rf'^sub-{self._sub}_ses-{self._ses}.*^bval')
 		for file in os.listdir(dir_path):
 			if pattern.match(file):
 				return file
