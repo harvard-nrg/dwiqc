@@ -74,9 +74,13 @@ class Task(tasks.BaseTask):
 
 		# copy and rename bval file from qsiprep output dir
 
-		self.copy_file(f'{self._outdir}/qsiprep/sub-{self._sub}/ses-{self._ses}/dwi/sub-{self._sub}_ses-{self._ses}_acq-A_run-1_space-T1w_desc-preproc_dwi.bval', eddy_quad_dir)
+		## locate .bval file with regex helper method
 
-		self.rename_file(f'{eddy_quad_dir}/sub-{self._sub}_ses-{self._ses}_acq-A_run-1_space-T1w_desc-preproc_dwi.bval', f'{eddy_quad_dir}/{self._sub}.bval')
+		full_bval_name = self.match_bval(f'{self._outdir}/qsiprep/sub-{self._sub}/ses-{self._ses}/dwi')
+
+		self.copy_file(f'{self._outdir}/qsiprep/sub-{self._sub}/ses-{self._ses}/dwi/{full_bval_name}', eddy_quad_dir)
+
+		self.rename_file(f'{eddy_quad_dir}/{full_bval_name}', f'{eddy_quad_dir}/{self._sub}.bval')
 
 		# copy slspec file from bids dir
 
@@ -100,6 +104,13 @@ class Task(tasks.BaseTask):
 		eddy_results_dir = f'{eddy_quad_dir}/{self._sub}_{self._ses}.qc'
 
 		self.parse_json(eddy_results_dir)
+
+	def match_bval(self, dir_path):
+		pattern = re.compile(r'^sub-{self._sub}_ses-{self._ses}.*^bval')
+		for file in os.listdir(dir_path):
+			if pattern.match(file):
+				return file
+
 
 	def match_preproc_string(self, input_dir):
 		pattern = re.compile(r'^dwi_preproc_ses.*')
