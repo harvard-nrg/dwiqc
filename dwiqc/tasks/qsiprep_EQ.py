@@ -106,7 +106,7 @@ class Task(tasks.BaseTask):
 		self.parse_json(eddy_results_dir)
 
 	def match_bval(self, dir_path):
-		print(match_bval)
+		print(dir_path)
 		pattern = re.compile(r"\.bval", re.IGNORECASE)
 		for file in os.listdir(dir_path):
 			print(file)
