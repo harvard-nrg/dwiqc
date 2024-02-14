@@ -102,7 +102,7 @@ class Task(tasks.BaseTask):
 		self.parse_json(eddy_results_dir)
 
 	def match_preproc_string(self, input_dir):
-		pattern = re.compile(r'^dwi_preproc_ses')
+		pattern = re.compile(r'^dwi_preproc_ses.*')
 		for file in os.listdir():
 			if pattern.match(file):
 				print(file)
