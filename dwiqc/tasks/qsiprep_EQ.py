@@ -1,6 +1,7 @@
 import shutil
 import os
 import sys
+import re
 import dwiqc.tasks as tasks
 import logging
 import subprocess
@@ -39,7 +40,9 @@ class Task(tasks.BaseTask):
 
 		# Define working directory for the subject
 
-		qsiprep_work_dir = f'{self._tempdir}/qsiprep_wf/single_subject_{self._sub}_wf/dwi_preproc_ses_{self._ses}_acq_A_run_1_wf/hmc_sdc_wf'
+		dwi_preproc_string = self.match_preproc_string(f'{self._tempdir}/qsiprep_wf/single_subject_{self._sub}_wf')
+
+		qsiprep_work_dir = f'{self._tempdir}/qsiprep_wf/single_subject_{self._sub}_wf/{dwi_preproc_string}/hmc_sdc_wf'
 
 		# Define eddy quad destination directory
 
@@ -97,6 +100,14 @@ class Task(tasks.BaseTask):
 		eddy_results_dir = f'{eddy_quad_dir}/{self._sub}_{self._ses}.qc'
 
 		self.parse_json(eddy_results_dir)
+
+	def match_preproc_string(input_dir):
+		pattern = re.compile(r'^dwi_preproc_ses')
+		for file in os.listdir():
+			if pattern.match(file):
+				print(file)
+				sys.exit()
+				return file
 
 
 	def bind_environmentals(self):
