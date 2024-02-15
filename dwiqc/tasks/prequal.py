@@ -666,8 +666,8 @@ class Task(tasks.BaseTask):
 		else:
 			self.job = Job(
 				name='dwiqc-prequal',
-				time='3000',
-				memory='40G',
+				time='4000',
+				memory='60G',
 				gpus=1,
 				nodes=1,
 				command=self._command,
