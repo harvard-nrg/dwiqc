@@ -596,6 +596,8 @@ class Task(tasks.BaseTask):
 				f'{self._tempdir}:/tmp',
 				'-B',
 				f'{self._fs_license}:/APPS/freesurfer/license.txt',
+                                '-B',
+                                '/n/home_fasse/dasay/prequal_mod/stats_mod.py:/CODE/dtiQA_v7/stats.py',
 				f'{prequal_sif}',
 				'--save_component_pngs',
 				'--subject',
