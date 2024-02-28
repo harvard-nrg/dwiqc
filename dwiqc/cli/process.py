@@ -29,11 +29,16 @@ def do(args):
         logger.warning('disabling ssl certificate verification')
         yaxil.CHECK_CERTIFICATE = False
 
+    if args.exclude_nodes:
+        excluded_nodes = list(args.exclude_nodes)
+    else:
+        excluded_nodes = ['']
+
     # create job executor and job array
     if args.scheduler:
         E = executors.get(args.scheduler, partition=args.partition)
     else:
-        E = executors.probe(args.partition)
+        E = executors.probe(args.partition, exclude=excluded_nodes)
     jarray = JobArray(E)
 
 
