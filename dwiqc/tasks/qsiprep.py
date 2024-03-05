@@ -511,7 +511,7 @@ class Task(tasks.BaseTask):
 			'--fs-license-file',
 			self._fs_license,
 			'-w',
-			self._tempdir
+			f'{self._tempdir}/{self._ses}'
 		]
 
 		for item in qsiprep_options:
