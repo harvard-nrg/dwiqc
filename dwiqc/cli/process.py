@@ -128,10 +128,12 @@ def do(args):
         numjobs = len(jarray.array)
         failed = len(jarray.failed)
         complete = len(jarray.complete)
-        prequal_eddy(args, prequal_outdir)
-        qsiprep_eddy(args, qsiprep_outdir)
-        browser.snapshot(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html", f"{qsiprep_outdir}/qsiprep/qsiprep.pdf")
-        browser.imbed_images(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html")
+        if 'prequal' in args.sub_tasks:
+            prequal_eddy(args, prequal_outdir)
+        if 'qsiprep' in args.sub_tasks:
+            qsiprep_eddy(args, qsiprep_outdir)
+            browser.snapshot(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html", f"{qsiprep_outdir}/qsiprep/qsiprep.pdf")
+            browser.imbed_images(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html")
         if failed:
             logger.info('%s/%s jobs failed', failed, numjobs)
             for pid,job in iter(jarray.failed.items()):

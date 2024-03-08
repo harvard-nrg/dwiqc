@@ -40,9 +40,9 @@ class Task(tasks.BaseTask):
 
 		# Define working directory for the subject
 
-		dwi_preproc_string = self.match_preproc_string(f'{self._tempdir}/qsiprep_wf/single_subject_{self._sub}_wf')
+		dwi_preproc_string = self.match_preproc_string(f'{self._tempdir}/{self._ses}/qsiprep_wf/single_subject_{self._sub}_wf')
 
-		qsiprep_work_dir = f'{self._tempdir}/qsiprep_wf/single_subject_{self._sub}_wf/{dwi_preproc_string}/hmc_sdc_wf'
+		qsiprep_work_dir = f'{self._tempdir}/{self._ses}/qsiprep_wf/single_subject_{self._sub}_wf/{dwi_preproc_string}/hmc_sdc_wf'
 
 		# Define eddy quad destination directory
 
