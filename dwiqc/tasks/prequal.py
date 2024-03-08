@@ -585,6 +585,7 @@ class Task(tasks.BaseTask):
 				'--output-file', self._prov,
 				'singularity',
 				'run',
+				'--pwd',
 				'-e',
 				'--contain',
 				'--nv',
@@ -627,6 +628,7 @@ class Task(tasks.BaseTask):
 				'--output-file', self._prov,
 				'singularity',
 				'run',
+				'--pwd',
 				'-e',
 				'--contain',
 				'--nv',
@@ -674,8 +676,8 @@ class Task(tasks.BaseTask):
 				cpus=2,
 				nodes=1,
 				command=self._command,
-				output=logfile,
-				error=logfile
+				output=logfile
+				#error=logfile
 			)
 		else:
 			self.job = Job(
@@ -685,8 +687,8 @@ class Task(tasks.BaseTask):
 				gpus=1,
 				nodes=1,
 				command=self._command,
-				output=logfile,
-				error=logfile
+				output=logfile
+				#error=logfile
 			)
 
 
