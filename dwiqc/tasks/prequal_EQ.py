@@ -27,7 +27,7 @@ class Task(tasks.BaseTask):
 
 		if self._container_dir:
 			try:
-				fsl_sif = f'{self._container_dir}/fsl_6.0.4.sif'
+				self._fsl_sif = f'{self._container_dir}/fsl_6.0.4.sif'
 			except FileNotFoundError:
 				logger.error(f'{self._container_dir}/fsl_6.0.4.sif does not exist. Verify the path and file name.')
 				sys.exit(1)
@@ -36,7 +36,7 @@ class Task(tasks.BaseTask):
 
 			home_dir = os.path.expanduser("~")
 
-			fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
+			self._fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
 
 		os.chdir(f"{self._outdir}/EDDY")
 
@@ -75,7 +75,7 @@ class Task(tasks.BaseTask):
 
 		eddy_quad = f"""singularity exec \
 		--pwd {self._outdir}/EDDY \
-		{fsl_sif} \
+		{self._fsl_sif} \
 		/APPS/fsl/bin/eddy_quad \
 		{self._sub}_{self._ses} \
 		-idx index.txt \
@@ -169,11 +169,9 @@ class Task(tasks.BaseTask):
 		logging.info('successfully parsed json and wrote out results to eddy_metrics.json')
 
 	def extract_b0_vol(self):
-		home_dir = os.path.expanduser("~")
-		fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif') 
 		os.chdir(f"{self._outdir}/PREPROCESSED")
 		extract_command = f"""singularity exec \
-		{fsl_sif} \
+		{self._fsl_sif} \
 		/APPS/fsl/bin/fslselectvols \
 		-i dwmri.nii.gz \
 		-o b0_volume \
