@@ -1,4 +1,3 @@
-
 #### load necessary libraries
 import tempfile
 import subprocess
@@ -585,31 +584,17 @@ class Task(tasks.BaseTask):
 				'--output-file', self._prov,
 				'singularity',
 				'run',
-				#'--pwd',
-				#self._bids,
 				'-e',
-				'--env',
-				f"TMPDIR={os.environ['TMPDIR']}",
+                                '--env', 'PYTHONUNBUFFERED=1',
+				'--pwd', self._tempdir,
 				'--contain',
 				'--nv',
-				'-B',
-				f'{inputs_dir}:/INPUTS/',
-				'-B',
-				f'{self._outdir}:/OUTPUTS',
-				'-B',
-				f'{self._tempdir}:/tmp',
-				'-B',
-				f'{self._fs_license}:/APPS/freesurfer/license.txt',
-				'-B',
-				'/n/home_fasse/dasay/prequal_mod/stats_mod.py:/CODE/dtiQA_v7/stats.py',
-				'-B',
-				'/n/home_fasse/dasay/prequal_mod/utils_mod.py:/CODE/dtiQA_v7/utils.py',
-				'-B',
-				'/n/home_fasse/dasay/prequal_mod/image_mod.py:/APPS/mrtrix3/lib/mrtrix3/image.py',
-				'-B',
-				'/n/home_fasse/dasay/prequal_mod/run_dtiQA_mod.py:/CODE/dtiQA_v7/run_dtiQA.py',
-				'-B',
-				'/n/home_fasse/dasay/prequal_mod/run_dtiQA.sh:/CODE/run_dtiQA.sh',
+                                '-B', '/n/home_fasse/nrgadmin/mrtrix3.dev:/APPS/mrtrix3/lib/mrtrix3',
+                                '-B', '/n/home_fasse/nrgadmin/dtiqa.code/dtiQA_vy/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
+				'-B', f'{inputs_dir}:/INPUTS/',
+				'-B', f'{self._outdir}:/OUTPUTS',
+				'-B', f'{self._tempdir}:/tmp',
+				'-B', f'{self._fs_license}:/APPS/freesurfer/license.txt',
 				f'{prequal_sif}',
 				'--save_component_pngs',
 				'--subject',
@@ -623,7 +608,7 @@ class Task(tasks.BaseTask):
 			for item in prequal_options:
 				self._command.append(item)
 
-			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=6+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
+			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=5+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
 			self._command.append(eddy_args)
 
 		elif self._nonzero_shells == True:
@@ -633,31 +618,17 @@ class Task(tasks.BaseTask):
 				'--output-file', self._prov,
 				'singularity',
 				'run',
-				#'--pwd',
-				#self._bids,
 				'-e',
-				'--env',
-				f"TMPDIR={os.environ['TMPDIR']}",
+				'--env', 'PYTHONUNBUFFERED=1',
+				'--pwd', self._tempdir,
 				'--contain',
 				'--nv',
-				'-B',
-				f'{inputs_dir}:/INPUTS/',
-				'-B',
-				f'{self._outdir}:/OUTPUTS',
-				'-B',
-				f'{self._tempdir}:/tmp',
-				'-B',
-				f'{self._fs_license}:/APPS/freesurfer/license.txt',
-				'-B',
-				'/n/home_fasse/dasay/prequal_mod/stats_mod.py:/CODE/dtiQA_v7/stats.py',
-				'-B',
-				'/n/home_fasse/dasay/prequal_mod/utils_mod.py:/CODE/dtiQA_v7/utils.py',
-				'-B',
-				'/n/home_fasse/dasay/prequal_mod/run_dtiQA_mod.py:/CODE/dtiQA_v7/run_dtiQA.py',
-				'-B',
-				'/n/home_fasse/dasay/prequal_mod/image_mod.py:/APPS/mrtrix3/lib/mrtrix3/image.py',
-				'-B',
-				'/n/home_fasse/dasay/prequal_mod/run_dtiQA.sh:/CODE/run_dtiQA.sh',
+				'-B', '/n/home_fasse/nrgadmin/mrtrix3.dev:/APPS/mrtrix3/lib/mrtrix3',
+				'-B', '/n/home_fasse/nrgadmin/dtiqa.code/dtiQA_v7/run_dtiQA.py:/CODE/dtiQA_v7/run_dtiQA.py',
+				'-B', f'{inputs_dir}:/INPUTS/',
+				'-B', f'{self._outdir}:/OUTPUTS',
+				'-B', f'{self._tempdir}:/tmp',
+				'-B', f'{self._fs_license}:/APPS/freesurfer/license.txt',
 				f'{prequal_sif}',
 				'--save_component_pngs',
 				'--nonzero_shells',
@@ -680,33 +651,28 @@ class Task(tasks.BaseTask):
 		logfile = os.path.join(logdir, 'dwiqc-prequal.log')
 		if self._no_gpu:
 			self.job = Job(
-				name='dwiqc-prequal',
+				name='test-dwiqc-prequal',
 				time='3000',
-				memory='40G',
+				memory='60G',
 				cpus=2,
 				nodes=1,
 				command=self._command,
-				output=logfile
-				#error=logfile
+				output=logfile,
+				error=logfile
 			)
 		else:
 			self.job = Job(
-				name='dwiqc-prequal',
+				name='test-dwiqc-prequal',
 				time='4000',
 				memory='60G',
 				gpus=1,
 				nodes=1,
 				command=self._command,
-				output=logfile
-				#error=logfile
+				output=logfile,
+				error=logfile
 			)
 
 
 
 class DWISpecError(Exception):
 	pass
-
-
-
-
-
