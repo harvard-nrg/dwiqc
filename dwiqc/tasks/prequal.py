@@ -649,7 +649,7 @@ class Task(tasks.BaseTask):
 		logfile = os.path.join(logdir, 'dwiqc-prequal.log')
 		if self._no_gpu:
 			self.job = Job(
-				name='test-dwiqc-prequal',
+				name='dwiqc-prequal',
 				time='3000',
 				memory='60G',
 				cpus=2,
@@ -660,7 +660,7 @@ class Task(tasks.BaseTask):
 			)
 		else:
 			self.job = Job(
-				name='test-dwiqc-prequal',
+				name='dwiqc-prequal',
 				time='4000',
 				memory='60G',
 				gpus=1,
