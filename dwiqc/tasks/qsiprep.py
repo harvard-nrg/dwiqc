@@ -239,7 +239,7 @@ class Task(tasks.BaseTask):
 			"estimate_move_by_susceptibility": True,
 			"mporder": mporder,
 			"slice_order": self._spec,
-			"args": "--ol_nstd=5 --ol_type=gw"
+			"args": "--ol_nstd=6 --ol_type=gw"
 		}
 		
 		if not self._custom_eddy:
