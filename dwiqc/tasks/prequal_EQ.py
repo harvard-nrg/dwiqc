@@ -87,9 +87,9 @@ class Task(tasks.BaseTask):
 		-s {self._outdir}/{spec_file} \
 		-v"""
 
-		if os.path.isdir(f'{self._sub}_{self._ses}.qc'):
-			logging.warning('Output directory already exists. Removing and trying again.')
-			shutil.rmtree(f'{self._sub}_{self._ses}.qc')
+		#if os.path.isdir(f'{self._sub}_{self._ses}.qc'):
+		#	logging.warning('Output directory already exists. Removing and trying again.')
+		#	shutil.rmtree(f'{self._sub}_{self._ses}.qc')
 
 		logging.info('Running eddy_quad...')
 		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
@@ -107,6 +107,8 @@ class Task(tasks.BaseTask):
 		self.parse_json(eddy_results_dir)
 
 		self.extract_b0_vol()
+
+		self.delete_bval_bvec()
 
 
 	def parse_json(self, eddy_dir):
@@ -184,5 +186,13 @@ class Task(tasks.BaseTask):
 		bind = [self._outdir, self._tempdir]
 		
 		os.environ["SINGULARITY_BIND"] = ','.join(bind)
+
+	def delete_bval_bvec(self):
+		logging.info('cleaning fmap bids directory')
+		fmap_dir = os.path.join(f'{self._bids}/sub-{self._sub}/ses-{self._ses}/fmap')
+		for file in os.listdir(fmap_dir):
+			if file.endswith('.bval') or file.endswith('.bvec'):
+				os.remove(file)
+
 
 
