@@ -7,6 +7,9 @@ import logging
 import subprocess
 import json
 from executors.models import Job
+from datetime import datetime
+
+date = datetime.today().strftime('%Y-%m-%d')
 
 
 class Task(tasks.BaseTask):
@@ -40,9 +43,9 @@ class Task(tasks.BaseTask):
 
 		# Define working directory for the subject
 
-		dwi_preproc_string = self.match_preproc_string(f'{self._tempdir}/qsiprep_wf/single_subject_{self._sub}_wf')
+		dwi_preproc_string = self.match_preproc_string(f'{self._tempdir}/qsiprep_{date}/{self._ses}/qsiprep_wf/single_subject_{self._sub}_wf')
 
-		qsiprep_work_dir = f'{self._tempdir}/qsiprep_wf/single_subject_{self._sub}_wf/{dwi_preproc_string}/hmc_sdc_wf'
+		qsiprep_work_dir = f'{self._tempdir}/qsiprep_{date}/{self._ses}/qsiprep_wf/single_subject_{self._sub}_wf/{dwi_preproc_string}/hmc_sdc_wf'
 
 		# Define eddy quad destination directory
 
@@ -146,9 +149,9 @@ class Task(tasks.BaseTask):
 		-v
 		"""
 
-		if os.path.isdir(f'{self._sub}_{self._ses}.qc'):
-			logging.warning('Output directory already exists. Removing and trying again.')
-			shutil.rmtree(f'{self._sub}_{self._ses}.qc')
+		#if os.path.isdir(f'{self._sub}_{self._ses}.qc'):
+		#	logging.warning('Output directory already exists. Removing and trying again.')
+		#	shutil.rmtree(f'{self._sub}_{self._ses}.qc')
 
 		logging.info('Running eddy_quad...')
 		proc1 = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)

@@ -102,6 +102,8 @@ def main():
         help='Upload results to XNAT over REST API')
     parser_process.add_argument('--container-dir',
         help='Pass path to downloaded DWIQC containers')
+    parser_process.add_argument('--exclude-nodes', nargs='+',
+        help='List of cluster nodes to exclude from use.')
     parser_process.set_defaults(func=cli.process.do)
 
     # tandem mode
@@ -155,7 +157,9 @@ def main():
     parser_tandem.add_argument('--xnat-upload', action='store_true',
         help='Upload results to XNAT over REST API')
     parser_tandem.add_argument('--container-dir',
-        help='Pass path to downloaded DWIQC containers')  
+        help='Pass path to downloaded DWIQC containers')
+    parser_tandem.add_argument('--exclude-nodes', nargs='+',
+        help='List of cluster nodes to exclude from use.')
     parser_tandem.set_defaults(func=cli.tandem.do)
     args = parser.parse_args()
 
