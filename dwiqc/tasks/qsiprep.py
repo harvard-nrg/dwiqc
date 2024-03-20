@@ -18,6 +18,9 @@ import re
 import shutil
 from dipy.io import read_bvals_bvecs
 from dipy.core.gradients import gradient_table
+from datetime import datetime
+
+date = datetime.today().strftime('%Y-%m-%d')
 
 logger = logging.getLogger(__name__)
 
@@ -239,7 +242,7 @@ class Task(tasks.BaseTask):
 			"estimate_move_by_susceptibility": True,
 			"mporder": mporder,
 			"slice_order": self._spec,
-			"args": "--ol_nstd=5 --ol_type=gw"
+			"args": "--ol_nstd=6 --ol_type=gw"
 		}
 		
 		if not self._custom_eddy:
@@ -511,7 +514,7 @@ class Task(tasks.BaseTask):
 			'--fs-license-file',
 			self._fs_license,
 			'-w',
-			self._tempdir
+			f'{self._tempdir}/qsiprep_{date}/{self._ses}'
 		]
 
 		for item in qsiprep_options:
@@ -522,8 +525,8 @@ class Task(tasks.BaseTask):
 			logfile = os.path.join(logdir, 'dwiqc-qsiprep.log')
 			self.job = Job(
 				name='dwiqc-qsiprep',
-				time='3000',
-				memory='40G',
+				time='4000',
+				memory='60G',
 				cpus=2,
 				nodes=1,
 				command=self._command,
@@ -536,8 +539,8 @@ class Task(tasks.BaseTask):
 			logfile = os.path.join(logdir, 'dwiqc-qsiprep.log')
 			self.job = Job(
 				name='dwiqc-qsiprep',
-				time='3000',
-				memory='40G',
+				time='4000',
+				memory='60G',
 				gpus=1,
 				nodes=1,
 				command=self._command,

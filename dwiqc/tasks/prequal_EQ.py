@@ -27,7 +27,7 @@ class Task(tasks.BaseTask):
 
 		if self._container_dir:
 			try:
-				fsl_sif = f'{self._container_dir}/fsl_6.0.4.sif'
+				self._fsl_sif = f'{self._container_dir}/fsl_6.0.4.sif'
 			except FileNotFoundError:
 				logger.error(f'{self._container_dir}/fsl_6.0.4.sif does not exist. Verify the path and file name.')
 				sys.exit(1)
@@ -36,7 +36,7 @@ class Task(tasks.BaseTask):
 
 			home_dir = os.path.expanduser("~")
 
-			fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
+			self._fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
 
 		os.chdir(f"{self._outdir}/EDDY")
 
@@ -75,7 +75,7 @@ class Task(tasks.BaseTask):
 
 		eddy_quad = f"""singularity exec \
 		--pwd {self._outdir}/EDDY \
-		{fsl_sif} \
+		{self._fsl_sif} \
 		/APPS/fsl/bin/eddy_quad \
 		{self._sub}_{self._ses} \
 		-idx index.txt \
@@ -87,9 +87,9 @@ class Task(tasks.BaseTask):
 		-s {self._outdir}/{spec_file} \
 		-v"""
 
-		if os.path.isdir(f'{self._sub}_{self._ses}.qc'):
-			logging.warning('Output directory already exists. Removing and trying again.')
-			shutil.rmtree(f'{self._sub}_{self._ses}.qc')
+		#if os.path.isdir(f'{self._sub}_{self._ses}.qc'):
+		#	logging.warning('Output directory already exists. Removing and trying again.')
+		#	shutil.rmtree(f'{self._sub}_{self._ses}.qc')
 
 		logging.info('Running eddy_quad...')
 		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
@@ -107,6 +107,8 @@ class Task(tasks.BaseTask):
 		self.parse_json(eddy_results_dir)
 
 		self.extract_b0_vol()
+
+		self.delete_bval_bvec()
 
 
 	def parse_json(self, eddy_dir):
@@ -169,11 +171,9 @@ class Task(tasks.BaseTask):
 		logging.info('successfully parsed json and wrote out results to eddy_metrics.json')
 
 	def extract_b0_vol(self):
-		home_dir = os.path.expanduser("~")
-		fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif') 
 		os.chdir(f"{self._outdir}/PREPROCESSED")
 		extract_command = f"""singularity exec \
-		{fsl_sif} \
+		{self._fsl_sif} \
 		/APPS/fsl/bin/fslselectvols \
 		-i dwmri.nii.gz \
 		-o b0_volume \
@@ -186,5 +186,13 @@ class Task(tasks.BaseTask):
 		bind = [self._outdir, self._tempdir]
 		
 		os.environ["SINGULARITY_BIND"] = ','.join(bind)
+
+	def delete_bval_bvec(self):
+		logging.info('cleaning fmap bids directory')
+		fmap_dir = os.path.join(f'{self._bids}/sub-{self._sub}/ses-{self._ses}/fmap')
+		for file in os.listdir(fmap_dir):
+			if file.endswith('.bval') or file.endswith('.bvec'):
+				os.remove(file)
+
 
 

@@ -1,4 +1,3 @@
-
 #### load necessary libraries
 import tempfile
 import subprocess
@@ -586,16 +585,14 @@ class Task(tasks.BaseTask):
 				'singularity',
 				'run',
 				'-e',
+				'--env', 'PYTHONUNBUFFERED=1',
+				'--pwd', self._tempdir,
 				'--contain',
 				'--nv',
-				'-B',
-				f'{inputs_dir}:/INPUTS/',
-				'-B',
-				f'{self._outdir}:/OUTPUTS',
-				'-B',
-				f'{self._tempdir}:/tmp',
-				'-B',
-				f'{self._fs_license}:/APPS/freesurfer/license.txt',
+				'-B', f'{inputs_dir}:/INPUTS/',
+				'-B', f'{self._outdir}:/OUTPUTS',
+				'-B', f'{self._tempdir}:/tmp',
+				'-B', f'{self._fs_license}:/APPS/freesurfer/license.txt',
 				f'{prequal_sif}',
 				'--save_component_pngs',
 				'--subject',
@@ -609,7 +606,7 @@ class Task(tasks.BaseTask):
 			for item in prequal_options:
 				self._command.append(item)
 
-			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=5+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
+			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=6+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
 			self._command.append(eddy_args)
 
 		elif self._nonzero_shells == True:
@@ -620,16 +617,14 @@ class Task(tasks.BaseTask):
 				'singularity',
 				'run',
 				'-e',
+				'--env', 'PYTHONUNBUFFERED=1',
+				'--pwd', self._tempdir,
 				'--contain',
 				'--nv',
-				'-B',
-				f'{inputs_dir}:/INPUTS/',
-				'-B',
-				f'{self._outdir}:/OUTPUTS',
-				'-B',
-				f'{self._tempdir}:/tmp',
-				'-B',
-				f'{self._fs_license}:/APPS/freesurfer/license.txt',
+				'-B', f'{inputs_dir}:/INPUTS/',
+				'-B', f'{self._outdir}:/OUTPUTS',
+				'-B', f'{self._tempdir}:/tmp',
+				'-B', f'{self._fs_license}:/APPS/freesurfer/license.txt',
 				f'{prequal_sif}',
 				'--save_component_pngs',
 				'--nonzero_shells',
@@ -645,7 +640,7 @@ class Task(tasks.BaseTask):
 			for item in prequal_options:
 				self._command.append(item)
 
-			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=5+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
+			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=6+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
 			self._command.append(eddy_args)
 
 		logdir = self.logdir()
@@ -654,7 +649,7 @@ class Task(tasks.BaseTask):
 			self.job = Job(
 				name='dwiqc-prequal',
 				time='3000',
-				memory='40G',
+				memory='60G',
 				cpus=2,
 				nodes=1,
 				command=self._command,
@@ -677,8 +672,3 @@ class Task(tasks.BaseTask):
 
 class DWISpecError(Exception):
 	pass
-
-
-
-
-
