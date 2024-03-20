@@ -18,6 +18,9 @@ import re
 import shutil
 from dipy.io import read_bvals_bvecs
 from dipy.core.gradients import gradient_table
+from datetime import datetime
+
+date = datetime.today().strftime('%Y-%m-%d')
 
 logger = logging.getLogger(__name__)
 
@@ -511,7 +514,7 @@ class Task(tasks.BaseTask):
 			'--fs-license-file',
 			self._fs_license,
 			'-w',
-			f'{self._tempdir}/qsiprep/{self._ses}'
+			f'{self._tempdir}/qsiprep_{date}/{self._ses}'
 		]
 
 		for item in qsiprep_options:
