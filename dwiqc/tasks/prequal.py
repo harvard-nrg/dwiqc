@@ -589,7 +589,6 @@ class Task(tasks.BaseTask):
 				'--pwd', self._tempdir,
 				'--contain',
 				'--nv',
-				'-B', '/n/home_fasse/nrgadmin/mrtrix3.dev:/APPS/mrtrix3/lib/mrtrix3',
 				'-B', f'{inputs_dir}:/INPUTS/',
 				'-B', f'{self._outdir}:/OUTPUTS',
 				'-B', f'{self._tempdir}:/tmp',
@@ -607,7 +606,7 @@ class Task(tasks.BaseTask):
 			for item in prequal_options:
 				self._command.append(item)
 
-			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=5+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
+			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=6+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
 			self._command.append(eddy_args)
 
 		elif self._nonzero_shells == True:
@@ -622,7 +621,6 @@ class Task(tasks.BaseTask):
 				'--pwd', self._tempdir,
 				'--contain',
 				'--nv',
-				'-B', '/n/home_fasse/nrgadmin/mrtrix3.dev:/APPS/mrtrix3/lib/mrtrix3',
 				'-B', f'{inputs_dir}:/INPUTS/',
 				'-B', f'{self._outdir}:/OUTPUTS',
 				'-B', f'{self._tempdir}:/tmp',
