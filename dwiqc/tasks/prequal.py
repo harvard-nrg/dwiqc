@@ -668,7 +668,7 @@ class Task(tasks.BaseTask):
 				error=logfile
 			)
 
-		print('making it here')
+		logger.info('making it here')
 		sys.exit()
 
 
