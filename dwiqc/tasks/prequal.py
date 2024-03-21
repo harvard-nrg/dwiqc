@@ -668,6 +668,9 @@ class Task(tasks.BaseTask):
 				error=logfile
 			)
 
+		print('making it here')
+		sys.exit()
+
 
 
 class DWISpecError(Exception):
