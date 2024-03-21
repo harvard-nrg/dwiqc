@@ -188,11 +188,14 @@ class Task(tasks.BaseTask):
 		os.environ["SINGULARITY_BIND"] = ','.join(bind)
 
 	def delete_bval_bvec(self):
+		cwd = os.getcwd()
 		logging.info('cleaning fmap bids directory')
 		fmap_dir = os.path.join(f'{self._bids}/sub-{self._sub}/ses-{self._ses}/fmap')
-		for file in os.listdir(fmap_dir):
+		os.chdir(fmap_dir)
+		for file in os.listdir():
 			if file.endswith('.bval') or file.endswith('.bvec'):
 				os.remove(file)
+		os.chdir(cwd)
 
 
 
