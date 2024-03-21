@@ -474,6 +474,16 @@ class Task(tasks.BaseTask):
 		else:
 			return None
 
+	def delete_bval_bvec(self):
+		cwd = os.getcwd()
+		logging.info('cleaning fmap bids directory')
+		fmap_dir = os.path.join(f'{self._bids}/sub-{self._sub}/ses-{self._ses}/fmap')
+		os.chdir(fmap_dir)
+		for file in os.listdir():
+			if file.endswith('.bval') or file.endswith('.bvec'):
+				os.remove(file)
+		os.chdir(cwd)
+
 	def bind_environmentals(self):
 	
 		bind = [self._outdir, self._tempdir, self._fs_license]
@@ -489,6 +499,7 @@ class Task(tasks.BaseTask):
 		self.create_nipype()
 		self.check_output_resolution()
 		self.check_fieldmaps()
+		self.delete_bval_bvec()
 		try:
 			qsiprep_command = yaml.safe_load(open(self._qsiprep_config))
 		except yaml.parser.ParserError:
