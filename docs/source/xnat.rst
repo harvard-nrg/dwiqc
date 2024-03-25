@@ -79,13 +79,13 @@ Before using *get* mode, I strongly recommend creating an `xnat_auth alias <http
 get: The Config File
 """"""""""""""""""""
 
-Diffusion imaging is a burgeoning field with huge potential to deepen our understanding of the brain. While exciting, it also means that acquisition parameters, study designs, and theoretical analysis frameworks vary greatly. We've decided to rely heavily on yaml config files for downloading data to accomodate as many approaches as possible. The yaml config file tells *DWIQC* which scans to download from your XNAT instance based on information from the series description, notes field, or other metadata. It also tells *DWIQC* what to do with those scans once they've been downloaded (i.e. BIDS formatting). Let's dive in!
+Diffusion imaging is a burgeoning field with huge potential to deepen our understanding of the brain. While exciting, it also means that acquisition parameters, study designs, and theoretical analysis frameworks vary greatly. We've decided to rely heavily on yaml config files for downloading data to accomodate as many approaches as possible. The yaml config file tells *DWIQC* which scans to download from your XNAT instance based on information from each scan's notes field. It also tells *DWIQC* what to do with those scans once they've been downloaded (i.e. BIDS formatting). Let's dive in!
 
 Many diffusion study designs fall into two general camps (with many sub-variations, mind you). Let's discuss them here:
 
-| 1. Dedicated Field Maps
+| 1. Dedicated Fieldmaps
 
-This type of design means that each "main" diffusion scan (or set of "main" diffusion scans) has a field map acquired for it both in the AP and PA directions. Here's an example in XNAT:
+This type of design means that each "main" diffusion scan (or set of "main" diffusion scans) has a fieldmap acquired for it both in the AP and PA directions. Here's an example in XNAT:
 
 .. image:: images/dedicated_fmaps_example.png
 
@@ -103,7 +103,7 @@ Scan 36 is the reverse polarity scan, acquired in the PA direction, while scan 3
 
 Now that you have a general idea of how diffusion scans are frequently collected we can get into the anatomy of the yaml config file. We'll look at an example for each of the above experimental designs. A quick note about yaml: Indentation, hyphens, spaces, and colons are very important to the yaml structure. Be sure to maintain the exact structure seen here when editing.
 
-dedicated field map design
+dedicated fieldmap design
 """"""""""""""""""""""""""
 
 This looks a bit hairy, I admit, but it's not as wild as it seems. I would recommend copying and pasting this code block into a text editor and reading my breakdown of it side-by-side so that you're not constantly trying to read and scroll at the same time.
@@ -160,23 +160,10 @@ Just as before, the ``tag`` element tells *DWIQC* what to look for as its lookin
 
 ``acquisition_group`` is the same as above. We want this fieldmap scan to be linked to the main diffusion scan so we give it the same ``acquisition_group`` value: **A**
 
-reverse polarity field map design
+reverse polarity fieldmap design
 """""""""""""""""""""""""""""""""
 
-This kind of config file could be used when the diffusion data is not acquired with dedicated fieldmaps. In this case, there are reverse polarity (labeled here as "revpol") or reverse phase encode direction scans (usually consisting of 4-8 volumes) being acquired that correspond with the "main" (or primary) diffusion scans that consist of many more volumes. During processing, volumes will be extracted from both the "revpol" and "main" scans to create fieldmaps with FSL's topup tool.
-
-Let's unpack this example config file a bit more. The top line with *"dwiqc"* should be left alone (*DWIQC* needs it there as a point of reference). *"dwi_main_a"* on line 2 is an example of what you might want to name a certain type of scan you've acquired, though the specific name here doesn't matter as long as it is unique. Nested underneath *"dwi_main_a"* on line 3 is the *"tag"* element. It should correspond to the tag you've inserted into the note field for a particular scan using *xnattagger* (or manually). In this example, *get* mode will look for **#dwi_main_a** (plus any number or other characters associated with it, case insensitive). As long as **#dwi_main_a** is found in the note field of a scan, it will be considered a match. 
-
-The rest of the elements found nested under *"dwi_main_a"* are used for generating BIDS-compliant file names and structure. *"bids_subdir"* on line 5 refers to the directory that a scan with the **#dwi_main_a** tag should be placed in. This element has significant implications for downstream processing. *Scans that serve as fieldmaps, either dedicated or as "revpol", should be placed into the BIDS fmap directory*. Otherwise, all scans should be placed into the dwi directory. The *"direction"* element on line 7 refers to the phase encoding direction of the scan. It will either be *AP* or *PA*. 
-
-Finally, the *"acquisition_group"* element serves as a means of grouping "main" and "revpol" scans together. For example, a certain study may be acquiring 4 "main" diffusion scans and 2 "revpol" scans. As mentioned earlier, volumes will be extracted from both "revpol" scans and "main" scans to create fieldmaps. As such, you want to be sure that the correct "revpol" and "main" scans are associated with each other. If the first acquired "revpol" scan corresponds to "main" scans 1 and 2, you wouldn't want that "revpol" scan to be used to create fieldmaps for "main" scans 3 and 4, or "main" scans 1 and 4, and so on. *"acquisition_group"* helps us pair scans together to ensure that field maps are being generated properly. In the example below, "main" and "revpol" scans are grouped by using the letters *A* and *B*, but you can use whatever convention you'd like as long as it's consistent.
-
-Only the *"tag"* and *"bids_subdir"* elements are required in the config file. If you have no need for *"direction"* or *"acquisition_group"*, you don't have to use them!
-
-.. note::
-    Indentation, hyphens, spaces, and colons are very important to the yaml structure. Be sure to maintain the exact structure seen here when editing.
-
-Phew! I would recommend pulling up this example config file in a text editor and looking at it side-by-side with the above explanation.
+Kudos to you for making it this far! Hopefully this section will be a bit more palatable since we've already covered most aspects of the config file. Take a look at the example config file below. Once again, I would recommend copying and pasting it into a text editor and looking at it side-by-side with my description.
 
 .. code-block:: yaml
 
@@ -222,6 +209,20 @@ Phew! I would recommend pulling up this example config file in a text editor and
           - .*(^|\s)ANAT_1.0_ADNI(?P<run>_\d+)?(\s|$).*
         bids_subdir:
           - anat
+
+You'll notice that this config file is very similar to the example shown above, with a few key differences. 
+
+``dwi_main_a`` has the same sub elements as seen above for ``dwi_main`` plus the ``direction`` element. The phase encode direction is important to specify here because there are no dedicated fieldmaps. *DWIQC* needs to know the phase encode direction for these study designs as it prepares the data to be distortion corrected. 
+
+You'll also notice that this study design included more than one main diffusion scan and more than one reverse polarity scan. This is where the ``acquisition_group`` element becomes vital. By specifying the different scans as part of the **A** or **B** group, the reverse polarity and main scans get properly associated with one another. For example, ``dwi_main_b`` and ``revpol_b`` both have **B** specified as the value for their ``acquisition_group`` element, while ``dwi_main_a`` and ``revpol_a`` have **A** as the value.
+
+Those differences aside, the config files both use the ``tag``, ``bids_subdir``, ``direction`` and ``acquisition_group`` elements in very similar ways.
+
+.. note::
+    Only the ``tag`` and ``bids_subdir`` elements are required in the config file. If you have no need for ``direction`` or ``acquisition_group``, you don't have to use them!
+
+
+Phew! You made it through. Try your hand at modifying the examples above for your own dataset. Best way to learn is by doing!
 
 get: Required Arguments
 """""""""""""""""""""""
@@ -271,7 +272,7 @@ After running *DWIQC* *get* you should see two new directories and one new file 
 
 .. image:: images/get-output.png
 
-*dataset_description.json* conatains very basic information about the downloaded data. It's required by BIDS format. *sourcedata* contains the raw dicoms of all the downloaded scans. *sub-PE201222* (will differ for you) contains the downloaded data in proper BIDS format. If you enter the directory, you should see the subject session, then three more directories: *anat*, *dwi* and *fmap*. Those directories contain the MR Session's respective anatomical, diffusion and diffusion field map data. If one of the directories is missing or empty, verify that your session's scans have been tagged correctly and that the data is downloadable.
+*dataset_description.json* conatains very basic information about the downloaded data. It's required by BIDS format. *sourcedata* contains the raw dicoms of all the downloaded scans. *sub-PE201222* (will differ for you) contains the downloaded data in proper BIDS format. If you enter the directory, you should see the subject session, then three more directories: *anat*, *dwi* and *fmap*. Those directories contain the MR Session's respective anatomical, diffusion and diffusion fieldmap data. If one of the directories is missing or empty, verify that your session's scans have been tagged correctly and that the data is downloadable.
 
 get: Common Errors
 """"""""""""""""""
