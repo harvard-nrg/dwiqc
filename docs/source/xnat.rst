@@ -12,7 +12,7 @@ User Documentation
 
 Tagging your scans
 ------------------
-For *DWIQC* to discover Diffusion and Fieldmap scans to process, you need to add notes to those scans in `XNAT`_. This can either be done via the XNAT interface or through the xnattagger `command line tool <https://github.com/harvard-nrg/xnattagger>`_. To tag via the XNAT interface, you can add notes using the ``Edit`` button located within the ``Actions`` box on the MR Session report page.
+For *DWIQC* to discover diffusion and fieldmap scans to process, you need to add notes to those scans in `XNAT`_. This can either be done via the XNAT interface or through the xnattagger `command line tool <xnattagger.html>`_. To tag via the XNAT interface, you can add notes using the ``Edit`` button located within the ``Actions`` box on the MR Session report page.
 
 ========= ================================  ===========================================================
 Type      Example series                    Note
@@ -43,7 +43,7 @@ DWI scan          run
 
 Running the pipeline
 --------------------
-For the time being, *DWIQC* can only be run outside of XNAT on a High Performance Computing system (or a beefed up local machine). Please see the developer documentation for `installation`_ details before proceeding.
+For the time being, *DWIQC* can only be run outside of XNAT on a High Performance Computing system with access to gpu nodes (or a local gpu node). Please see the developer documentation for `installation`_ details before proceeding.
 
 Overview
 ^^^^^^^^^
@@ -53,8 +53,8 @@ With *DWIQC* and it's necessary containers installed, you're ready to analyze so
 
 *DWIQC* is built on the `prequal`_ and `qsiprep`_ processing packages. Both of these tools are excellent in their own right. We found that by running both of them, we can maximize our understanding of the data quality and glean additional key insights. Please take the necessary time to understand both tools and the theoretical approach they take to analyzing diffusion data. You may find that you only want to use one of them in your analysis (which is possible using the ``--sub-tasks`` command). *DWIQC* was built completely in python and we welcome anyone to peruse the `codebase <https://github.com/harvard-nrg/dwiqc>`_ and make build suggestions (hello, pull requests!).
 
-get, process and tandem modes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+install-containers, get, process and tandem modes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *DWIQC* is broken down into four different "modes". As you saw in the `installation`_ section, the *install-containers* mode is used upon initial setup of your *DWIQC* environment. *get*, *process* and *tandem* modes are used once everything has been properly installed and you're ready to start working with the data. We'll start by looking at *get* mode.
 
 .. note::
@@ -72,29 +72,98 @@ get mode
 get: Overview
 """""""""""""
 
-*get* mode functions as a way to download data from XNAT to your local compute environment. *get* mode's primary feature is the ability to download data and convert it to BIDS format. Take a look at the official `docs <https://bids-specification.readthedocs.io/en/stable/>`_ if you're unfamiliar with BIDS.
+*get* mode downloads data from XNAT to your local compute environment and converts it to BIDS format. Take a look at the official `docs <https://bids-specification.readthedocs.io/en/stable/>`_ if you're unfamiliar with BIDS.
 
 Before using *get* mode, I strongly recommend creating an `xnat_auth alias <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using the excellent `yaxil <https://yaxil.readthedocs.io/en/latest/>`_ python library. It's not stictly necessary to do so, but it will make your life easier. Example code will use an xnat alias. yaxil comes as a part of the *DWIQC* `installation <developers.html#hpc-installation>`_ (yaxil is a *DWIQC* dependency). 
 
-get: Config File
-""""""""""""""""
+get: The Config File
+""""""""""""""""""""
 
-Diffusion imaging is a burgeoning field with huge potential to deepen our understanding of the brain. While exciting, it also means that acquisition parameters, study designs, and theoretical analysis frameworks vary greatly. We've decided to make heavy use of yaml config files to accomodate as many approaches as possible. Take a look at the example config file below (`download it <https://raw.githubusercontent.com/harvard-nrg/dwiqc/main/example.yaml>`_ or copy/paste into text editor).
+Diffusion imaging is a burgeoning field with huge potential to deepen our understanding of the brain. While exciting, it also means that acquisition parameters, study designs, and theoretical analysis frameworks vary greatly. We've decided to rely heavily on yaml config files for downloading data to accomodate as many approaches as possible. The yaml config file tells *DWIQC* which scans to download from your XNAT instance based on information from each scan's notes field. It also tells *DWIQC* what to do with those scans once they've been downloaded (i.e. BIDS formatting). Let's dive in!
 
-This kind of config file could be used when the diffusion data is not acquired with dedicated fieldmaps. In this case, there are reverse polarity (labeled here as "revpol") or reverse phase encode direction scans (usually consisting of 4-8 volumes) being acquired that correspond with the "main" (or primary) diffusion scans that consist of many more volumes. During processing, volumes will be extracted from both the "revpol" and "main" scans to create fieldmaps with FSL's topup tool.
+Many diffusion study designs fall into two general camps (with many sub-variations, mind you). Let's discuss them here:
 
-Let's unpack this example config file a bit more. The top line with *"dwiqc"* should be left alone (*DWIQC* needs it there as a point of reference). *"dwi_main_a"* on line 2 is an example of what you might want to name a certain type of scan you've acquired, though the specific name here doesn't matter as long as it is unique. Nested underneath *"dwi_main_a"* on line 3 is the *"tag"* element. It should correspond to the tag you've inserted into the note field for a particular scan using *xnattagger* (or manually). In this example, *get* mode will look for **#dwi_main_a** (plus any number or other characters associated with it, case insensitive). As long as **#dwi_main_a** is found in the note field of a scan, it will be considered a match. 
+| 1. Dedicated Fieldmaps
 
-The rest of the elements found nested under *"dwi_main_a"* are used for generating BIDS-compliant file names and structure. *"bids_subdir"* on line 5 refers to the directory that a scan with the **#dwi_main_a** tag should be placed in. This element has significant implications for downstream processing. *Scans that serve as fieldmaps, either dedicated or as "revpol", should be placed into the BIDS fmap directory*. Otherwise, all scans should be placed into the dwi directory. The *"direction"* element on line 7 refers to the phase encoding direction of the scan. It will either be *AP* or *PA*. 
+This type of design means that each "main" diffusion scan (or set of "main" diffusion scans) has a fieldmap acquired for it both in the AP and PA directions. Here's an example in XNAT:
 
-Finally, the *"acquisition_group"* element serves as a means of grouping "main" and "revpol" scans together. For example, a certain study may be acquiring 4 "main" diffusion scans and 2 "revpol" scans. As mentioned earlier, volumes will be extracted from both "revpol" scans and "main" scans to create fieldmaps. As such, you want to be sure that the correct "revpol" and "main" scans are associated with each other. If the first acquired "revpol" scan corresponds to "main" scans 1 and 2, you wouldn't want that "revpol" scan to be used to create fieldmaps for "main" scans 3 and 4, or "main" scans 1 and 4, and so on. *"acquisition_group"* helps us pair scans together to ensure that field maps are being generated properly. In the example below, "main" and "revpol" scans are grouped by using the letters *A* and *B*, but you can use whatever convention you'd like as long as it's consistent.
+.. image:: images/dedicated_fmaps_example.png
 
-Only the *"tag"* and *"bids_subdir"* elements are required in the config file. If you have no need for *"direction"* or *"acquisition_group"*, you don't have to use them!
+Scans 23 and 24 serve as the dedicated fieldmaps, 23 as the PA fieldmap and 24 as the AP fieldmap. Scan 25 is the "main" diffusion scan.
 
-.. note::
-    Indentation, hyphens, spaces, and colons are very important to the yaml structure. Be sure to maintain the exact structure seen here when editing.
+| 2. Reverse Polarity Scan
 
-Phew! I would recommend pulling up this example config file in a text editor and looking at it side-by-side with the above explanation.
+The other popular design choice is having just one scan serve as the fieldmap. In most cases, this scan is acquired in the reverse phase encode direction relative to the "main" diffusion scan. So if the "main" scan is acquired in the PA direction, the reverse polarity scan would be acquired in the AP direction. Here's an example in XNAT:
+
+.. image:: images/revpol_example.png
+
+Scan 36 is the reverse polarity scan, acquired in the PA direction, while scan 38 is the "main" diffusion a scan acquired in the AP direction. Scan 37 is an SBRef scan not used here.
+
+.. note:: You may notice the tags on the far right of the examples above (e.g. #DWI_REVPOL_A, #DWI_MAIN_001). The tags don't have to be anything in particular; it's completely up to you.
+
+Now that you have a general idea of how diffusion scans are frequently collected we can get into the anatomy of the yaml config file. We'll look at an example for each of the above experimental designs. A quick note about yaml: Indentation, hyphens, spaces, and colons are very important to the yaml structure. Be sure to maintain the exact structure seen here when editing.
+
+dedicated fieldmap design
+""""""""""""""""""""""""""
+
+This looks a bit hairy, I admit, but it's not as wild as it seems. I would recommend copying and pasting this code block into a text editor and reading my breakdown of it side-by-side so that you're not constantly trying to read and scroll at the same time.
+
+.. code-block:: yaml
+
+    dwiqc:
+      dwi_main:
+        tag:
+          - .*(^|\s)#dwi_main(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - dwi
+        acquisition_group:
+          - A
+      fmap_ap:
+        tag:
+          - .*(^|\s)#dwi_fmap_ap(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - fmap
+        direction:
+          - AP
+        acquisition_group:
+          - A
+      fmap_pa:
+        tag:
+          - .*(^|\s)#dwi_fmap_pa(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - fmap
+        direction:
+          - PA
+        acquisition_group:
+          - A
+      t1w:
+        tag:
+          - .*(^|\s)#T1w(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - anat
+
+The first thing to notice is that ``dwiqc`` is the first layer of this whole thing. This is simply a way to keep everything orderly and tidy. Next, there are four 1st level layers: ``dwi_main``, ``fmap_ap``, ``fmap_pa`` and  ``t1w``. Each one of those labels represents a different scan within an XNAT session.
+
+The ``dwi_main`` layer has three sub-elements: ``tag``, ``bids_subdir`` and ``acquisition_group``. ``tag`` refers to the tag you've put into the notes field for your "main" diffusion scan. The tag can be anything, it just has to be consistent. In the case of our example here, as *DWIQC* iterates through all of the scans of an XNAT session it makes use of `regular expressions <https://coderpad.io/blog/development/the-complete-guide-to-regular-expressions-regex/>`_ to find a scan with a **#dwi_main** (case insensitive) followed by a digit (e.g. **001**) in the notes field. Once it finds a scan with a matching tag, it downloads it. 
+
+The ``bids_subdir`` element tells *DWIQC* where to put the scan in the BIDS hierarchy. In this case, it will place the matching scan into the 'dwi' directory. 
+
+``acquisition_group`` serves as a way to link "main" diffusion scans to its fieldmaps. It's not relevant in this example, however there are cases when a study might have several different sets of "main" diffusion scans and fieldmaps. ``acquisition_group`` helps group these sets together. Here, the ``acquisition_group`` is **A** (you'll notice the fieldmaps have the same value).
+
+Now let's take a look at one of the fieldmap sub-layers. ``fmap_pa`` has four sub-elements as opposed to the three that ``dwi_main`` has. 
+
+Just as before, the ``tag`` element tells *DWIQC* what to look for as its looking through all the scans in a session. Here, it uses a regular expression to match to any scan that has a **#dwi_fmap_pa** (case insensitive) followed by a digit (e.g. **001**) in the notes field.
+
+``bids_subdir`` tells *DWIQC* where to download the scan to in the BIDS hierarchy, **fmap** in this case.
+
+``direction`` is a new element. It refers to the primary phase encode direction of the scan. **PA** for this scan. You can include this element for ``dwi_main`` but it's usually not necessary when there are dedicated fieldmaps.
+
+``acquisition_group`` is the same as above. We want this fieldmap scan to be linked to the main diffusion scan so we give it the same ``acquisition_group`` value: **A**
+
+reverse polarity fieldmap design
+"""""""""""""""""""""""""""""""""
+
+Kudos to you for making it this far! Hopefully this section will be a bit more palatable since we've already covered most aspects of the config file. Take a look at the example config file below. Once again, I would recommend copying and pasting it into a text editor and looking at it side-by-side with my description.
 
 .. code-block:: yaml
 
@@ -141,6 +210,20 @@ Phew! I would recommend pulling up this example config file in a text editor and
         bids_subdir:
           - anat
 
+You'll notice that this config file is very similar to the example shown above, with a few key differences. 
+
+``dwi_main_a`` has the same sub elements as seen above for ``dwi_main`` plus the ``direction`` element. The phase encode direction is important to specify here because there are no dedicated fieldmaps. *DWIQC* needs to know the phase encode direction for these study designs as it prepares the data to be distortion corrected. 
+
+You'll also notice that this study design included more than one main diffusion scan and more than one reverse polarity scan. This is where the ``acquisition_group`` element becomes vital. By specifying the different scans as part of the **A** or **B** group, the reverse polarity and main scans get properly associated with one another. For example, ``dwi_main_b`` and ``revpol_b`` both have **B** specified as the value for their ``acquisition_group`` element, while ``dwi_main_a`` and ``revpol_a`` have **A** as the value.
+
+Those differences aside, the config files both use the ``tag``, ``bids_subdir``, ``direction`` and ``acquisition_group`` elements in very similar ways.
+
+.. note::
+    Only the ``tag`` and ``bids_subdir`` elements are required in the config file. If you have no need for ``direction`` or ``acquisition_group``, you don't have to use them!
+
+
+Phew! You made it through. Try your hand at modifying the examples above for your own dataset. Best way to learn is by doing!
+
 get: Required Arguments
 """""""""""""""""""""""
 
@@ -161,7 +244,7 @@ get: Required Arguments
 
 | 3. ``--xnat-alias`` is the alias containing credentials associated with your XNAT instance. It can be created in a few `steps <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using yaxil.
 
-| 4. ``--download-config`` is the **absolute** path to the yaml config file that tells *DWIQC* which tags it should look for (see the `xnattagger docs <xnattagger.html>`_) and the `config file <#get-config-file>`_ section of get mode for more tagging details.
+| 4. ``--download-config`` is the **absolute** path to the yaml config file that tells *DWIQC* which tags it should look for (see the `xnattagger docs <xnattagger.html>`_) and the `config file <#get-the-config-file>`_ section of get mode for more tagging details.
 
 
 get: Executing the Command
@@ -189,7 +272,7 @@ After running *DWIQC* *get* you should see two new directories and one new file 
 
 .. image:: images/get-output.png
 
-*dataset_description.json* conatains very basic information about the downloaded data. It's required by BIDS format. *sourcedata* contains the raw dicoms of all the downloaded scans. *sub-PE201222* (will differ for you) contains the downloaded data in proper BIDS format. If you enter the directory, you should see the subject session, then three more directories: *anat*, *dwi* and *fmap*. Those directories contain the MR Session's respective anatomical, diffusion and diffusion field map data. If one of the directories is missing or empty, verify that your session's scans have been tagged correctly and that the data is downloadable.
+*dataset_description.json* conatains very basic information about the downloaded data. It's required by BIDS format. *sourcedata* contains the raw dicoms of all the downloaded scans. *sub-PE201222* (will differ for you) contains the downloaded data in proper BIDS format. If you enter the directory, you should see the subject session, then three more directories: *anat*, *dwi* and *fmap*. Those directories contain the MR Session's respective anatomical, diffusion and diffusion fieldmap data. If one of the directories is missing or empty, verify that your session's scans have been tagged correctly and that the data is downloadable.
 
 get: Common Errors
 """"""""""""""""""
@@ -201,7 +284,7 @@ get: Advanced Usage
 
 There are a couple *get* mode optional arguments that are worth noting. 
 
-| 1. By default, *get* mode will run `xnattagger <xnattagger.html>`_ on the provided MR Session. Pass the ``--no-tagger`` argument if you'd like to turn off that functionality.
+| 1. *get* mode will not run `xnattagger <xnattagger.html>`_  by default on the provided MR Session. Pass the ``--run-tagger`` argument along with the ``--tagger-config`` argument with a path to the *xnattagger* config file to run *xnattagger* with *get* mode.
  
 | 2. If you would like to see what data will be downloaded from XNAT without actually downloading it, pass the ``--dry-run`` argument.
 
@@ -215,9 +298,13 @@ Argument              Description                               Required
 ``--bids-dir``        Path to BIDS download directory           Yes
 ``--xnat-alias``      Alias for XNAT Project                    Yes
 ``--download-config`` Configuration file for downloading scans  Yes
-``--project``         Project Name                              No
-``--no-tagger``       Turn off *xnattagger*                     No
+``--run-tagger``      Run *xnattagger*                          No
+``--tagger-config``   Path to *xnattagger* config file          No
 ``--dry-run``         Generate list of to-be-downloaded scans   No
+``--project``         XNAT project Name                         No
+``--xnat-host``       URL of XNAT Host                          No
+``--xnat-user``       XNAT username                             No
+``--xnat-pass``       XNAT user password                        No
 ===================== ========================================  ========
 
 process mode
@@ -225,7 +312,7 @@ process mode
 process: Overview
 """""""""""""""""
 
-With your data successfully downloaded using *get* mode (or organized in BIDS format through other means) you are ready to run *DWIQC*. We recommended running *DWIQC* in an HPC (High Performance Computing) environment rather than on a local machine. *DWIQC* will run both `prequal`_ and `qsiprep`_ using gpu compute nodes by default. However, it is possible to turn off gpu-dependent features by using the ``--no-gpu`` argument. *DWIQC* may require up to 20GB of RAM if run on a local/non-gpu machine so please allocate resources appropriately. 
+With your data successfully downloaded using *get* mode (or organized in BIDS format through other means) you are ready to run *DWIQC*. We recommended running *DWIQC* in an HPC (High Performance Computing) environment rather than on a local machine. *DWIQC* will run both `prequal`_ and `qsiprep`_ and requires gpu compute nodes. *DWIQC* must be run on gpu nodes for the time being.
 
 process: Required Arguments
 """""""""""""""""""""""""""
@@ -285,9 +372,11 @@ Download an example :download:`here <examples/sub-MS881355-imbedded_images.html>
 
 **Eddy Quad Output:**
 
-To find the eddy quad pdf report, navigate to the ``--bids-dir`` directory you passed to *process* mode. The pdf file will be located under several layers of directories:
+To find the eddy quad pdf report, navigate to the ``--bids-dir`` directory you passed to *process* mode. It runs on both prequal and qsiprep output. The pdf file will be located under several layers of directories:
 
-derivatives ---> dwiqc-prequal ---> subject_dir ---> session_dir ---> sub_session_dir_run__dwi ---> OUTPUTS ---> EDDY ---> SUBJECT_SESSION.qc ---> qc.pdf
+derivatives ---> dwiqc-prequal ---> subject_dir ---> session_dir ---> OUTPUTS ---> EDDY ---> SUBJECT_SESSION.qc ---> qc.pdf
+
+derivatives ---> dwiqc-qsiprep ---> subject_dir ---> session_dir ---> qsiprep_output ---> EDDY ---> SUBJECT_SESSION.qc ---> qc.pdf
 
 Download an example :download:`here <examples/qc.pdf>`.
 
@@ -326,11 +415,9 @@ Only a few of the many possible *process* mode arguments will be discussed here.
 
 | 3. ``--output-resolution`` allows you to specify the resolution of images created by qsiprep. The default is the same as the input data. Example usage: ``--output-resolution 1.0``
 
-| 4. ``--no-gpu`` enables users without access to a gpu node to run *DWIQC*. Note that some advanced processing features are not available without gpu computing. Example usage: ``--no-gpu`` (just passing the argument is sufficient)
+| 4. ``--sub-tasks`` is used to run either just qsiprep or prequal. Example usage: ``--sub-tasks qsiprep``
 
-| 5. ``--sub-tasks`` is used to run either just qsiprep or prequal. Example usage: ``--sub-tasks qsiprep``
-
-| 6. ``--custom-eddy`` is used to pass custom FSL eddy parameters to qsiprep as noted under *Common Errors*. Example usage: ``--custom-eddy /users/nrg/PE201222_230719/eddy_params_s2v_mbs.json``
+| 5. ``--custom-eddy`` is used to pass custom FSL eddy parameters to qsiprep as noted under *Common Errors*. Example usage: ``--custom-eddy /users/nrg/PE201222_230719/eddy_params_s2v_mbs.json``
 
 process: All Arguments
 """"""""""""""""""""""
@@ -497,12 +584,12 @@ The ``SNR/CNR Metrics`` pane displays SNR/CNR metrics computed *for each individ
 =========== ======================= =================================================
 Metric      From                    Description                              
 =========== ======================= =================================================
-B0 SNR      Eddy Quad (Prequal/FSL) Signal-to-noise ratio for B0 Shell
-BN CNR      Eddy Quad (Prequal/FSL) Contrast-to-noise ratio for each shell
+B0 SNR      Eddy Quad (FSL/Both)    Signal-to-noise ratio for B0 Shell
+BN CNR      Eddy Quad (FSL/Both)    Contrast-to-noise ratio for each shell
 =========== ======================= =================================================
 
 .. note::
-      Anywhere you see "Eddy Quad (Prequal/FSL)" means that FSL's Eddy Quad tool was run on Prequal output.
+      Anywhere you see "Eddy Quad (FSL/Both)" means that FSL's Eddy Quad tool was run on prequal and qsiprep output.
 
 Motion Metrics
 """"""""""""""
@@ -513,11 +600,11 @@ The ``Motion Metrics`` pane displays motion metrics computed over dwi scan(s).
 ================= ======================= ===========================================================
 Metric            From                    Description
 ================= ======================= ===========================================================
-Avg Abs Motion    Eddy Quad (Prequal/FSL) Estimated amount of all motion in any direction
-Avg Rel Motion    Eddy Quad (Prequal/FSL) Estimated motion relative to initial head position
-Avg X Translation Eddy Quad (Prequal/FSL) Estimated X translation motion
-Avg Y Translation Eddy Quad (Prequal/FSL) Estimated Y translation motion
-Avg Z Translation Eddy Quad (Prequal/FSL) Estimated Z translation motion
+Avg Abs Motion    Eddy Quad (FSL/Both)    Estimated amount of all motion in any direction
+Avg Rel Motion    Eddy Quad (FSL/Both)    Estimated motion relative to initial head position
+Avg X Translation Eddy Quad (FSL/Both)    Estimated X translation motion
+Avg Y Translation Eddy Quad (FSL/Both)    Estimated Y translation motion
+Avg Z Translation Eddy Quad (FSL/Both)    Estimated Z translation motion
 ================= ======================= ===========================================================
 
 Files
@@ -529,16 +616,16 @@ The ``Files`` pane contains the most commonly requested files. Clicking on any o
 ======================= ======================= ======================================================
 File                    From                    Description
 ======================= ======================= ======================================================
-B0 Average              Eddy Quad (Prequal/FSL) BO Shell Average Image
+B0 Average              Eddy Quad (FSL/Both)    BO Shell Average Image
 Brain Mask              Qsiprep                 Gray Matter, White Matter and Pial Boundaries
 FA Map                  Prequal                 Fractional Anisotropy Map
 MD Map                  Prequal                 Mean Diffusivity Map
 Eddy Outlier Sices      Prequal                 Plot of Slices with Motion Outliers
 T1 Registration         Qsiprep                 GIF of T1w image to Template Registration
 Denoise                 Qsiprep                 GIF of DWI Image Pre and Post Denoising
-Motion Plot             Eddy Quad (Prequal/FSL) Translational and rotational motion, displacement
+Motion Plot             Eddy Quad (FSL/Both)    Translational and rotational motion, displacement
 Prequal Report          Prequal                 Prequal PDF Report
-Eddy Quad Report        Eddy Quad (Prequal/FSL) Eddy Quad PDF Report
+Eddy Quad Report        Eddy Quad (FSL/Both)    Eddy Quad PDF Report
 Qsiprep Report          Qsiprep                 Qsiprep HTML Report
 Carpet Plot             Qsiprep                 Maximum Framewise Displacement Plot
 ======================= ======================= ======================================================
@@ -599,7 +686,7 @@ Motion Translations               Plot of motion translations across DWI scan
 Motion Rotations                  Plot of motion rorations acorss DWI scan
 Motion Displacements              Plot of motion displacements across DWI scan
 Prequal PDF Report                Complete Prequal Report
-Eddy Quad PDF Report              Complete Eddy Quad Report (run on Prequal output)
+Eddy Quad PDF Report              Complete Eddy Quad Report (run on both output)
 Qsiprep HTML Report               Complete Qsiprep Report in HTML Format
 Qsiprep PDF Report                Complete Qsiprep Report in PDF Format
 T1 Registration                   GIF of T1w image to Template Registration
