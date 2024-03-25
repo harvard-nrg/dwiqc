@@ -12,7 +12,7 @@ User Documentation
 
 Tagging your scans
 ------------------
-For *DWIQC* to discover Diffusion and Fieldmap scans to process, you need to add notes to those scans in `XNAT`_. This can either be done via the XNAT interface or through the xnattagger `command line tool <https://github.com/harvard-nrg/xnattagger>`_. To tag via the XNAT interface, you can add notes using the ``Edit`` button located within the ``Actions`` box on the MR Session report page.
+For *DWIQC* to discover diffusion and fieldmap scans to process, you need to add notes to those scans in `XNAT`_. This can either be done via the XNAT interface or through the xnattagger `command line tool <xnattagger.html>`_. To tag via the XNAT interface, you can add notes using the ``Edit`` button located within the ``Actions`` box on the MR Session report page.
 
 ========= ================================  ===========================================================
 Type      Example series                    Note
@@ -43,7 +43,7 @@ DWI scan          run
 
 Running the pipeline
 --------------------
-For the time being, *DWIQC* can only be run outside of XNAT on a High Performance Computing system (or a beefed up local machine). Please see the developer documentation for `installation`_ details before proceeding.
+For the time being, *DWIQC* can only be run outside of XNAT on a High Performance Computing system with access to gpu nodes (or a local gpu node). Please see the developer documentation for `installation`_ details before proceeding.
 
 Overview
 ^^^^^^^^^
@@ -53,8 +53,8 @@ With *DWIQC* and it's necessary containers installed, you're ready to analyze so
 
 *DWIQC* is built on the `prequal`_ and `qsiprep`_ processing packages. Both of these tools are excellent in their own right. We found that by running both of them, we can maximize our understanding of the data quality and glean additional key insights. Please take the necessary time to understand both tools and the theoretical approach they take to analyzing diffusion data. You may find that you only want to use one of them in your analysis (which is possible using the ``--sub-tasks`` command). *DWIQC* was built completely in python and we welcome anyone to peruse the `codebase <https://github.com/harvard-nrg/dwiqc>`_ and make build suggestions (hello, pull requests!).
 
-get, process and tandem modes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+install-containers, get, process and tandem modes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *DWIQC* is broken down into four different "modes". As you saw in the `installation`_ section, the *install-containers* mode is used upon initial setup of your *DWIQC* environment. *get*, *process* and *tandem* modes are used once everything has been properly installed and you're ready to start working with the data. We'll start by looking at *get* mode.
 
 .. note::
@@ -72,14 +72,96 @@ get mode
 get: Overview
 """""""""""""
 
-*get* mode functions as a way to download data from XNAT to your local compute environment. *get* mode's primary feature is the ability to download data and convert it to BIDS format. Take a look at the official `docs <https://bids-specification.readthedocs.io/en/stable/>`_ if you're unfamiliar with BIDS.
+*get* mode downloads data from XNAT to your local compute environment and converts it to BIDS format. Take a look at the official `docs <https://bids-specification.readthedocs.io/en/stable/>`_ if you're unfamiliar with BIDS.
 
 Before using *get* mode, I strongly recommend creating an `xnat_auth alias <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using the excellent `yaxil <https://yaxil.readthedocs.io/en/latest/>`_ python library. It's not stictly necessary to do so, but it will make your life easier. Example code will use an xnat alias. yaxil comes as a part of the *DWIQC* `installation <developers.html#hpc-installation>`_ (yaxil is a *DWIQC* dependency). 
 
-get: Config File
-""""""""""""""""
+get: The Config File
+""""""""""""""""""""
 
-Diffusion imaging is a burgeoning field with huge potential to deepen our understanding of the brain. While exciting, it also means that acquisition parameters, study designs, and theoretical analysis frameworks vary greatly. We've decided to make heavy use of yaml config files to accomodate as many approaches as possible. Take a look at the example config file below (`download it <https://raw.githubusercontent.com/harvard-nrg/dwiqc/main/example.yaml>`_ or copy/paste into text editor).
+Diffusion imaging is a burgeoning field with huge potential to deepen our understanding of the brain. While exciting, it also means that acquisition parameters, study designs, and theoretical analysis frameworks vary greatly. We've decided to rely heavily on yaml config files for downloading data to accomodate as many approaches as possible. The yaml config file tells *DWIQC* which scans to download from your XNAT instance based on information from the series description, notes field, or other metadata. It also tells *DWIQC* what to do with those scans once they've been downloaded (i.e. BIDS formatting). Let's dive in!
+
+Many diffusion study designs fall into two general camps (with many sub-variations, mind you). Let's discuss them here:
+
+| 1. Dedicated Field Maps
+
+This type of design means that each "main" diffusion scan (or set of "main" diffusion scans) has a field map acquired for it both in the AP and PA directions. Here's an example in XNAT:
+
+.. image:: images/dedicated_fmaps_example.png
+
+Scans 23 and 24 serve as the dedicated fieldmaps, 23 as the PA fieldmap and 24 as the AP fieldmap. Scan 25 is the "main" diffusion scan.
+
+| 2. Reverse Polarity Scan
+
+The other popular design choice is having just one scan serve as the fieldmap. In most cases, this scan is acquired in the reverse phase encode direction relative to the "main" diffusion scan. So if the "main" scan is acquired in the PA direction, the reverse polarity scan would be acquired in the AP direction. Here's an example in XNAT:
+
+.. image:: images/revpol_example.png
+
+Scan 36 is the reverse polarity scan, acquired in the PA direction, while scan 38 is the "main" diffusion a scan acquired in the AP direction. Scan 37 is an SBRef scan not used here.
+
+.. note:: You may notice the tags on the far right of the examples above (e.g. #DWI_REVPOL_A, #DWI_MAIN_001). The tags don't have to be anything in particular; it's completely up to you.
+
+Now that you have a general idea of how diffusion scans are frequently collected we can get into the anatomy of the yaml config file. We'll look at an example for each of the above experimental designs. A quick note about yaml: Indentation, hyphens, spaces, and colons are very important to the yaml structure. Be sure to maintain the exact structure seen here when editing.
+
+dedicated field map design
+""""""""""""""""""""""""""
+
+This looks a bit hairy, I admit, but it's not as wild as it seems. I would recommend copying and pasting this code block into a text editor and reading my breakdown of it side-by-side so that you're not constantly trying to read and scroll at the same time.
+
+.. code-block:: yaml
+
+    dwiqc:
+      dwi_main:
+        tag:
+          - .*(^|\s)#dwi_main(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - dwi
+        acquisition_group:
+          - A
+      fmap_ap:
+        tag:
+          - .*(^|\s)#dwi_fmap_ap(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - fmap
+        direction:
+          - AP
+        acquisition_group:
+          - A
+      fmap_pa:
+        tag:
+          - .*(^|\s)#dwi_fmap_pa(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - fmap
+        direction:
+          - PA
+        acquisition_group:
+          - A
+      t1w:
+        tag:
+          - .*(^|\s)#T1w(?P<run>_\d+)?(\s|$).*
+        bids_subdir:
+          - anat
+
+The first thing to notice is that ``dwiqc`` is the first layer of this whole thing. This is simply a way to keep everything orderly and tidy. Next, there are four 1st level layers: ``dwi_main``, ``fmap_ap``, ``fmap_pa`` and  ``t1w``. Each one of those labels represents a different scan within an XNAT session.
+
+The ``dwi_main`` layer has three sub-elements: ``tag``, ``bids_subdir`` and ``acquisition_group``. ``tag`` refers to the tag you've put into the notes field for your "main" diffusion scan. The tag can be anything, it just has to be consistent. In the case of our example here, as *DWIQC* iterates through all of the scans of an XNAT session it makes use of `regular expressions <https://coderpad.io/blog/development/the-complete-guide-to-regular-expressions-regex/>`_ to find a scan with a **#dwi_main** (case insensitive) followed by a digit (e.g. **001**) in the notes field. Once it finds a scan with a matching tag, it downloads it. 
+
+The ``bids_subdir`` element tells *DWIQC* where to put the scan in the BIDS hierarchy. In this case, it will place the matching scan into the 'dwi' directory. 
+
+``acquisition_group`` serves as a way to link "main" diffusion scans to its fieldmaps. It's not relevant in this example, however there are cases when a study might have several different sets of "main" diffusion scans and fieldmaps. ``acquisition_group`` helps group these sets together. Here, the ``acquisition_group`` is **A** (you'll notice the fieldmaps have the same value).
+
+Now let's take a look at one of the fieldmap sub-layers. ``fmap_pa`` has four sub-elements as opposed to the three that ``dwi_main`` has. 
+
+Just as before, the ``tag`` element tells *DWIQC* what to look for as its looking through all the scans in a session. Here, it uses a regular expression to match to any scan that has a **#dwi_fmap_pa** (case insensitive) followed by a digit (e.g. **001**) in the notes field.
+
+``bids_subdir`` tells *DWIQC* where to download the scan to in the BIDS hierarchy, **fmap** in this case.
+
+``direction`` is a new element. It refers to the primary phase encode direction of the scan. **PA** for this scan. You can include this element for ``dwi_main`` but it's usually not necessary when there are dedicated fieldmaps.
+
+``acquisition_group`` is the same as above. We want this fieldmap scan to be linked to the main diffusion scan so we give it the same ``acquisition_group`` value: **A**
+
+reverse polarity field map design
+"""""""""""""""""""""""""""""""""
 
 This kind of config file could be used when the diffusion data is not acquired with dedicated fieldmaps. In this case, there are reverse polarity (labeled here as "revpol") or reverse phase encode direction scans (usually consisting of 4-8 volumes) being acquired that correspond with the "main" (or primary) diffusion scans that consist of many more volumes. During processing, volumes will be extracted from both the "revpol" and "main" scans to create fieldmaps with FSL's topup tool.
 
