@@ -244,7 +244,7 @@ get: Required Arguments
 
 | 3. ``--xnat-alias`` is the alias containing credentials associated with your XNAT instance. It can be created in a few `steps <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using yaxil.
 
-| 4. ``--download-config`` is the **absolute** path to the yaml config file that tells *DWIQC* which tags it should look for (see the `xnattagger docs <xnattagger.html>`_) and the `config file <#get-config-file>`_ section of get mode for more tagging details.
+| 4. ``--download-config`` is the **absolute** path to the yaml config file that tells *DWIQC* which tags it should look for (see the `xnattagger docs <xnattagger.html>`_) and the `config file <#get-the-config-file>`_ section of get mode for more tagging details.
 
 
 get: Executing the Command
@@ -284,7 +284,7 @@ get: Advanced Usage
 
 There are a couple *get* mode optional arguments that are worth noting. 
 
-| 1. By default, *get* mode will run `xnattagger <xnattagger.html>`_ on the provided MR Session. Pass the ``--no-tagger`` argument if you'd like to turn off that functionality.
+| 1. *get* mode will not run `xnattagger <xnattagger.html>`_  by default on the provided MR Session. Pass the ``--run-tagger`` argument along with the ``--tagger-config`` argument with a path to the *xnattagger* config file to run *xnattagger* with *get* mode.
  
 | 2. If you would like to see what data will be downloaded from XNAT without actually downloading it, pass the ``--dry-run`` argument.
 
@@ -298,9 +298,13 @@ Argument              Description                               Required
 ``--bids-dir``        Path to BIDS download directory           Yes
 ``--xnat-alias``      Alias for XNAT Project                    Yes
 ``--download-config`` Configuration file for downloading scans  Yes
-``--project``         Project Name                              No
-``--no-tagger``       Turn off *xnattagger*                     No
+``--run-tagger``      Run *xnattagger*                          No
+``--tagger-config``   Path to *xnattagger* config file          No
 ``--dry-run``         Generate list of to-be-downloaded scans   No
+``--project``         XNAT project Name                         No
+``--xnat-host``       URL of XNAT Host                          No
+``--xnat-user``       XNAT username                             No
+``--xnat-pass``       XNAT user password                        No
 ===================== ========================================  ========
 
 process mode
@@ -308,7 +312,7 @@ process mode
 process: Overview
 """""""""""""""""
 
-With your data successfully downloaded using *get* mode (or organized in BIDS format through other means) you are ready to run *DWIQC*. We recommended running *DWIQC* in an HPC (High Performance Computing) environment rather than on a local machine. *DWIQC* will run both `prequal`_ and `qsiprep`_ using gpu compute nodes by default. However, it is possible to turn off gpu-dependent features by using the ``--no-gpu`` argument. *DWIQC* may require up to 20GB of RAM if run on a local/non-gpu machine so please allocate resources appropriately. 
+With your data successfully downloaded using *get* mode (or organized in BIDS format through other means) you are ready to run *DWIQC*. We recommended running *DWIQC* in an HPC (High Performance Computing) environment rather than on a local machine. *DWIQC* will run both `prequal`_ and `qsiprep`_ and requires gpu compute nodes. *DWIQC* must be run on gpu nodes for the time being.
 
 process: Required Arguments
 """""""""""""""""""""""""""
@@ -368,9 +372,11 @@ Download an example :download:`here <examples/sub-MS881355-imbedded_images.html>
 
 **Eddy Quad Output:**
 
-To find the eddy quad pdf report, navigate to the ``--bids-dir`` directory you passed to *process* mode. The pdf file will be located under several layers of directories:
+To find the eddy quad pdf report, navigate to the ``--bids-dir`` directory you passed to *process* mode. It runs on both prequal and qsiprep output. The pdf file will be located under several layers of directories:
 
-derivatives ---> dwiqc-prequal ---> subject_dir ---> session_dir ---> sub_session_dir_run__dwi ---> OUTPUTS ---> EDDY ---> SUBJECT_SESSION.qc ---> qc.pdf
+derivatives ---> dwiqc-prequal ---> subject_dir ---> session_dir ---> OUTPUTS ---> EDDY ---> SUBJECT_SESSION.qc ---> qc.pdf
+
+derivatives ---> dwiqc-qsiprep ---> subject_dir ---> session_dir ---> qsiprep_output ---> EDDY ---> SUBJECT_SESSION.qc ---> qc.pdf
 
 Download an example :download:`here <examples/qc.pdf>`.
 
@@ -409,11 +415,9 @@ Only a few of the many possible *process* mode arguments will be discussed here.
 
 | 3. ``--output-resolution`` allows you to specify the resolution of images created by qsiprep. The default is the same as the input data. Example usage: ``--output-resolution 1.0``
 
-| 4. ``--no-gpu`` enables users without access to a gpu node to run *DWIQC*. Note that some advanced processing features are not available without gpu computing. Example usage: ``--no-gpu`` (just passing the argument is sufficient)
+| 4. ``--sub-tasks`` is used to run either just qsiprep or prequal. Example usage: ``--sub-tasks qsiprep``
 
-| 5. ``--sub-tasks`` is used to run either just qsiprep or prequal. Example usage: ``--sub-tasks qsiprep``
-
-| 6. ``--custom-eddy`` is used to pass custom FSL eddy parameters to qsiprep as noted under *Common Errors*. Example usage: ``--custom-eddy /users/nrg/PE201222_230719/eddy_params_s2v_mbs.json``
+| 5. ``--custom-eddy`` is used to pass custom FSL eddy parameters to qsiprep as noted under *Common Errors*. Example usage: ``--custom-eddy /users/nrg/PE201222_230719/eddy_params_s2v_mbs.json``
 
 process: All Arguments
 """"""""""""""""""""""
@@ -580,12 +584,12 @@ The ``SNR/CNR Metrics`` pane displays SNR/CNR metrics computed *for each individ
 =========== ======================= =================================================
 Metric      From                    Description                              
 =========== ======================= =================================================
-B0 SNR      Eddy Quad (Prequal/FSL) Signal-to-noise ratio for B0 Shell
-BN CNR      Eddy Quad (Prequal/FSL) Contrast-to-noise ratio for each shell
+B0 SNR      Eddy Quad (FSL/Both)    Signal-to-noise ratio for B0 Shell
+BN CNR      Eddy Quad (FSL/Both)    Contrast-to-noise ratio for each shell
 =========== ======================= =================================================
 
 .. note::
-      Anywhere you see "Eddy Quad (Prequal/FSL)" means that FSL's Eddy Quad tool was run on Prequal output.
+      Anywhere you see "Eddy Quad (FSL/Both)" means that FSL's Eddy Quad tool was run on prequal and qsiprep output.
 
 Motion Metrics
 """"""""""""""
@@ -596,11 +600,11 @@ The ``Motion Metrics`` pane displays motion metrics computed over dwi scan(s).
 ================= ======================= ===========================================================
 Metric            From                    Description
 ================= ======================= ===========================================================
-Avg Abs Motion    Eddy Quad (Prequal/FSL) Estimated amount of all motion in any direction
-Avg Rel Motion    Eddy Quad (Prequal/FSL) Estimated motion relative to initial head position
-Avg X Translation Eddy Quad (Prequal/FSL) Estimated X translation motion
-Avg Y Translation Eddy Quad (Prequal/FSL) Estimated Y translation motion
-Avg Z Translation Eddy Quad (Prequal/FSL) Estimated Z translation motion
+Avg Abs Motion    Eddy Quad (FSL/Both)    Estimated amount of all motion in any direction
+Avg Rel Motion    Eddy Quad (FSL/Both)    Estimated motion relative to initial head position
+Avg X Translation Eddy Quad (FSL/Both)    Estimated X translation motion
+Avg Y Translation Eddy Quad (FSL/Both)    Estimated Y translation motion
+Avg Z Translation Eddy Quad (FSL/Both)    Estimated Z translation motion
 ================= ======================= ===========================================================
 
 Files
@@ -612,16 +616,16 @@ The ``Files`` pane contains the most commonly requested files. Clicking on any o
 ======================= ======================= ======================================================
 File                    From                    Description
 ======================= ======================= ======================================================
-B0 Average              Eddy Quad (Prequal/FSL) BO Shell Average Image
+B0 Average              Eddy Quad (FSL/Both)    BO Shell Average Image
 Brain Mask              Qsiprep                 Gray Matter, White Matter and Pial Boundaries
 FA Map                  Prequal                 Fractional Anisotropy Map
 MD Map                  Prequal                 Mean Diffusivity Map
 Eddy Outlier Sices      Prequal                 Plot of Slices with Motion Outliers
 T1 Registration         Qsiprep                 GIF of T1w image to Template Registration
 Denoise                 Qsiprep                 GIF of DWI Image Pre and Post Denoising
-Motion Plot             Eddy Quad (Prequal/FSL) Translational and rotational motion, displacement
+Motion Plot             Eddy Quad (FSL/Both)    Translational and rotational motion, displacement
 Prequal Report          Prequal                 Prequal PDF Report
-Eddy Quad Report        Eddy Quad (Prequal/FSL) Eddy Quad PDF Report
+Eddy Quad Report        Eddy Quad (FSL/Both)    Eddy Quad PDF Report
 Qsiprep Report          Qsiprep                 Qsiprep HTML Report
 Carpet Plot             Qsiprep                 Maximum Framewise Displacement Plot
 ======================= ======================= ======================================================
@@ -682,7 +686,7 @@ Motion Translations               Plot of motion translations across DWI scan
 Motion Rotations                  Plot of motion rorations acorss DWI scan
 Motion Displacements              Plot of motion displacements across DWI scan
 Prequal PDF Report                Complete Prequal Report
-Eddy Quad PDF Report              Complete Eddy Quad Report (run on Prequal output)
+Eddy Quad PDF Report              Complete Eddy Quad Report (run on both output)
 Qsiprep HTML Report               Complete Qsiprep Report in HTML Format
 Qsiprep PDF Report                Complete Qsiprep Report in PDF Format
 T1 Registration                   GIF of T1w image to Template Registration
