@@ -28,3 +28,70 @@
 	year = {2004},
 	pages = {S208--S219},
 }
+
+@article{cai_prequal:_2021,
+	title = {{PreQual}: {An} automated pipeline for integrated preprocessing and quality assurance of diffusion weighted {MRI} images},
+	volume = {86},
+	issn = {0740-3194, 1522-2594},
+	shorttitle = {Prequal},
+	url = {https://onlinelibrary.wiley.com/doi/10.1002/mrm.28678},
+	doi = {10.1002/mrm.28678},
+	abstract = {Purpose
+              Diffusion weighted MRI imaging (DWI) is often subject to low signal‐to‐noise ratios (SNRs) and artifacts. Recent work has produced software tools that can correct individual problems, but these tools have not been combined with each other and with quality assurance (QA). A single integrated pipeline is proposed to perform DWI preprocessing with a spectrum of tools and produce an intuitive QA document.
+            
+            
+              Methods
+              The proposed pipeline, built around the FSL, MRTrix3, and ANTs software packages, performs DWI denoising; inter‐scan intensity normalization; susceptibility‐, eddy current‐, and motion‐induced artifact correction; and slice‐wise signal drop‐out imputation. To perform QA on the raw and preprocessed data and each preprocessing operation, the pipeline documents qualitative visualizations, quantitative plots, gradient verifications, and tensor goodness‐of‐fit and fractional anisotropy analyses.
+            
+            
+              Results
+              Raw DWI data were preprocessed and quality checked with the proposed pipeline and demonstrated improved SNRs; physiologic intensity ratios; corrected susceptibility‐, eddy current‐, and motion‐induced artifacts; imputed signal‐lost slices; and improved tensor fits. The pipeline identified incorrect gradient configurations and file‐type conversion errors and was shown to be effective on externally available datasets.
+            
+            
+              Conclusions
+              The proposed pipeline is a single integrated pipeline that combines established diffusion preprocessing tools from major MRI‐focused software packages with intuitive QA.},
+	language = {en},
+	number = {1},
+	urldate = {2024-03-26},
+	journal = {Magnetic Resonance in Medicine},
+	author = {Cai, Leon Y. and Yang, Qi and Hansen, Colin B. and Nath, Vishwesh and Ramadass, Karthik and Johnson, Graham W. and Conrad, Benjamin N. and Boyd, Brian D. and Begnoche, John P. and Beason‐Held, Lori L. and Shafer, Andrea T. and Resnick, Susan M. and Taylor, Warren D. and Price, Gavin R. and Morgan, Victoria L. and Rogers, Baxter P. and Schilling, Kurt G. and Landman, Bennett A.},
+	month = jul,
+	year = {2021},
+	pages = {456--470},
+}
+
+@article{cieslak_qsiprep:_2021,
+	title = {{QSIPrep}: an integrative platform for preprocessing and reconstructing diffusion {MRI} data},
+	volume = {18},
+	issn = {1548-7091, 1548-7105},
+	shorttitle = {Qsiprep},
+	url = {https://www.nature.com/articles/s41592-021-01185-5},
+	doi = {10.1038/s41592-021-01185-5},
+	language = {en},
+	number = {7},
+	urldate = {2024-03-26},
+	journal = {Nature Methods},
+	author = {Cieslak, Matthew and Cook, Philip A. and He, Xiaosong and Yeh, Fang-Cheng and Dhollander, Thijs and Adebimpe, Azeez and Aguirre, Geoffrey K. and Bassett, Danielle S. and Betzel, Richard F. and Bourque, Josiane and Cabral, Laura M. and Davatzikos, Christos and Detre, John A. and Earl, Eric and Elliott, Mark A. and Fadnavis, Shreyas and Fair, Damien A. and Foran, Will and Fotiadis, Panagiotis and Garyfallidis, Eleftherios and Giesbrecht, Barry and Gur, Ruben C. and Gur, Raquel E. and Kelz, Max B. and Keshavan, Anisha and Larsen, Bart S. and Luna, Beatriz and Mackey, Allyson P. and Milham, Michael P. and Oathes, Desmond J. and Perrone, Anders and Pines, Adam R. and Roalf, David R. and Richie-Halford, Adam and Rokem, Ariel and Sydnor, Valerie J. and Tapera, Tinashe M. and Tooley, Ursula A. and Vettel, Jean M. and Yeatman, Jason D. and Grafton, Scott T. and Satterthwaite, Theodore D.},
+	month = jul,
+	year = {2021},
+	pages = {775--778},
+}
+
+@article{tournier_mrtrix:_2012,
+	title = {{MRtrix}: {Diffusion} tractography in crossing fiber regions},
+	volume = {22},
+	issn = {0899-9457, 1098-1098},
+	shorttitle = {Mrtrix},
+	url = {https://onlinelibrary.wiley.com/doi/10.1002/ima.22005},
+	doi = {10.1002/ima.22005},
+	abstract = {Abstract
+            In recent years, diffusion‐weighted magnetic resonance imaging has attracted considerable attention due to its unique potential to delineate the white matter pathways of the brain. However, methodologies currently available and in common use among neuroscientists and clinicians are typically based on the diffusion tensor model, which has comprehensively been shown to be inadequate to characterize diffusion in brain white matter. This is due to the fact that it is only capable of resolving a single fiber orientation per voxel, causing incorrect fiber orientations, and hence pathways, to be estimated through these voxels. Given that the proportion of affected voxels has been recently estimated at 90\%, this is a serious limitation. Furthermore, most implementations use simple “deterministic” streamlines tracking algorithms, which have now been superseded by “probabilistic” approaches. In this study, we present a robust set of tools to perform tractography, using fiber orientations estimated using the validated constrained spherical deconvolution method, coupled with a probabilistic streamlines tracking algorithm. This methodology is shown to provide superior delineations of a number of known white matter tracts, in a manner robust to crossing fiber effects. These tools have been compiled into a software package, called MRtrix, which has been made freely available for use by the scientific community. © 2012 Wiley Periodicals, Inc. Int J Imaging Syst Technol, 22, 53–66, 2012},
+	language = {en},
+	number = {1},
+	urldate = {2024-03-26},
+	journal = {International Journal of Imaging Systems and Technology},
+	author = {Tournier, J‐Donald and Calamante, Fernando and Connelly, Alan},
+	month = mar,
+	year = {2012},
+	pages = {53--66},
+}

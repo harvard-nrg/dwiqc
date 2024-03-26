@@ -24,9 +24,8 @@ bibliography: citations.bib
 
 # Summary
 
-Diffusion weighted (DW) neuroimaging is an MR modality that seeks to generate a cohesive mapping of white-matter microstructure in the brain. DWIQC serves as both an analysis and quality assurance tool for DW images as well as a means to facilitate data management and sharing via the XNAT platform. DWIQC utilizes analysis tools developed by FSL [@smith_advances_2004]
+Diffusion weighted (DW) neuroimaging is an MR modality that seeks to generate a cohesive mapping of white-matter microstructure in the brain. DWIQC serves as a robust quality assurance tool for DW images as well as a means to facilitate data management and sharing via the XNAT platform. DWIQC utilizes analysis tools developed by FSL [@smith_advances_2004], Prequal [@cai_prequal:_2021], Qsiprep [@cieslak_qsiprep:_2021] and MRtrix [@tournier_mrtrix:_2012] to perform first level preprocessing of DW images and to assess data quality through quantitative metrics. 
 
-The Hofstadter model successfully describes the behavior of non-interacting quantum particles hopping on a lattice coupled to a gauge field, and hence is ubiquitous in many fields of research, including condensed matter, optical, and atomic physics. Motivated by this, we introduce HofstadterTools ([https://hofstadter.tools](https://hofstadter.tools)), a Python package that can be used to analyze the energy spectrum of a generalized Hofstadter model, with any combination of hoppings on any regular Euclidean lattice. The package can be applied to compute key properties of the band structure, such as quantum geometry and topology, as well as plot Hofstadter butterflies and Wannier diagrams that are colored according to their Chern numbers.
 
 # Statement of need
 
