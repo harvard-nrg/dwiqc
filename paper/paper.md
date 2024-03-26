@@ -46,6 +46,6 @@ Furthermore, `DWIQC's` integration with the XNAT data management platform facili
 
 # Acknowledgements
 
-We thank Ross Mair for his fundamentally important input during the development of DWIQC. We thank the Center for Brain Science at Harvard and the Harvard Faculty of Arts and Sciences for the financial support of this project.
+We thank the Center for Brain Science at Harvard and the Harvard Faculty of Arts and Sciences for the financial support of this project.
 
 # References
