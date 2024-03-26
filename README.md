@@ -4,4 +4,8 @@ DWIQC is a diffusion MRI quality control pipeline built on the Prequal and QSIPR
 
 # Installation
 
-Install via python: ```pip install dwiqc```
+See documentation: https://dwiqc.readthedocs.io/en/latest/developers.html#
+
+# Usage
+
+See documentation: https://dwiqc.readthedocs.io/en/latest/xnat.html#running-the-pipeline
