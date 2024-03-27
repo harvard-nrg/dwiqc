@@ -13,9 +13,9 @@ authors:
   - name: Daniel J. Asay
     orcid: 0000-0002-6691-7706
     affiliation: 1
-  - name: Timothy O'Keefe
+  - name: Timothy M. O'Keefe
     affiliation: 1
-  - name: Ross Mair
+  - name: Ross W. Mair
     affiliation: "1, 2"
   - name: Randy L. Buckner
     affiliation: "1, 2, 3"
