@@ -1,5 +1,5 @@
 ---
-title: 'DWIQC: A Python package for analyzing and quality assurance of diffusion weighted images'
+title: 'DWIQC: A Python package for preprocessing and quality assurance of diffusion weighted images'
 tags:
   - Python
   - neuroimaging
@@ -15,10 +15,10 @@ authors:
     affiliation: 1
   - name: Timothy M. O'Keefe
     affiliation: 1
+  - name: Randy L. Buckner
+    affiliation: "1, 2, 3" 
   - name: Ross W. Mair
     affiliation: "1, 2"
-  - name: Randy L. Buckner
-    affiliation: "1, 2, 3"
 affiliations:
  - name: Center for Brain Science, Harvard University, Cambridge, Massachusetts, United States
    index: 1
