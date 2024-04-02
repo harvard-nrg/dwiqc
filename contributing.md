@@ -118,7 +118,7 @@ Enhancement suggestions are tracked as [GitHub issues](/issues).
 
 ## Styleguides
 ### Commit Messages
-
+ 
 
 ## Join The Project Team
 
