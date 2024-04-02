@@ -10,13 +10,9 @@ See documentation: https://dwiqc.readthedocs.io/en/latest/developers.html#
 
 See documentation: https://dwiqc.readthedocs.io/en/latest/xnat.html#running-the-pipeline
 
-# Contributing
-
-Diffusion neuroimaging is a rapidly evolving field and we expect new experimental designs to be created that have not been incorporated into DWIQC. 
-
 # Contributing to DWIQC
 
-First off, thanks for taking the time to contribute!
+First off, thanks for taking the time to contribute! Diffusion neuroimaging is a rapidly evolving field and we expect new experimental designs to be created that have not been incorporated into DWIQC. We expect contributions to be a helpful and necessary aspect of DWIQC.
 
 All types of contributions are encouraged and valued. See the [Table of Contents](#table-of-contents) for different ways to help and details about how this project handles them. Please make sure to read the relevant section before making your contribution. It will make it a lot easier for us maintainers and smooth out the experience for all involved. The community looks forward to your contributions. 🎉
 
@@ -41,7 +37,7 @@ All types of contributions are encouraged and valued. See the [Table of Contents
 
 ## I Have a Question
 
-> If you want to ask a question, we assume that you have read the available [Documentation]().
+> If you want to ask a question, we assume that you have read the available [Documentation](https://dwiqc.readthedocs.io/en/latest/).
 
 Before you ask a question, it is best to search for existing [Issues](/issues) that might help you. In case you have found a suitable issue and still need clarification, you can write your question in this issue. It is also advisable to search the internet for answers first.
 
