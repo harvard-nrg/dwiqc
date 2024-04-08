@@ -31,6 +31,8 @@
 #set($brain_mask = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/seg-brainmask/$!{aid}_seg_brainmask.svg"))
 #set($denoise = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/denoise/$!{aid}_denoise.svg"))
 #set($b0_volume = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b0-volume/$!{aid}_b0_volume.nii.gz"))
+#set($qc_json = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/eddy_quad_json/$!{aid}_eddy_quad_metrics.json"))
+#set($prequal_stats) = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/eddy_quad_json/$!{aid}_prequal_stats.csv"))
 
 
 #set($manual_wrap = $!item.getProperty("manual/wrap"))
@@ -875,6 +877,20 @@
               <td><a download="$!{name}" href="$!{b0_volume}">$!{name}</a></td>
               <td>b0 Volume</td>
               <td>file/nii.gz</td>
+            </tr>
+            <tr>
+              <td>$!{count}</td>
+              #set($name = "${aid}_eddy_quad_metrics.json")
+              <td><a download="$!{name}" href="$!{qc_json}">$!{name}</a></td>
+              <td>Eddy Quad Metrics</td>
+              <td>file/json</td>
+            </tr>
+            <tr>
+              <td>$!{count}</td>
+              #set($name = "${aid}_prequal_stats.csv")
+              <td><a download="$!{name}" href="$!{prequal_stats}">$!{name}</a></td>
+              <td>Prequal Metrics</td>
+              <td>file/csv</td>
             </tr>
           </table>
         </div>
