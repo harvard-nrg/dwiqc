@@ -9,10 +9,17 @@ logger = logging.getLogger(__name__)
 home_dir = os.path.expanduser("~")
 
 
-def snapshot(url, saveto):
-	proc1 = f'{home_dir}/.config/dwiqc/containers/chromium.sif --no-sandbox --headless --print-to-pdf={saveto} {url}'
-	output = subprocess.Popen(proc1, shell=True, stderr=subprocess.PIPE)
+def snapshot(url, saveto, container_dir):
+	proc1 = f'{container_dir}/chromium.sif --no-sandbox --headless --print-to-pdf={saveto} {url}'
+	output = subprocess.Popen(proc1, shell=True, stdout=subprocess.PIPE)
 	output.communicate()
+    code = output.returncode
+
+    if code == 0:
+        logging.info('pdf conversion successful!')
+    else:
+        logging.error('pdf conversion threw an error. exiting.')
+        sys.exit(1)
 
 def imbed_images(infile, outfile=None):
     infile = Path(infile)

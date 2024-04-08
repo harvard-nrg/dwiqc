@@ -132,7 +132,7 @@ def do(args):
             prequal_eddy(args, prequal_outdir)
         if 'qsiprep' in args.sub_tasks:
             qsiprep_eddy(args, qsiprep_outdir)
-            browser.snapshot(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html", f"{qsiprep_outdir}/qsiprep/qsiprep.pdf")
+            browser.snapshot(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html", f"{qsiprep_outdir}/qsiprep/qsiprep.pdf", args.container_dir)
             browser.imbed_images(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html")
         if failed:
             logger.info('%s/%s jobs failed', failed, numjobs)
