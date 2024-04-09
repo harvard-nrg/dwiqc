@@ -122,6 +122,10 @@ class Report:
                 'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep', 'EDDY', 'motion_plot.png'),
                 'dest': os.path.join('motion-plot', '{0}_motion_plot.png'.format(aid))
             },
+            {
+                'source': os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep', 'EDDY', f'{no_prefix_sub}_{self.ses}.qc', 'qc.json'),
+                'dest': os.path.join('eddy-quad-metrics', '{0}_eddy_quad_metrics.json'.format(aid))
+            },
 
             # pull images from prequal output
             {
@@ -155,6 +159,10 @@ class Report:
             {
                 'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'PREPROCESSED', 'b0_volume.nii.gz'),
                 'dest': os.path.join('b0-volume', '{0}_b0_volume.nii.gz'.format(aid))
+            },
+           {
+                'source': os.path.join(self.dirs['prequal'], 'OUTPUTS', 'STATS', 'stats.csv'),
+                'dest': os.path.join('prequal_metrics', '{0}_prequal_metrics.csv'.format(aid))
             },
 
             # pull files from qsiprep output
