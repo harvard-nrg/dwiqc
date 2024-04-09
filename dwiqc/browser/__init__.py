@@ -5,12 +5,18 @@ from lxml import etree, html
 from pathlib import Path
 import mimetypes
 import os
+import sys
 logger = logging.getLogger(__name__)
 home_dir = os.path.expanduser("~")
 
 
 def snapshot(url, saveto, container_dir):
-    proc1 = f'{container_dir}/chromium.sif --no-sandbox --headless --print-to-pdf={saveto} {url}'
+    proc1 = f"""singularity run \
+    {container_dir}/chromium.sif \
+    --no-sandbox \
+    --headless \
+    --print-to-pdf={saveto} \
+    {url}"""
     output = subprocess.Popen(proc1, shell=True, stdout=subprocess.PIPE)
     output.communicate()
     code = output.returncode
