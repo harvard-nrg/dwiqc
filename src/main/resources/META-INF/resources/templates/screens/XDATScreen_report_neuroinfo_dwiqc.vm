@@ -32,7 +32,7 @@
 #set($denoise = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/denoise/$!{aid}_denoise.svg"))
 #set($b0_volume = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/b0-volume/$!{aid}_b0_volume.nii.gz"))
 #set($qc_json = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/eddy_quad_json/$!{aid}_eddy_quad_metrics.json"))
-#set($prequal_stats) = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/eddy_quad_json/$!{aid}_prequal_stats.csv"))
+#set($prequal_stats = $content.getURI("/data/experiments/$!{mr_id}/assessors/$!{aid}/files/eddy_quad_json/$!{aid}_prequal_stats.csv"))
 
 
 #set($manual_wrap = $!item.getProperty("manual/wrap"))
