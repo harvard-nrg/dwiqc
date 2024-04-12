@@ -873,6 +873,7 @@
             </tr>
             <tr>
               <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_b0-volume.nii.gz")
               <td><a download="$!{name}" href="$!{b0_volume}">$!{name}</a></td>
               <td>b0 Volume</td>
@@ -880,6 +881,7 @@
             </tr>
             <tr>
               <td>$!{count}</td>
+              #set($count = $count + 1)
               #set($name = "${aid}_eddy_quad_metrics.json")
               <td><a download="$!{name}" href="$!{qc_json}">$!{name}</a></td>
               <td>Eddy Quad Metrics</td>
