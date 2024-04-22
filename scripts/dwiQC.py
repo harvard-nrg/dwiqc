@@ -104,6 +104,8 @@ def main():
         help='Pass path to downloaded DWIQC containers')
     parser_process.add_argument('--exclude-nodes', nargs='+',
         help='List of cluster nodes to exclude from use.')
+    parser_process.add_argument('--work-dir',
+        help='Working directory that is shared across compute cluster')
     parser_process.set_defaults(func=cli.process.do)
 
     # tandem mode
@@ -160,6 +162,8 @@ def main():
         help='Pass path to downloaded DWIQC containers')
     parser_tandem.add_argument('--exclude-nodes', nargs='+',
         help='List of cluster nodes to exclude from use.')
+    parser_tandem.add_argument('--work-dir',
+        help='Working directory that is shared across compute cluster')
     parser_tandem.set_defaults(func=cli.tandem.do)
     args = parser.parse_args()
 
@@ -182,8 +186,3 @@ def configure_logging(verbose):
 
 if __name__ == '__main__':
    main()
-
-
-
-
-
