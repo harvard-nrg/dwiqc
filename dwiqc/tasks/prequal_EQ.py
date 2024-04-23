@@ -181,7 +181,7 @@ class Task(tasks.BaseTask):
 
 	def bind_environmentals(self):
 	
-		bind = [self._outdir, self._tempdir]
+		bind = [self._bids, self._tempdir]
 		
 		os.environ["SINGULARITY_BIND"] = ','.join(bind)
 
