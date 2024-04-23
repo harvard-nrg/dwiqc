@@ -84,7 +84,7 @@ def do(args):
             bids=args.bids_dir,
             outdir=prequal_outdir,
             fs_license = args.fs_license,
-            work_dir = args.work_dir if args.work_dir else prequal_outdir
+            work_dir = args.work_dir if args.work_dir else prequal_outdir,
             container_dir = args.container_dir,
             prequal_config=args.prequal_config,
             no_gpu=args.no_gpu,
