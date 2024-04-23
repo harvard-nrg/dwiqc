@@ -187,7 +187,7 @@ class Task(tasks.BaseTask):
 				fp.write(' '.join(str(item) for item in sublist))
 				fp.write('\n')
 
-		os.makedirs(self._outdir)
+		os.makedirs(self._outdir, exist_ok=True)
 		shutil.copy(f"{inputs_dir}/even_slices_slspec.txt", self._outdir)
 		#self._spec = "even"
 
@@ -236,7 +236,7 @@ class Task(tasks.BaseTask):
 
 		np.savetxt(spec_file, all_cols, fmt=['%d', '%d', '%d'])
 
-		os.makedirs(self._outdir)
+		os.makedirs(self._outdir, exist_ok=True)
 		shutil.copy(f"{inputs_dir}/odd_slices_slspec.txt", self._outdir)
 		#self._spec = "odd"
 
