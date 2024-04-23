@@ -94,7 +94,7 @@ def do(args):
             pipenv='/sw/apps/prequal'
         )
         os.environ['OPENBLAS_NUM_THREADS'] = '1'
-        logger.info(f'SINGULARITY_BIND: {print(os.environ["SINGULARITY_BIND"])}')
+        logger.info(f'SINGULARITY_BIND: {os.environ["SINGULARITY_BIND"]}')
         logger.info(json.dumps(prequal_task.command, indent=1))
         jarray.add(prequal_task.job)
 
