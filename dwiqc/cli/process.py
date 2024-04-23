@@ -41,6 +41,9 @@ def do(args):
         E = executors.probe(args.partition, exclude=excluded_nodes)
     jarray = JobArray(E)
 
+    if args.work_dir:
+        os.environ['TMPDIR'] = args.work_dir
+
 
     # load data into pybids as layout
 
@@ -84,7 +87,6 @@ def do(args):
             bids=args.bids_dir,
             outdir=prequal_outdir,
             fs_license = args.fs_license,
-            work_dir = args.work_dir if args.work_dir else prequal_outdir,
             container_dir = args.container_dir,
             prequal_config=args.prequal_config,
             no_gpu=args.no_gpu,
@@ -92,6 +94,7 @@ def do(args):
             pipenv='/sw/apps/prequal'
         )
         os.environ['OPENBLAS_NUM_THREADS'] = '1'
+        logger.info(f'SINGULARITY_BIND: {print(os.environ["SINGULARITY_BIND"])}')
         logger.info(json.dumps(prequal_task.command, indent=1))
         jarray.add(prequal_task.job)
 

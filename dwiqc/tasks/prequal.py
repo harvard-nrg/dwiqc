@@ -24,14 +24,13 @@ logger = logging.getLogger(__name__)
 # pull in some parameters from the BaseTask class in the __init__.py directory
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, prequal_config, fs_license, work_dir, container_dir=None, no_gpu=False, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, prequal_config, fs_license, container_dir=None, no_gpu=False, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
 		self._prequal_config = prequal_config
 		self._fs_license = fs_license
-		self._work_dir = work_dir
 		self._container_dir = container_dir
 		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
@@ -553,10 +552,10 @@ class Task(tasks.BaseTask):
 	def build(self):
 		self.bind_environmentals()
 		self.add_intended_for()
-		self._tempdir = self._work_dir
 		inputs_dir = f'{self._tempdir}/PREQUAL_INPUTS_{self._date}/ses-{self._ses}'
 		self.copy_inputs(inputs_dir)
 		mporder = self.calc_mporder()
+		logger.info(f'TMPDIR: {self._tempdir}')
 		if self._container_dir:
 			try:
 				prequal_sif = f'{self._container_dir}/prequal_nrg.sif'

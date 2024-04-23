@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 class BaseTask(ABC):
     def __init__(self, outdir, tempdir=None, pipenv=None):
         self._outdir = outdir
-        self._tempdir = tempdir
         self._pipenv = pipenv
         self._tempdir = tempdir if tempdir else tf.gettempdir()
         self._logdir = os.path.join(outdir, 'logs')
