@@ -1,30 +1,32 @@
 import base64
 import logging
-import subprocess
 from lxml import etree, html
-from pathlib import Path
 import mimetypes
 import os
+from pathlib import Path
+import subprocess
 import sys
+
 logger = logging.getLogger(__name__)
-home_dir = os.path.expanduser("~")
 
 
 def snapshot(url, saveto, container_dir):
-    proc1 = f"""singularity run \
+    proc1 = f"""
+    singularity run \
     {container_dir}/chromium.sif \
     --no-sandbox \
     --headless \
     --print-to-pdf={saveto} \
-    {url}"""
+    {url}
+    """
     output = subprocess.Popen(proc1, shell=True, stdout=subprocess.PIPE)
     output.communicate()
     code = output.returncode
     if code == 0:
-        logging.info('pdf conversion successful!')
+        logger.info('pdf conversion successful!')
     else:
-        logging.error('pdf conversion threw an error. exiting.')
-        sys.exit(1)
+        logger.critical('pdf conversion failed')
+        raise ChromiumConvertError('')
 
 def imbed_images(infile, outfile=None):
     infile = Path(infile)
@@ -52,3 +54,5 @@ def imbed_images(infile, outfile=None):
         fo.write(etree.tostring(root))
 
 
+class ChromiumConvertError(Exception):
+    pass
