@@ -22,11 +22,12 @@ def snapshot(url, saveto, container_dir):
     output = subprocess.Popen(proc1, shell=True, stdout=subprocess.PIPE)
     output.communicate()
     code = output.returncode
+    print(type(output.returncode))
     if code == 0:
         logger.info('pdf conversion successful!')
     else:
         logger.critical('pdf conversion failed')
-        raise ChromiumConvertError('')
+        raise ChromiumConvertError(output.errors)
 
 def imbed_images(infile, outfile=None):
     infile = Path(infile)
