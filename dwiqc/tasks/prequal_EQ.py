@@ -8,7 +8,7 @@ import subprocess
 import json
 from executors.models import Job
 
-
+logger = logging.getLogger()
 
 class Task(tasks.BaseTask):
 	def __init__(self, sub, ses, run, bids, outdir, container_dir=None, parent=None, tempdir=None, pipenv=None):
@@ -169,15 +169,37 @@ class Task(tasks.BaseTask):
 		logging.info('successfully parsed json and wrote out results to eddy_metrics.json')
 
 	def extract_b0_vol(self):
-		os.chdir(f"{self._outdir}/PREPROCESSED")
-		extract_command = f"""singularity exec \
-		{self._fsl_sif} \
-		/APPS/fsl/bin/fslselectvols \
-		-i dwmri.nii.gz \
-		-o b0_volume \
-		--vols=0"""
-		proc1 = subprocess.Popen(extract_command, shell=True, stdout=subprocess.PIPE)
-		proc1.communicate()
+		dwmri = f'{self._outdir}/PREPROCESSED/dwmri.nii.gz'
+		logger.info(f'checking for input file "{dwmri}"')
+		if not os.path.exists(dwmri):
+			raise FileNotFoundError(dwmri)
+		logger.info(f'found input file "{dwmri}"')
+		bindings = os.environ.get('SINGULARITY_BIND', None)
+		logger.info(f'SINGULARITY_BIND environment variable is set to "{bindings}"')
+		preproc_dir = f'{self._outdir}/PREPROCESSED'
+		cmd = [
+			'singularity',
+			'exec',
+			'--pwd', preproc_dir,
+			self._fsl_sif,
+			'/APPS/fsl/bin/fslselectvols',
+			'-i', 'dwmri.nii.gz',
+			'-o', 'b0_volume',
+			'--vols=0'
+		]
+		cmdline = subprocess.list2cmdline(cmd)
+		logger.info(f'running {cmdline}')
+		proc = subprocess.Popen(cmdline, shell=True, stdout=subprocess.PIPE)
+		proc.communicate()
+		if proc.returncode > 0:
+			logger.critical(f'fslselectvols command failed')
+			raise subprocess.CalledProcessError(returncode=proc.returncode, cmd=cmdline)
+		logging.info(f'fslselectvols exited with returncode={proc.returncode}')		
+		b0vol = os.path.join(preproc_dir, 'b0_volume.nii.gz')
+		logging.info(f'checking for output file "{b0vol}"')
+		if not os.path.exists(b0vol):
+			raise FileNotFoundError(b0vol)
+		logger.info(f'found output file "{b0vol}"')
 
 	def bind_environmentals(self):
 	
