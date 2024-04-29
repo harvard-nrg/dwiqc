@@ -8,8 +8,8 @@ import logging
 import argparse as ap
 import subprocess as sp
 import collections as col
-from xnattagger import Tagger
 from bids import BIDSLayout
+from xnattagger import Tagger
 import xnattagger.config as config 
 
 
@@ -19,7 +19,6 @@ def do(args):
     if args.insecure:
         logger.warning('disabling ssl certificate verification')
         yaxil.CHECK_CERTIFICATE = False
-
 
     # call and run xnattagger on the diffusion data if argument passed
 

@@ -1,16 +1,18 @@
+import os
+import sys
 import base64
 import logging
-from lxml import etree, html
 import mimetypes
-import os
-from pathlib import Path
 import subprocess
-import sys
+from pathlib import Path
+from lxml import etree, html
 
 logger = logging.getLogger(__name__)
 
-
 def snapshot(url, saveto, container_dir):
+    """
+    Function to convert the qsiprep html file to a pdf file with the chromium container
+    """
     proc1 = f"""
     singularity run \
     {container_dir}/chromium.sif \
@@ -30,6 +32,9 @@ def snapshot(url, saveto, container_dir):
         raise ChromiumConvertError(output.errors)
 
 def imbed_images(infile, outfile=None):
+    """
+    Function that will take the qsiprep.html file and imbed the images into the html file
+    """
     infile = Path(infile)
     if not outfile:
         outfile = infile.with_stem(f'{infile.stem}-imbedded_images')
