@@ -1,3 +1,5 @@
+print(os.getcwd())
+
 import os
 import re
 import sys
@@ -10,7 +12,7 @@ import subprocess as sp
 import collections as col
 from xnattagger import Tagger
 from bids import BIDSLayout
-import xnattagger.config as config 
+import xnattagger.config as config
 
 
 logger = logging.getLogger(__name__)
