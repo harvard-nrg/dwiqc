@@ -25,5 +25,5 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: lint.txt
+        name: ${{ github.workspace }}/artifact/lint.txt
         path: ${{ github.workspace }}/artifact/lint.txt
