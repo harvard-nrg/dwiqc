@@ -1,4 +1,3 @@
-print(os.getcwd())
 import os
 import re
 import sys
