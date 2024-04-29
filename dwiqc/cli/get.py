@@ -1,6 +1,5 @@
 import os
 import re
-sys.exit()
 import sys
 import json
 import yaml
