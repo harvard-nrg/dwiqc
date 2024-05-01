@@ -81,10 +81,10 @@ You will have to do a little bit of extra configuration in the ``nginx.conf`` fi
 
 First, navigate to your ``nginx`` directory. This might be located at ``/etc/nginx`` if you're running XNAT on "bare metal" or under your ``xnat-docker-compose`` directory if you're using that to run your XNAT. Once you're there, cd into the ``conf.d`` directory and open up the server config file using your favorite text editor. ``xnat-docker-compose`` users may have a file named ``nginx.conf``. 
 
-Your ``nginx.conf`` file may look something like this:
+Your ``nginx.conf`` file may look something like this (lines of interest highlighted):
 
-.. code-block:: yaml
-
+.. code-block:: text
+  :emphasize-lines: 71-85
 
     #user www-data;
     worker_processes auto;
@@ -137,7 +137,6 @@ Your ``nginx.conf`` file may look something like this:
         listen 80;
         return                301 https://cbscentral02.rc.fas.harvard.edu$request_uri;
       } 
-
       server {
         listen 443 ssl;
         ssl_certificate       /etc/pki/tls/cbscentral02_rc_fas_harvard_edu.crt;
@@ -202,7 +201,7 @@ With that added to the ``nginx.conf`` file, you're ready to activate your plugin
 
 .. note::
 
-    If tomcat is running or the docker containers are running when you make this change you will have to restart them!
+    If tomcat or the docker containers are running when you make this change you will have to restart them!
 
 Activating the Plugin
 ^^^^^^^^^^^^^^^^^^^^^
