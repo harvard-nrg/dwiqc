@@ -243,22 +243,26 @@ class Task(tasks.BaseTask):
 	# if it is a Siemens Skyra and the max bval is 2000, the non-zero_shells argument needs to be passed to prequal
 	def check_shells(self, dwi_file):
 		# grab the Manufacturer and model from dwi file metadata
-		manufacturer = dwi_file.get_metadata()['Manufacturer']
-		scanner_model = dwi_file.get_metadata()['ManufacturersModelName']
+		try:
+			manufacturer = dwi_file.get_metadata()['Manufacturer']
+			scanner_model = dwi_file.get_metadata()['ManufacturersModelName']
 
 		# load the f val and convert it to a python list. convert the elements from strings to integers
-		bval_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.bval', return_type='filename').pop()
+			bval_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.bval', return_type='filename').pop()
 
-		bval = open(bval_file, 'r')
-		data = bval.read()
-		data = data.replace('\n', '').split(" ")
-		int_data = [eval(i) for i in data]
+			bval = open(bval_file, 'r')
+			data = bval.read()
+			data = data.replace('\n', '').split(" ")
+			int_data = [eval(i) for i in data]
 
-		max_val = max(int_data)
+			max_val = max(int_data)
 
-		if manufacturer == "Siemens" and scanner_model == "Skyra" and max_val == 2000:
-			self._nonzero_shells = True
-		else:
+			if manufacturer == "Siemens" and scanner_model == "Skyra" and max_val == 2000:
+				self._nonzero_shells = True
+			else:
+				self._nonzero_shells = False
+		except KeyError:
+			logger.warning(f'could not determine the manufacturer for {dwi_file}. this may affect shell calculations')
 			self._nonzero_shells = False
 
 
