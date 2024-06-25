@@ -126,10 +126,11 @@ class Task(tasks.BaseTask):
 		"""
 		self.get_fsl_sif()
 
+		truncated_fmaps = []
+
 		for fmap in fmap_files:
 			fmap_basename = os.path.basename(fmap)
 			fmap_dir = os.path.dirname(fmap)
-			print(fmap_dir)
 			cmd = [
 				'singularity',
 				'exec',
@@ -141,6 +142,22 @@ class Task(tasks.BaseTask):
 				'--vols=0'
 			]
 			logger.info(f'running {json.dumps(cmd, indent=2)} on {fmap}')
+
+			cmdline = subprocess.list2cmdline(cmd)
+			logger.info(f'running {cmdline}')
+			proc = subprocess.Popen(cmdline, shell=True, stdout=subprocess.PIPE)
+			proc.communicate()
+			if proc.returncode > 0:
+				logger.critical(f'fslselectvols command failed')
+				raise subprocess.CalledProcessError(returncode=proc.returncode, cmd=cmdline)
+
+			print(fmap_dir + basename)
+
+			truncated_fmaps.append(fmap_dir + fmap_basename)
+
+
+		print(truncated_fmaps)
+		sys.exit()
 
 
 	def get_fsl_sif(self):
