@@ -151,9 +151,7 @@ class Task(tasks.BaseTask):
 				logger.critical(f'fslselectvols command failed')
 				raise subprocess.CalledProcessError(returncode=proc.returncode, cmd=cmdline)
 
-			print(fmap_dir + fmap_basename)
-
-			truncated_fmaps.append(fmap_dir + fmap_basename)
+			truncated_fmaps.append(fmap_dir + f'/fmap_basename')
 
 
 		print(truncated_fmaps)
