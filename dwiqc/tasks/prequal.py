@@ -124,7 +124,7 @@ class Task(tasks.BaseTask):
 		"""
 		method that will extract all the b0 volumes from the scans designated as BIDS fieldmaps
 		"""
-		get_fsl_sif(self)
+		get_fsl_sif()
 
 		for fmap in fmap_files:
 			print(fmap)
