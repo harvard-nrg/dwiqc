@@ -69,8 +69,12 @@ class Task(tasks.BaseTask):
 		if not fmap_files:
 			self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii', return_type='filename')
 
+		# truncate down the fmap files to include just b0 volumes
+
+		truncated_fmaps = self.truncate_fmaps(fmap_files)
+
 		# get the basename of the file and then remove the extension
-		for fmap in fmap_files:
+		for fmap in truncated_fmaps:
 
 			basename = os.path.basename(fmap)
 
@@ -115,6 +119,56 @@ class Task(tasks.BaseTask):
 
 	# this method serves to create the accompanying spec file for prequal 
 	# the contents of the file depends on the SeriesDescription stored in the metadata
+
+	def truncate_fmaps(self, fmap_files):
+		"""
+		method that will extract all the b0 volumes from the scans designated as BIDS fieldmaps
+		"""
+		self.get_fsl_sif()
+
+		truncated_fmaps = []
+
+		for fmap in fmap_files:
+			fmap_basename = os.path.basename(fmap)
+			fmap_dir = os.path.dirname(fmap)
+			cmd = [
+				'singularity',
+				'exec',
+				'--pwd', fmap_dir,
+				self._fsl_sif,
+				'/APPS/fsl/bin/fslselectvols',
+				'-i', fmap_basename,
+				'-o', fmap_basename,
+				'--vols=0'
+			]
+			#logger.info(f'running {json.dumps(cmd, indent=2)} on {fmap}')
+
+			cmdline = subprocess.list2cmdline(cmd)
+			logger.info(f'running {cmdline}')
+			proc = subprocess.Popen(cmdline, shell=True, stdout=subprocess.PIPE)
+			proc.communicate()
+			if proc.returncode > 0:
+				logger.critical(f'fslselectvols command failed')
+				raise subprocess.CalledProcessError(returncode=proc.returncode, cmd=cmdline)
+
+			truncated_fmaps.append(fmap_dir + f'/{fmap_basename}')
+
+
+		return truncated_fmaps
+
+
+	def get_fsl_sif(self):
+
+		if self._container_dir:
+			try:
+				self._fsl_sif = f'{self._container_dir}/fsl_6.0.4.sif'
+			except FileNotFoundError:
+				logger.error(f'{self._container_dir}/fsl_6.0.4.sif does not exist. Verify the path and file name.')
+				sys.exit(1)
+		else:
+			home_dir = os.path.expanduser("~")
+			self._fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
+
 
 	def create_spec(self, inputs_dir):
 		dwi_file = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz')
