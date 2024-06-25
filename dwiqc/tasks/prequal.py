@@ -71,7 +71,7 @@ class Task(tasks.BaseTask):
 
 		# truncate down the fmap files to include just b0 volumes
 
-		truncated_fmaps = truncate_fmaps(fmap_files)
+		truncated_fmaps = self.truncate_fmaps(fmap_files)
 
 		# get the basename of the file and then remove the extension
 		for fmap in truncated_fmaps:
@@ -124,21 +124,23 @@ class Task(tasks.BaseTask):
 		"""
 		method that will extract all the b0 volumes from the scans designated as BIDS fieldmaps
 		"""
-		get_fsl_sif()
+		self.get_fsl_sif()
 
 		for fmap in fmap_files:
-			print(fmap)
-			sys.exit()
+			fmap_basename = os.path.basename(fmap)
+			fmap_dir = os.path.dirname(fmap)
+			print(fmap_dir)
 			cmd = [
 				'singularity',
 				'exec',
-				'--pwd', preproc_dir,
+				'--pwd', fmap_dir,
 				self._fsl_sif,
 				'/APPS/fsl/bin/fslselectvols',
 				'-i', 'dwmri.nii.gz',
-				'-o', 'b0_volume',
+				'-o', fmap_basename,
 				'--vols=0'
 			]
+			logger.info(f'running {json.dumps(cmd, indent=2)} on {fmap}')
 
 
 	def get_fsl_sif(self):
