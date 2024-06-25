@@ -71,7 +71,7 @@ class Task(tasks.BaseTask):
 
 		# truncate down the fmap files to include just b0 volumes
 
-		truncated_fmaps = trucate_fmaps(self, fmap_files)
+		truncated_fmaps = truncate_fmaps(self, fmap_files)
 
 		# get the basename of the file and then remove the extension
 		for fmap in truncated_fmaps:
