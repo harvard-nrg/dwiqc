@@ -120,7 +120,7 @@ class Task(tasks.BaseTask):
 	# this method serves to create the accompanying spec file for prequal 
 	# the contents of the file depends on the SeriesDescription stored in the metadata
 
-	def trucate_fmaps(self, fmap_files):
+	def truncate_fmaps(self, fmap_files):
 		"""
 		method that will extract all the b0 volumes from the scans designated as BIDS fieldmaps
 		"""
