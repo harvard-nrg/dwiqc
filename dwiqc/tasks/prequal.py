@@ -154,8 +154,8 @@ class Task(tasks.BaseTask):
 			truncated_fmaps.append(fmap_dir + f'/{fmap_basename}')
 
 
-		print(truncated_fmaps)
 		sys.exit()
+		return truncated_fmaps
 
 
 	def get_fsl_sif(self):
