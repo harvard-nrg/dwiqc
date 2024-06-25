@@ -137,11 +137,11 @@ class Task(tasks.BaseTask):
 				'--pwd', fmap_dir,
 				self._fsl_sif,
 				'/APPS/fsl/bin/fslselectvols',
-				'-i', 'dwmri.nii.gz',
+				'-i', fmap_basename,
 				'-o', fmap_basename,
 				'--vols=0'
 			]
-			logger.info(f'running {json.dumps(cmd, indent=2)} on {fmap}')
+			#logger.info(f'running {json.dumps(cmd, indent=2)} on {fmap}')
 
 			cmdline = subprocess.list2cmdline(cmd)
 			logger.info(f'running {cmdline}')
@@ -151,7 +151,7 @@ class Task(tasks.BaseTask):
 				logger.critical(f'fslselectvols command failed')
 				raise subprocess.CalledProcessError(returncode=proc.returncode, cmd=cmdline)
 
-			print(fmap_dir + basename)
+			print(fmap_dir + fmap_basename)
 
 			truncated_fmaps.append(fmap_dir + fmap_basename)
 
