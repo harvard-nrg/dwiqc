@@ -154,7 +154,6 @@ class Task(tasks.BaseTask):
 			truncated_fmaps.append(fmap_dir + f'/{fmap_basename}')
 
 
-		sys.exit()
 		return truncated_fmaps
 
 
