@@ -11,7 +11,7 @@ requires = [
     'executors==0.6a1',
     'selfie',
     'lxml',
-    'numpy',
+    'numpy==1.26.4',
     'dcm2niix',
     'tenacity',
     'nibabel',
