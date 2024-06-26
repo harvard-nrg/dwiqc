@@ -71,7 +71,7 @@ class Task(tasks.BaseTask):
 
 		# truncate down the fmap files to include just b0 volumes
 
-		truncated_fmaps = self.truncate_fmaps(fmap_files)
+		truncated_fmaps = self.truncate_fmaps(fmap_files, inputs_dir)
 
 		# get the basename of the file and then remove the extension
 		for fmap in truncated_fmaps:
@@ -120,7 +120,7 @@ class Task(tasks.BaseTask):
 	# this method serves to create the accompanying spec file for prequal 
 	# the contents of the file depends on the SeriesDescription stored in the metadata
 
-	def truncate_fmaps(self, fmap_files):
+	def truncate_fmaps(self, fmap_files, inputs_dir):
 		"""
 		method that will extract all the b0 volumes from the scans designated as BIDS fieldmaps
 		"""
@@ -138,7 +138,7 @@ class Task(tasks.BaseTask):
 				self._fsl_sif,
 				'/APPS/fsl/bin/fslselectvols',
 				'-i', fmap_basename,
-				'-o', fmap_basename,
+				'-o', f'{inputs_dir}/{fmap_basename}',
 				'--vols=0'
 			]
 			#logger.info(f'running {json.dumps(cmd, indent=2)} on {fmap}')
