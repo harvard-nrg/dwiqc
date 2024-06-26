@@ -51,18 +51,7 @@ class Task(tasks.BaseTask):
 		
 		all_files = self._layout.get(subject=self._sub, session=self._ses, return_type='filename') # get a list of all of the subject's files
 
-		# copy the all the subject's files into the INPUTS directory
-		for file in all_files:
-			basename = os.path.basename(file)
-			dest = os.path.join(inputs_dir, basename)
-			shutil.copy(file, dest)
-
-		self.create_bfiles(inputs_dir)
-		
-
-	# the fieldmap data needs accompanying 'dummy' bval and bvec files that consist of 0's
-	def create_bfiles(self, inputs_dir):
-		# get a list of all the fmap files that end with .json (this it's helpful to have a file with just one extension)
+		# remove all non b0volumes from the fieldmaps. return a list of paths to newly truncated files
 
 		fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')
 
@@ -72,6 +61,19 @@ class Task(tasks.BaseTask):
 		# truncate down the fmap files to include just b0 volumes
 
 		truncated_fmaps = self.truncate_fmaps(fmap_files, inputs_dir)
+
+		# copy the all the subject's files into the INPUTS directory
+		for file in all_files:
+			basename = os.path.basename(file)
+			dest = os.path.join(inputs_dir, basename)
+			shutil.copy(file, dest)
+
+		self.create_bfiles(inputs_dir, truncated_fmaps)
+		
+
+	# the fieldmap data needs accompanying 'dummy' bval and bvec files that consist of 0's
+	def create_bfiles(self, inputs_dir, truncated_fmaps):
+		# get a list of all the fmap files that end with .json (this it's helpful to have a file with just one extension)
 
 		# get the basename of the file and then remove the extension
 		for fmap in truncated_fmaps:
@@ -134,11 +136,11 @@ class Task(tasks.BaseTask):
 			cmd = [
 				'singularity',
 				'exec',
-				'--pwd', inputs_dir,
+				'--pwd', fmap_dir,
 				self._fsl_sif,
 				'/APPS/fsl/bin/fslselectvols',
 				'-i', fmap_basename,
-				'-o', f'{inputs_dir}/{fmap_basename}',
+				'-o', fmap_basename,
 				'--vols=0'
 			]
 			#logger.info(f'running {json.dumps(cmd, indent=2)} on {fmap}')
