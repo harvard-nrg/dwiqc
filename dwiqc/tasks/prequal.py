@@ -134,7 +134,7 @@ class Task(tasks.BaseTask):
 			cmd = [
 				'singularity',
 				'exec',
-				'--pwd', fmap_dir,
+				'--pwd', inputs_dir,
 				self._fsl_sif,
 				'/APPS/fsl/bin/fslselectvols',
 				'-i', fmap_basename,
