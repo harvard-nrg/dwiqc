@@ -363,7 +363,7 @@ class Task(tasks.BaseTask):
 
 	def run_fslroi(self, fmap, volume):
 		vol_index = int(volume) - 1
-		split_command = f'singularity exec /{self._fsl_sif} /APPS/fsl/bin/fslroi {fmap} {fmap} {volume} {str(vol_index)}'
+		split_command = f'singularity exec {self._fsl_sif} /APPS/fsl/bin/fslroi {fmap} {fmap} {str(vol_index)} 1'
 		logger.info(f'executing {split_command}')
 		proc1 = subprocess.check_output(split_command, shell=True, stderr=subprocess.STDOUT, text=True)
 
@@ -401,7 +401,7 @@ class Task(tasks.BaseTask):
 		os.makedirs(self._outdir, exist_ok=True)
 
 		try:
-			extract_command = f'singularity exec /{self._fsl_sif} /APPS/fsl/bin/fslselectvols -i {dwi_full_path} -o {epi_out_path} --vols={b0_string}'
+			extract_command = f'singularity exec {self._fsl_sif} /APPS/fsl/bin/fslselectvols -i {dwi_full_path} -o {epi_out_path} --vols={b0_string}'
 			logger.info(f'executing {extract_command}')
 			bindings = os.environ.get('SINGULARITY_BIND', None)
 			logger.info(f'SINGULARITY_BIND environment variable contains "{bindings}"')
