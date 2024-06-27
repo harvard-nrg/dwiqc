@@ -26,13 +26,14 @@ logger = logging.getLogger(__name__)
 
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config, fs_license, container_dir=None, custom_eddy=False, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config, fs_license, truncate_fmap=False, container_dir=None, custom_eddy=False, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
 		self._qsiprep_config = qsiprep_config
 		self._fs_license = fs_license
+		self._truncate_fmap = truncate_fmap
 		self._container_dir = container_dir
 		self._custom_eddy = custom_eddy
 		self._no_gpu = no_gpu
@@ -329,7 +330,7 @@ class Task(tasks.BaseTask):
 
 		epi_output_path = epi_output.replace('/dwi/', '/fmap/')
 		
-		self.run_extract(dwi_full_path, bval, epi_output_path)
+		fmap_path = self.run_extract(dwi_full_path, bval, epi_output_path)
 
 
 		# create an output file path for the new fmap's json file
@@ -351,6 +352,20 @@ class Task(tasks.BaseTask):
 		## Add IntendedFor to the new json files
 
 		self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{dwi_basename}', fmap_json_file_path)
+
+		if self._truncate_fmap:
+			shape = nib.load(fmap_path).get_fdata().shape
+			if len(shape) == 4:
+				num_vols = shape[3]
+				middle_vol = num_vols // 2
+				
+				self.run_fslroi(fmap_path, middle_vol)
+
+	def run_fslroi(self, fmap, volume):
+		vol_index = int(volume) - 1
+		split_command = f'singularity exec /{self._fsl_sif} /APPS/fsl/bin/fslroi {fmap} {fmap} {volume} {str(vol_index)}'
+		logger.info(f'executing {split_command}')
+		proc1 = subprocess.check_output(split_command, shell=True, stderr=subprocess.STDOUT, text=True)
 
 	def run_extract(self, dwi_full_path, bval_path, epi_out_path):
 
@@ -395,6 +410,7 @@ class Task(tasks.BaseTask):
 				logger.critical(f'fslselectvols failed to produce "{epi_out_path}"')
 				raise subprocess.CalledProcessError(returncode=1, cmd=extract_command)
 			logger.info(f'found fslselectvols derived file "{epi_out_path}"')
+			return epi_out_path
 		except subprocess.CalledProcessError as e:
 			print(e.stdout)
 			raise e

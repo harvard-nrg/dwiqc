@@ -112,6 +112,7 @@ def do(args):
             outdir=qsiprep_outdir,
             qsiprep_config=args.qsiprep_config,
             fs_license=args.fs_license,
+            truncate_fmap=args.truncate_qsiprep_fmap,
             container_dir = args.container_dir,
             custom_eddy=args.custom_eddy,
             no_gpu=args.no_gpu,

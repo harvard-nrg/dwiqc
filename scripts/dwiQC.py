@@ -106,6 +106,8 @@ def main():
         help='List of cluster nodes to exclude from use.')
     parser_process.add_argument('--work-dir',
         help='Working directory that is shared across compute cluster')
+    parser_process.add_argument('--truncate-qsiprep-fmap', action='store_true',
+        help='Truncate the fmap created from the main diffusion scan to just one b0 volume.')
     parser_process.set_defaults(func=cli.process.do)
 
     # tandem mode
@@ -164,6 +166,8 @@ def main():
         help='List of cluster nodes to exclude from use.')
     parser_tandem.add_argument('--work-dir',
         help='Working directory that is shared across compute cluster')
+    parser_tandem.add_argument('--truncate-qsiprep-fmap', action='store_true',
+        help='Truncate the fmap created from the main diffusion scan to just one b0 volume.')
     parser_tandem.set_defaults(func=cli.tandem.do)
     args = parser.parse_args()
 
