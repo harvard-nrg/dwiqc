@@ -354,22 +354,22 @@ class Task(tasks.BaseTask):
 		self.insert_json_value('IntendedFor', f'ses-{self._ses}/dwi/{dwi_basename}', fmap_json_file_path)
 
 
-	def execute_fmap_truncation(self)
+	def execute_fmap_truncation(self):
 	"""
 	If truncate fmaps is true, this method will go through all of the fmaps in the fmap BIDS dir and make sure they are only one volume in length
 	"""
-	if self._truncate_fmap:
-		fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')
+		if self._truncate_fmap:
+			fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')	
 
-		for fmap in fmap_files:
-			shape = nib.load(fmap).get_fdata().shape
-			if len(shape) == 4:
-				num_vols = shape[3]
-				if num_vols == 1:
-					continue
-				middle_vol = num_vols // 2
-				
-				self.run_fslroi(fmap, middle_vol)
+			for fmap in fmap_files:
+				shape = nib.load(fmap).get_fdata().shape
+				if len(shape) == 4:
+					num_vols = shape[3]
+					if num_vols == 1:
+						continue
+					middle_vol = num_vols // 2
+					
+					self.run_fslroi(fmap, middle_vol)
 
 	def run_fslroi(self, fmap, volume):
 		vol_index = int(volume) - 1
