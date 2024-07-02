@@ -361,10 +361,13 @@ class Task(tasks.BaseTask):
 		if self._truncate_fmap:
 			fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')
 
+			logger.info(f'running truncation on {fmap_files}')
+
 			for fmap in fmap_files:
 				shape = nib.load(fmap).get_fdata().shape
 				if len(shape) == 4:
 					num_vols = shape[3]
+					logger.info(f'{fmap} has {num_vols} volumes')
 					if num_vols == 1:
 						continue
 					middle_vol = num_vols // 2
