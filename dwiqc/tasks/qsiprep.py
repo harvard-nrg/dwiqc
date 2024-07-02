@@ -359,7 +359,10 @@ class Task(tasks.BaseTask):
 		If truncate fmaps is true, this method will go through all of the fmaps in the fmap BIDS dir and make sure they are only one volume in length
 		"""
 		if self._truncate_fmap:
-			fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')
+
+			layout = BIDSLayout(self._bids)
+
+			fmap_files = layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')
 
 			logger.info(f'running truncation on {fmap_files}')
 
