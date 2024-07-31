@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 def snapshot(url, saveto, container_dir):
-    check_container_path(container_dir)
+    chromium_sif = check_container_path(container_dir)
     proc1 = f"""singularity run \
-    {container_dir}/chromium.sif \
+    {chromium_sif} \
     --no-sandbox \
     --headless \
     --print-to-pdf={saveto} \
@@ -56,6 +56,7 @@ def check_container_path(container_dir):
     if container_dir:
         try:
             chromium_sif = f'{container_dir}/chromium.sif'
+            return chromium_sif
         except FileNotFoundError:
             logger.error(f'{container_dir}/chromium.sif does not exist. Verify the path and file name.')
             sys.exit(1)
@@ -63,6 +64,7 @@ def check_container_path(container_dir):
         home_dir = os.path.expanduser("~")
         try:
             chromium_sif = os.path.join(home_dir, '.config/dwiqc/containers/chromium.sif')
+            return chromium_sif
         except FileNotFoundError:
             logger.error(f"No --container-dir argument was supplied and unable to find chromium sif at default location: {os.path.join(home_dir, '.config/dwiqc/containers}')}")
             sys.exit(1)
