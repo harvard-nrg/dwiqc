@@ -64,5 +64,5 @@ def check_container_path(container_dir):
         try:
             chromium_sif = os.path.join(home_dir, '.config/dwiqc/containers/chromium.sif')
         except FileNotFoundError:
-            logger.error(f'No --container-dir argument was supplied and unable to find chromium sif at default location: {os.path.join(home_dir, '.config/dwiqc/containers}')
+            logger.error(f"No --container-dir argument was supplied and unable to find chromium sif at default location: {os.path.join(home_dir, '.config/dwiqc/containers}')}")
             sys.exit(1)
