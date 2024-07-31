@@ -1,16 +1,17 @@
-import base64
-import logging
-import subprocess
-from lxml import etree, html
-from pathlib import Path
-import mimetypes
 import os
 import sys
-logger = logging.getLogger(__name__)
+import base64
+import logging
+import mimetypes
+import subprocess
+from pathlib import Path
+from lxml import etree, html
 home_dir = os.path.expanduser("~")
+logger = logging.getLogger(__name__)
 
 
 def snapshot(url, saveto, container_dir):
+    check_container_path(container_dir)
     proc1 = f"""singularity run \
     {container_dir}/chromium.sif \
     --no-sandbox \
@@ -51,4 +52,17 @@ def imbed_images(infile, outfile=None):
     with open(outfile, 'wb') as fo:
         fo.write(etree.tostring(root))
 
-
+def check_container_path(container_dir):
+    if container_dir:
+        try:
+            chromium_sif = f'{container_dir}/chromium.sif'
+        except FileNotFoundError:
+            logger.error(f'{container_dir}/chromium.sif does not exist. Verify the path and file name.')
+            sys.exit(1)
+    else:
+        home_dir = os.path.expanduser("~")
+        try:
+            chromium_sif = os.path.join(home_dir, '.config/dwiqc/containers/chromium.sif')
+        except FileNotFoundError:
+            logger.error(f'No --container-dir argument was supplied and unable to find chromium sif at default location: {os.path.join(home_dir, '.config/dwiqc/containers}')
+            sys.exit(1)
