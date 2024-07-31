@@ -10,7 +10,7 @@ home_dir = os.path.expanduser("~")
 logger = logging.getLogger(__name__)
 
 
-def snapshot(url, saveto, container_dir):
+def snapshot(url, saveto, container_dir=None):
     chromium_sif = check_container_path(container_dir)
     proc1 = f"""singularity run \
     {chromium_sif} \
