@@ -612,7 +612,7 @@ class Task(tasks.BaseTask):
 	def build(self):
 		self.bind_environmentals()
 		self.add_intended_for()
-		inputs_dir = f'{self._tempdir}/PREQUAL_INPUTS_{self._date}/ses-{self._ses}'
+		inputs_dir = f'{self._tempdir}/PREQUAL_INPUTS_{self._date}_{os.environ['SLURM_JOB_ID']}/ses-{self._ses}'
 		self.copy_inputs(inputs_dir)
 		mporder = self.calc_mporder()
 		logger.info(f'TMPDIR: {self._tempdir}')
