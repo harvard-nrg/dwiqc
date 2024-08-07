@@ -163,7 +163,7 @@ class Task(tasks.BaseTask):
 			logging.info('eddy quad ran without errors!')
 		else:
 			logging.error('eddy quad threw an error. retrying with input bvec/bval files')
-			new_bvec = match_bvec(f'{self._outdir}/qsiprep/sub-{self._sub}/ses-{self._ses}/dwi')
+			new_bvec = self.match_bvec(f'{self._outdir}/qsiprep/sub-{self._sub}/ses-{self._ses}/dwi')
 			os.remove(f'{eddy_quad_dir}/{self._sub}_{self._ses}.eddy_rotated_bvecs')
 			shutil.copy(new_bvec, eddy_quad_dir)
 
