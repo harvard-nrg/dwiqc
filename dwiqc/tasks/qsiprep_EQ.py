@@ -8,6 +8,7 @@ import subprocess
 import json
 from executors.models import Job
 from datetime import datetime
+from pathlib import Path
 
 date = datetime.today().strftime('%Y-%m-%d')
 
@@ -110,7 +111,7 @@ class Task(tasks.BaseTask):
 
 	def match_bval(self, dir_path):
 		for file in os.listdir(dir_path):
-			if file.endswith('.bval'):
+			if file.endswith('.bval') and self._run in file:
 				return file
 
 
@@ -161,8 +162,28 @@ class Task(tasks.BaseTask):
 		if code == 0:
 			logging.info('eddy quad ran without errors!')
 		else:
-			logging.error('eddy quad threw an error. exiting.')
-			sys.exit()
+			logging.error('eddy quad threw an error. retrying with input bvec/bval files')
+			new_bvec = match_bvec(f'{self._outdir}/qsiprep/sub-{self._sub}/ses-{self._ses}/dwi')
+			os.remove(f'{eddy_quad_dir}/{self._sub}_{self._ses}.eddy_rotated_bvecs')
+			shutil.copy(new_bvec, eddy_quad_dir)
+
+			logging.info('Running eddy_quad for the 2nd time...')
+			proc1 = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+			proc1.communicate()
+			code = proc1.returncode
+
+			if code == 0:
+				logging.info('eddy quad ran successfully on the second try!')
+
+			else:
+				logging.error('eddy quad failed on the second attempt as well. exiting.')
+				sys.exit()
+
+	def match_bvec(self, directory):
+		for file in os.listdir(directory):
+			if file.endswith('.bvec') and self._run in file:
+				return file
+
 
 	def parse_json(self, eddy_dir):
 		logging.info('parsing qc.json file.')
