@@ -571,7 +571,7 @@ class Task(tasks.BaseTask):
 			'--fs-license-file',
 			self._fs_license,
 			'-w',
-			f"{self._tempdir}/qsiprep_{date}_{os.environ['SLURM_JOB_ID']}/{self._ses}"
+			f"{self._tempdir}/qsiprep_{date}/SLURM_JOB_{os.environ['SLURM_JOB_ID']}/{self._ses}"
 		]
 
 		for item in qsiprep_options:
