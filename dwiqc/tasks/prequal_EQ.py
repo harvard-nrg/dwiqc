@@ -43,22 +43,12 @@ class Task(tasks.BaseTask):
 		# define log file
 		logging.basicConfig(filename=f"{self._outdir}/logs/dwiqc-prequal.log", encoding='utf-8', level=logging.DEBUG)
 
-		# copy the necessary file to EDDY directory
-
-		logging.info('copying dwmri.nii.gz file to EDDY dir')
-		if os.path.isfile(f'{self._outdir}/PREPROCESSED/dwmri.nii.gz'):
-			shutil.copy(f'{self._outdir}/PREPROCESSED/dwmri.nii.gz', f'{self._outdir}/EDDY/{self._sub}_{self._ses}.nii.gz')
-
-		else:
-			logging.error('PREPROCESSED/dwmri.nii.gz doesn\'t exist, which likely means prequal failed. exiting.')
-			sys.exit()
-
 		# grab name of slspec file
 		logging.info(f'grabbing slspec file from {self._outdir}')
 		try:
 			for file in os.listdir(self._outdir):
 				if 'slspec' in file and file.endswith('.txt'):
-					spec_file = file
+					self._spec_file = file
 		except FileNotFoundError:
 			logging.error('spec file not found. exiting.')
 			sys.exit()
@@ -72,24 +62,55 @@ class Task(tasks.BaseTask):
 				os.rename(file, new_name)
 
 
+		self.check_split_preproc()
+
+	def check_split_preproc(self):
+		# copy the necessary file to EDDY directory
+
+		all_files = [file for file in os.listdir(f'{self._outdir}/PREPROCESSED')]
+		if 'dwmri.nii.gz' in all_files:
+			logging.info('only one preproc file found, running eddy quad')
+			self.run_eddy_quad('dwmri.bval', 'dwmri.bvec')
+			self.extract_b0_vol_regular()
+
+		else:
+			logging.warning('PREPROCESSED/dwmri.nii.gz doesn\'t exist, checking for split output')
+			main_scans = [file for file in all_files if '_dwi_' in file and file.endswith('preproc.nii.gz')]
+			logger.info(f'found these main diffusion scans {main_scans}')
+			self.split_output_processing(main_scans)
+
+	def split_output_processing(self, scans):
+		if scans:
+			logger.info('split scans found')
+
+			for idx,scan in enumerate(scans, 1):
+				self.run_eddy_quad(scan.replace('.nii.gz', '.bval'), scan.replace('.nii.gz', '.bvec'), idx)
+				self.extract_b0_vol_split(scans, idx)
+
+		else:
+			logger.error('split scan output not found, exiting')
+			sys.exit()
+
+
+	def run_eddy_quad(self, bval, bvec, run=1):
 
 		eddy_quad = f"""singularity exec \
 		--pwd {self._outdir}/EDDY \
 		{self._fsl_sif} \
 		/APPS/fsl/bin/eddy_quad \
-		{self._sub}_{self._ses} \
+		{self._sub}_{self._ses}_{run} \
 		-idx index.txt \
 		-par acqparams.txt \
 		--mask=eddy_mask.nii.gz \
-		--bvals={self._outdir}/PREPROCESSED/dwmri.bval \
-		--bvecs={self._outdir}/PREPROCESSED/dwmri.bvec \
+		--bvals={self._outdir}/PREPROCESSED/{bval} \
+		--bvecs={self._outdir}/PREPROCESSED/{bvec} \
 		--field {self._outdir}/TOPUP/topup_field.nii.gz \
-		-s {self._outdir}/{spec_file} \
+		-s {self._outdir}/{self._spec_file} \
 		-v"""
 
-		if os.path.isdir(f'{self._sub}_{self._ses}.qc'):
+		if os.path.isdir(f'{self._sub}_{self._ses}_{run}.qc'):
 			logging.warning('Output directory already exists. Removing and trying again.')
-			shutil.rmtree(f'{self._sub}_{self._ses}.qc')
+			shutil.rmtree(f'{self._sub}_{self._ses}_{run}.qc')
 
 		logging.info('Running eddy_quad...')
 		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
@@ -102,11 +123,11 @@ class Task(tasks.BaseTask):
 			logging.error('eddy quad threw an error. exiting.')
 			sys.exit()
 
-		eddy_results_dir = f'{self._outdir}/EDDY/{self._sub}_{self._ses}.qc'
+
+		eddy_results_dir = f'{self._outdir}/EDDY/{self._sub}_{self._ses}_{run}.qc'
 
 		self.parse_json(eddy_results_dir)
-
-		self.extract_b0_vol()
+			
 
 
 	def parse_json(self, eddy_dir):
@@ -168,7 +189,7 @@ class Task(tasks.BaseTask):
 
 		logging.info('successfully parsed json and wrote out results to eddy_metrics.json')
 
-	def extract_b0_vol(self):
+	def extract_b0_vol_regular(self):
 		dwmri = f'{self._outdir}/PREPROCESSED/dwmri.nii.gz'
 		logger.info(f'checking for input file "{dwmri}"')
 		if not os.path.exists(dwmri):
@@ -194,12 +215,41 @@ class Task(tasks.BaseTask):
 		if proc.returncode > 0:
 			logger.critical(f'fslselectvols command failed')
 			raise subprocess.CalledProcessError(returncode=proc.returncode, cmd=cmdline)
-		logging.info(f'fslselectvols exited with returncode={proc.returncode}')		
+		logging.info(f'fslselectvols exited with returncode={proc.returncode}')
 		b0vol = os.path.join(preproc_dir, 'b0_volume.nii.gz')
 		logging.info(f'checking for output file "{b0vol}"')
 		if not os.path.exists(b0vol):
 			raise FileNotFoundError(b0vol)
 		logger.info(f'found output file "{b0vol}"')
+
+	def extract_b0_vol_split(self, scans, run):
+		bindings = os.environ.get('SINGULARITY_BIND', None)
+		logger.info(f'SINGULARITY_BIND environment variable is set to "{bindings}"')
+		preproc_dir = f'{self._outdir}/PREPROCESSED'
+		for scan in scans:
+			cmd = [
+				'singularity',
+				'exec',
+				'--pwd', preproc_dir,
+				self._fsl_sif,
+				'/APPS/fsl/bin/fslselectvols',
+				'-i', scan,
+				'-o', f'b0_volume_{run}',
+				'--vols=0'
+			]
+			cmdline = subprocess.list2cmdline(cmd)
+			logger.info(f'running {cmdline}')
+			proc = subprocess.Popen(cmdline, shell=True, stdout=subprocess.PIPE)
+			proc.communicate()
+			if proc.returncode > 0:
+				logger.critical(f'fslselectvols command failed')
+				raise subprocess.CalledProcessError(returncode=proc.returncode, cmd=cmdline)
+			logging.info(f'fslselectvols exited with returncode={proc.returncode}')
+			b0vol = os.path.join(preproc_dir, f'b0_volume{run}.nii.gz')
+			logging.info(f'checking for output file "{b0vol}"')
+			if not os.path.exists(b0vol):
+				raise FileNotFoundError(b0vol)
+			logger.info(f'found output file "{b0vol}"')
 
 	def bind_environmentals(self):
 	
