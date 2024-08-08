@@ -62,7 +62,7 @@ class Task(tasks.BaseTask):
 		all_files = [file for file in os.listdir(f'{self._outdir}/PREPROCESSED')]
 		if 'dwmri.nii.gz' in all_files:
 			logging.info('only one preproc file found, running eddy quad')
-			self.run_eddy_quad('dwmri.bval', 'dwmri.bvec')
+			self.run_eddy_quad('dwmri.nii.gz','dwmri.bval', 'dwmri.bvec')
 			self.extract_b0_vol_regular()
 
 		else:
@@ -76,7 +76,7 @@ class Task(tasks.BaseTask):
 			logger.info('split scans found')
 
 			for idx,scan in enumerate(scans, 1):
-				self.run_eddy_quad(scan.replace('.nii.gz', '.bval'), scan.replace('.nii.gz', '.bvec'), idx)
+				self.run_eddy_quad(scan, scan.replace('.nii.gz', '.bval'), scan.replace('.nii.gz', '.bvec'), idx)
 				self.extract_b0_vol_split(scans, idx)
 
 		else:
@@ -96,8 +96,13 @@ class Task(tasks.BaseTask):
 				new_name = file.replace(f"{self._sub}_{self._ses}_{run-1}", f"{self._sub}_{self._ses}_{run}")
 				os.rename(file, new_name)
 
+	def copy_nii(self, nii):
+		shutil.copy(f'{self._outdir}/PREPROCESSED/{nii}', f'{self._outdir}/EDDY')
 
-	def run_eddy_quad(self, bval, bvec, run=1):
+
+	def run_eddy_quad(self, nii, bval, bvec, run=1):
+
+		self.copy_nii(nii)
 
 		self.rename_eddy_files(run)
 
@@ -130,6 +135,7 @@ class Task(tasks.BaseTask):
 			logging.error('eddy quad threw an error. exiting.')
 			sys.exit()
 
+		os.remove(f'{self._outdir}/EDDY/{nii}')
 
 		eddy_results_dir = f'{self._outdir}/EDDY/{self._sub}_{self._ses}_{run}.qc'
 
