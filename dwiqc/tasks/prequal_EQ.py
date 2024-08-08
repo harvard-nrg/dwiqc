@@ -54,14 +54,6 @@ class Task(tasks.BaseTask):
 			sys.exit()
 
 
-		# rename all the eddy_results files to be {self._sub}_{self._ses}
-
-		for file in os.listdir():
-			if file.startswith("eddy_results"):
-				new_name = file.replace("eddy_results", f"{self._sub}_{self._ses}")
-				os.rename(file, new_name)
-
-
 		self.check_split_preproc()
 
 	def check_split_preproc(self):
@@ -91,8 +83,23 @@ class Task(tasks.BaseTask):
 			logger.error('split scan output not found, exiting')
 			sys.exit()
 
+	def rename_eddy_files(self, run):
+		# rename all the eddy_results files to be {self._sub}_{self._ses}_{run}
+
+		os.chdir(f"{self._outdir}/EDDY")
+
+		for file in os.listdir():
+			if file.startswith("eddy_results"):
+				new_name = file.replace("eddy_results", f"{self._sub}_{self._ses}_{run}")
+				os.rename(file, new_name)
+			elif file.startswith(f"{self._sub}_{self._ses}_{run-1}"):
+				new_name = file.replace(f"{self._sub}_{self._ses}_{run-1}", f"{self._sub}_{self._ses}_{run}")
+				os.rename(file, new_name)
+
 
 	def run_eddy_quad(self, bval, bvec, run=1):
+
+		self.rename_eddy_files(run)
 
 		eddy_quad = f"""singularity exec \
 		--pwd {self._outdir}/EDDY \
