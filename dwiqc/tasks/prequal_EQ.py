@@ -95,6 +95,8 @@ class Task(tasks.BaseTask):
 			elif file.startswith(f"{self._sub}_{self._ses}_{run-1}"):
 				new_name = file.replace(f"{self._sub}_{self._ses}_{run-1}", f"{self._sub}_{self._ses}_{run}")
 				os.rename(file, new_name)
+			elif file.endswith('_preproc.nii.gz'):
+				os.rename(file, f"{self._sub}_{self._ses}_{run}")
 
 	def copy_nii(self, nii):
 		shutil.copy(f'{self._outdir}/PREPROCESSED/{nii}', f'{self._outdir}/EDDY')
@@ -135,7 +137,7 @@ class Task(tasks.BaseTask):
 			logging.error('eddy quad threw an error. exiting.')
 			sys.exit()
 
-		os.remove(f'{self._outdir}/EDDY/{nii}')
+		#os.remove(f'{self._outdir}/EDDY/{nii}')
 
 		eddy_results_dir = f'{self._outdir}/EDDY/{self._sub}_{self._ses}_{run}.qc'
 
