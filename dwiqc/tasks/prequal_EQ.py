@@ -96,7 +96,7 @@ class Task(tasks.BaseTask):
 				new_name = file.replace(f"{self._sub}_{self._ses}_{run-1}", f"{self._sub}_{self._ses}_{run}")
 				os.rename(file, new_name)
 			elif file.endswith('_preproc.nii.gz'):
-				os.rename(file, f"{self._sub}_{self._ses}_{run}")
+				os.rename(file, f"{self._sub}_{self._ses}_{run}.nii.gz")
 
 	def copy_nii(self, nii):
 		shutil.copy(f'{self._outdir}/PREPROCESSED/{nii}', f'{self._outdir}/EDDY')
