@@ -6,6 +6,7 @@ import dwiqc.tasks as tasks
 import logging
 import subprocess
 import json
+from pathlib import Path
 from executors.models import Job
 
 logger = logging.getLogger()
@@ -76,12 +77,25 @@ class Task(tasks.BaseTask):
 			logger.info('split scans found')
 
 			for idx,scan in enumerate(scans, 1):
+				self.edit_index_file()
 				self.run_eddy_quad(scan, scan.replace('.nii.gz', '.bval'), scan.replace('.nii.gz', '.bvec'), idx)
 				self.extract_b0_vol_split(scans, idx)
 
 		else:
 			logger.error('split scan output not found, exiting')
 			sys.exit()
+
+	def edit_index_file(self):
+		index_file = Path(f'{self._outdir}/EDDY/index.txt')
+		with open(index_file, 'r') as file:
+		    content = file.read()
+
+		integers = content.split()
+		filtered_integers = [i for i in integers if i == '1']
+		result_content = ' '.join(filtered_integers)
+
+		with open(index_file, 'w') as file:
+			file.write(result_content)
 
 	def rename_eddy_files(self, run):
 		# rename all the eddy_results files to be {self._sub}_{self._ses}_{run}
@@ -121,6 +135,8 @@ class Task(tasks.BaseTask):
 		--field {self._outdir}/TOPUP/topup_field.nii.gz \
 		-s {self._outdir}/{self._spec_file} \
 		-v"""
+
+		logger.info(f'{json.dumps(eddy_quad, indent=2)}')
 
 		if os.path.isdir(f'{self._sub}_{self._ses}_{run}.qc'):
 			logging.warning('Output directory already exists. Removing and trying again.')
