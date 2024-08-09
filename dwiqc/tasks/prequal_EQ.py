@@ -67,10 +67,14 @@ class Task(tasks.BaseTask):
 			self.extract_b0_vol_regular()
 
 		else:
+			logging.error(f'{self._outdir}/PREPROCESSED/dwmri.nii.gz file not found. check prequal log dir for errors.')
+			sys.exit(1)
+			'''
 			logging.warning('PREPROCESSED/dwmri.nii.gz doesn\'t exist, checking for split output')
 			main_scans = [file for file in all_files if '_dwi_' in file and file.endswith('preproc.nii.gz')]
 			logger.info(f'found these main diffusion scans {main_scans}')
 			self.split_output_processing(main_scans)
+			'''
 
 	def split_output_processing(self, scans):
 		if scans:
