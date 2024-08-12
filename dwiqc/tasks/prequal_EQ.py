@@ -120,7 +120,7 @@ class Task(tasks.BaseTask):
 		shutil.copy(f'{self._outdir}/PREPROCESSED/{nii}', f'{self._outdir}/EDDY')
 
 
-	def run_eddy_quad(self, nii, bval, bvec):
+	def run_eddy_quad(self, nii, bval, bvec, run=1):
 
 		self.copy_nii(nii)
 
