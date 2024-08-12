@@ -101,36 +101,36 @@ class Task(tasks.BaseTask):
 		with open(index_file, 'w') as file:
 			file.write(result_content)
 
-	def rename_eddy_files(self, run):
+	def rename_eddy_files(self):
 		# rename all the eddy_results files to be {self._sub}_{self._ses}_{run}
 
 		os.chdir(f"{self._outdir}/EDDY")
 
 		for file in os.listdir():
 			if file.startswith("eddy_results"):
-				new_name = file.replace("eddy_results", f"{self._sub}_{self._ses}_{run}")
+				new_name = file.replace("eddy_results", f"{self._sub}_{self._ses}")
 				os.rename(file, new_name)
-			elif file.startswith(f"{self._sub}_{self._ses}_{run-1}"):
-				new_name = file.replace(f"{self._sub}_{self._ses}_{run-1}", f"{self._sub}_{self._ses}_{run}")
+			elif file.startswith(f"{self._sub}_{self._ses}"):
+				new_name = file.replace(f"{self._sub}_{self._ses}", f"{self._sub}_{self._ses}")
 				os.rename(file, new_name)
 			elif file.endswith('_preproc.nii.gz'):
-				os.rename(file, f"{self._sub}_{self._ses}_{run}.nii.gz")
+				os.rename(file, f"{self._sub}_{self._ses}.nii.gz")
 
 	def copy_nii(self, nii):
 		shutil.copy(f'{self._outdir}/PREPROCESSED/{nii}', f'{self._outdir}/EDDY')
 
 
-	def run_eddy_quad(self, nii, bval, bvec, run=1):
+	def run_eddy_quad(self, nii, bval, bvec):
 
 		self.copy_nii(nii)
 
-		self.rename_eddy_files(run)
+		self.rename_eddy_files()
 
 		eddy_quad = f"""singularity exec \
 		--pwd {self._outdir}/EDDY \
 		{self._fsl_sif} \
 		/APPS/fsl/bin/eddy_quad \
-		{self._sub}_{self._ses}_{run} \
+		{self._sub}_{self._ses} \
 		-idx index.txt \
 		-par acqparams.txt \
 		--mask=eddy_mask.nii.gz \
@@ -142,9 +142,9 @@ class Task(tasks.BaseTask):
 
 		logger.info(f'{json.dumps(eddy_quad, indent=2)}')
 
-		if os.path.isdir(f'{self._sub}_{self._ses}_{run}.qc'):
+		if os.path.isdir(f'{self._sub}_{self._ses}.qc'):
 			logging.warning('Output directory already exists. Removing and trying again.')
-			shutil.rmtree(f'{self._sub}_{self._ses}_{run}.qc')
+			shutil.rmtree(f'{self._sub}_{self._ses}.qc')
 
 		logging.info('Running eddy_quad...')
 		proc1 = subprocess.Popen(eddy_quad, shell=True, stdout=subprocess.PIPE)
@@ -159,7 +159,7 @@ class Task(tasks.BaseTask):
 
 		#os.remove(f'{self._outdir}/EDDY/{nii}')
 
-		eddy_results_dir = f'{self._outdir}/EDDY/{self._sub}_{self._ses}_{run}.qc'
+		eddy_results_dir = f'{self._outdir}/EDDY/{self._sub}_{self._ses}.qc'
 
 		self.parse_json(eddy_results_dir)
 			
@@ -269,7 +269,7 @@ class Task(tasks.BaseTask):
 				self._fsl_sif,
 				'/APPS/fsl/bin/fslselectvols',
 				'-i', scan,
-				'-o', f'b0_volume_{run}',
+				'-o', f'b0_volume',
 				'--vols=0'
 			]
 			cmdline = subprocess.list2cmdline(cmd)
@@ -280,7 +280,7 @@ class Task(tasks.BaseTask):
 				logger.critical(f'fslselectvols command failed')
 				raise subprocess.CalledProcessError(returncode=proc.returncode, cmd=cmdline)
 			logging.info(f'fslselectvols exited with returncode={proc.returncode}')
-			b0vol = os.path.join(preproc_dir, f'b0_volume{run}.nii.gz')
+			b0vol = os.path.join(preproc_dir, f'b0_volume.nii.gz')
 			logging.info(f'checking for output file "{b0vol}"')
 			if not os.path.exists(b0vol):
 				raise FileNotFoundError(b0vol)
