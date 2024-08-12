@@ -110,8 +110,8 @@ class Task(tasks.BaseTask):
 			if file.startswith("eddy_results"):
 				new_name = file.replace("eddy_results", f"{self._sub}_{self._ses}")
 				os.rename(file, new_name)
-			elif file.startswith(f"{self._sub}_{self._ses}"):
-				new_name = file.replace(f"{self._sub}_{self._ses}", f"{self._sub}_{self._ses}")
+			elif file == 'dwmri.nii.gz':
+				new_name = f"{self._sub}_{self._ses}.nii.gz"
 				os.rename(file, new_name)
 			elif file.endswith('_preproc.nii.gz'):
 				os.rename(file, f"{self._sub}_{self._ses}.nii.gz")
