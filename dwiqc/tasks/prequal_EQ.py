@@ -117,7 +117,7 @@ class Task(tasks.BaseTask):
 				os.rename(file, f"{self._sub}_{self._ses}.nii.gz")
 
 	def copy_nii(self, nii):
-		shutil.copy(f'{self._outdir}/PREPROCESSED/{nii}', f'{self._outdir}/EDDY')
+		shutil.copy(f'{self._outdir}/PREPROCESSED/{nii}', f'{self._outdir}/EDDY/{self._sub}_{self._ses}.nii.gz')
 
 
 	def run_eddy_quad(self, nii, bval, bvec, run=1):

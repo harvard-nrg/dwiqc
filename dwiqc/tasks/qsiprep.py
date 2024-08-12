@@ -582,7 +582,7 @@ class Task(tasks.BaseTask):
 			logfile = os.path.join(logdir, 'dwiqc-qsiprep.log')
 			self.job = Job(
 				name='dwiqc-qsiprep',
-				time='4000',
+				time='700',
 				memory='60G',
 				cpus=2,
 				nodes=1,
@@ -596,7 +596,7 @@ class Task(tasks.BaseTask):
 			logfile = os.path.join(logdir, 'dwiqc-qsiprep.log')
 			self.job = Job(
 				name='dwiqc-qsiprep',
-				time='4000',
+				time='700',
 				memory='60G',
 				gpus=1,
 				nodes=1,
