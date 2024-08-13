@@ -606,13 +606,26 @@ class Task(tasks.BaseTask):
 		
 		os.environ["SINGULARITY_BIND"] = ','.join(bind)
 
+		try: 
+			self._slurm_job_id = os.environ['SLURM_JOB_ID']
+		except KeyError:
+			logger.warning('could not find slurm job id, populating value with random number')
+			self._slurm_job_id = self.get_random_int(7)
+
+
+	def get_random_int(self, num_ints):
+		range_start = 10**(num_ints-1)
+		range_end = (10**num_ints)-1
+		return randint(range_start, range_end)
+
+
 
 	# build the prequal sbatch command and create job
 
 	def build(self):
 		self.bind_environmentals()
 		self.add_intended_for()
-		inputs_dir = f"{self._tempdir}/PREQUAL_INPUTS_{self._date}/SLURM_JOB_{os.environ['SLURM_JOB_ID']}/ses-{self._ses}"
+		inputs_dir = f"{self._tempdir}/PREQUAL_INPUTS_{self._date}/{self._slurm_job_id}/ses-{self._ses}"
 		self.copy_inputs(inputs_dir)
 		mporder = self.calc_mporder()
 		logger.info(f'TMPDIR: {self._tempdir}')

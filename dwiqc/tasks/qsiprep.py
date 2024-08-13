@@ -535,6 +535,12 @@ class Task(tasks.BaseTask):
 		
 		os.environ["SINGULARITY_BIND"] = ','.join(bind)
 
+		try: 
+			self._slurm_job_id = os.environ['SLURM_JOB_ID']
+		except KeyError:
+			logger.warning('could not find slurm job id, populating value with random number')
+			self._slurm_job_id = self.get_random_int(7)
+
 	# create qsiprep command to be executed
 
 	def build(self):
@@ -571,7 +577,7 @@ class Task(tasks.BaseTask):
 			'--fs-license-file',
 			self._fs_license,
 			'-w',
-			f"{self._tempdir}/qsiprep_{date}/SLURM_JOB_{os.environ['SLURM_JOB_ID']}/{self._ses}"
+			f"{self._tempdir}/qsiprep_{date}/{self._slurm_job_id}/{self._ses}"
 		]
 
 		for item in qsiprep_options:
