@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config, fs_license, truncate_fmap=False, container_dir=None, custom_eddy=False, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config, fs_license, truncate_fmap=False, container_dir=None, custom_eddy_qsiprep=False, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
@@ -35,7 +35,7 @@ class Task(tasks.BaseTask):
 		self._fs_license = fs_license
 		self._truncate_fmap = truncate_fmap
 		self._container_dir = container_dir
-		self._custom_eddy = custom_eddy
+		self._custom_eddy = custom_eddy_qsiprep
 		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
 		self._output_resolution = output_resolution
@@ -589,7 +589,7 @@ class Task(tasks.BaseTask):
 			self.job = Job(
 				name='dwiqc-qsiprep',
 				time='700',
-				memory='60G',
+				memory='30G',
 				cpus=2,
 				nodes=1,
 				command=self._command,
@@ -603,7 +603,7 @@ class Task(tasks.BaseTask):
 			self.job = Job(
 				name='dwiqc-qsiprep',
 				time='700',
-				memory='60G',
+				memory='30G',
 				gpus=1,
 				nodes=1,
 				command=self._command,

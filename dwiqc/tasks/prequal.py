@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 # pull in some parameters from the BaseTask class in the __init__.py directory
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, prequal_config, fs_license, container_dir=None, no_gpu=False, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, prequal_config, fs_license, custom_eddy_stdev, container_dir=None, no_gpu=False, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
@@ -33,6 +33,7 @@ class Task(tasks.BaseTask):
 		self._prequal_config = prequal_config
 		self._fs_license = fs_license
 		self._container_dir = container_dir
+		self._custom_eddy = custom_eddy_stdev
 		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
 		self._date = datetime.today().strftime('%Y-%m-%d')
@@ -680,7 +681,7 @@ class Task(tasks.BaseTask):
 			for item in prequal_options:
 				self._command.append(item)
 
-			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=6+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
+			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd={self._custom_eddy}+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
 			self._command.append(eddy_args)
 
 		elif self._nonzero_shells == True:
@@ -723,7 +724,7 @@ class Task(tasks.BaseTask):
 			self.job = Job(
 				name='dwiqc-prequal',
 				time='700',
-				memory='60G',
+				memory='30G',
 				cpus=2,
 				nodes=1,
 				command=self._command,
@@ -734,7 +735,7 @@ class Task(tasks.BaseTask):
 			self.job = Job(
 				name='dwiqc-prequal',
 				time='700',
-				memory='60G',
+				memory='30G',
 				gpus=1,
 				nodes=1,
 				command=self._command,

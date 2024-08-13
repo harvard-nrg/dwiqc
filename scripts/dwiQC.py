@@ -96,8 +96,10 @@ def main():
         help='XNAT password')
     parser_process.add_argument('--artifacts-dir',
         help='Location for generated assessors and resources')
-    parser_process.add_argument('--custom-eddy',
+    parser_process.add_argument('--custom-eddy-qsiprep',
         help='Feed in path to customized eddy parameters file for qsiprep.')
+    parser_process.add_argument('--custom-eddy-prequal_stdev', default='6',
+        help='Feed in path to customized eddy parameters file for prequal.')
     parser_process.add_argument('--xnat-upload', action='store_true',
         help='Upload results to XNAT over REST API')
     parser_process.add_argument('--container-dir',
@@ -156,8 +158,10 @@ def main():
         help='Run xnattagger')
     parser_tandem.add_argument('--artifacts-dir',
         help='Location for generated assessors and resources')
-    parser_tandem.add_argument('--custom-eddy',
+    parser_tandem.add_argument('--custom-eddy-qsiprep',
         help='Feed in path to customized eddy parameters file for qsiprep.')
+    parser_tandem.add_argument('--custom-eddy-prequal_stdev', default='6',
+        help='Feed in path to customized eddy parameters file for prequal.')
     parser_tandem.add_argument('--xnat-upload', action='store_true',
         help='Upload results to XNAT over REST API')
     parser_tandem.add_argument('--container-dir',

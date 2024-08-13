@@ -89,6 +89,7 @@ def do(args):
             fs_license = args.fs_license,
             container_dir = args.container_dir,
             prequal_config=args.prequal_config,
+            custom_eddy_stdev=args.custom_eddy_prequal_stdev,
             no_gpu=args.no_gpu,
             tempdir=tempfile.gettempdir(),
             pipenv='/sw/apps/prequal'
@@ -114,7 +115,7 @@ def do(args):
             fs_license=args.fs_license,
             truncate_fmap=args.truncate_qsiprep_fmap,
             container_dir = args.container_dir,
-            custom_eddy=args.custom_eddy,
+            custom_eddy_qsiprep=args.custom_eddy_qsiprep,
             no_gpu=args.no_gpu,
             tempdir=tempfile.gettempdir(),
             pipenv='/sw/apps/qsiprep'
