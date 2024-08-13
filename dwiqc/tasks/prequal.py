@@ -715,7 +715,7 @@ class Task(tasks.BaseTask):
 			for item in prequal_options:
 				self._command.append(item)
 
-			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd=6+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
+			eddy_args = f'--extra_eddy_args=--data_is_shelled+--ol_nstd={self._custom_eddy}+--ol_type=gw+--repol+--estimate_move_by_susceptibility+--cnr_maps+--flm=quadratic+--interp=spline+--resamp=jac+--mporder={mporder}+--niter=5+--nvoxhp=1000+--slspec=/INPUTS/{self._spec}+--slm=linear'
 			self._command.append(eddy_args)
 
 		logdir = self.logdir()
