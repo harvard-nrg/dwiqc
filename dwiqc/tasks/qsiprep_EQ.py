@@ -111,7 +111,7 @@ class Task(tasks.BaseTask):
 
 	def match_bval(self, dir_path):
 		for file in os.listdir(dir_path):
-			if file.endswith('.bval') and self._run in file:
+			if file.endswith('.bval') and str(self._run) in file:
 				return file
 
 
