@@ -1,22 +1,23 @@
-#### load necessary libraries
+ #### load necessary libraries
+
+import os
+import re
+import sys
+import yaml
+import json
+import shutil
+import logging
 import tempfile
 import subprocess
-import yaml
-import os
-import logging
-from bids import BIDSLayout
-import sys
-import json
-import dwiqc.tasks as tasks
-import shutil
-from executors.models import Job
-import dwiqc.config as config
 import numpy as np
-from pprint import pprint
-import re
 import nibabel as nib
+from pprint import pprint
+from random import randint
+from bids import BIDSLayout
+import dwiqc.tasks as tasks
+import dwiqc.config as config
 from datetime import datetime
-
+from executors.models import Job
 
 logger = logging.getLogger(__name__)
 

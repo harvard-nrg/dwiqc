@@ -1,24 +1,24 @@
 #### load necessary libraries
 
-import subprocess
 import os
+import re
 import yaml
-import logging
-from bids import BIDSLayout
 import sys
 import json
-import nibabel as nib
-import dwiqc.tasks as tasks
 import shutil
-from executors.models import Job
-import dwiqc.config as config
+import logging
+import subprocess
 import numpy as np
+import nibabel as nib
 from pprint import pprint
-import re
-import shutil
+from random import randint
+import dwiqc.tasks as tasks
+from bids import BIDSLayout
+import dwiqc.config as config
+from datetime import datetime
+from executors.models import Job
 from dipy.io import read_bvals_bvecs
 from dipy.core.gradients import gradient_table
-from datetime import datetime
 
 date = datetime.today().strftime('%Y-%m-%d')
 
