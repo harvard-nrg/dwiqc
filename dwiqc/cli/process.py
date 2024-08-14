@@ -144,9 +144,9 @@ def do(args):
         failed = len(jarray.failed)
         complete = len(jarray.complete)
         if 'prequal' in args.sub_tasks:
-            prequal_eddy(args, prequal_outdir)
+            prequal_eddy(args, prequal_outdir, slurm_job_id)
         if 'qsiprep' in args.sub_tasks:
-            qsiprep_eddy(args, qsiprep_outdir)
+            qsiprep_eddy(args, qsiprep_outdir, slurm_job_id)
             browser.snapshot(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html", f"{qsiprep_outdir}/qsiprep/qsiprep.pdf", args.container_dir)
             browser.imbed_images(f"{qsiprep_outdir}/qsiprep/sub-{args.sub}.html")
         if failed:
@@ -186,7 +186,7 @@ def get_random_int(num_ints):
     return randint(range_start, range_end)
 
 
-def prequal_eddy(args, prequal_outdir):
+def prequal_eddy(args, prequal_outdir, slurm_job_id):
     if 'prequal' in args.sub_tasks:
         eq_task = prequal_EQ.Task(
             sub=args.sub,
@@ -201,7 +201,7 @@ def prequal_eddy(args, prequal_outdir):
 
         eq_task.build()
 
-def qsiprep_eddy(args, qsiprep_outdir):
+def qsiprep_eddy(args, qsiprep_outdir, slurm_job_id):
     if 'qsiprep' in args.sub_tasks:
         eq_task = qsiprep_EQ.Task(
             sub=args.sub,
