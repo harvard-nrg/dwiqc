@@ -20,6 +20,7 @@ import dwiqc.tasks.qsiprep as qsiprep
 import dwiqc.tasks.prequal_EQ as prequal_EQ
 import dwiqc.tasks.qsiprep_EQ as qsiprep_EQ
 import dwiqc.browser as browser
+from random import randint
 
 
 logger = logging.getLogger(__name__)
@@ -179,7 +180,7 @@ def do(args):
         auth = yaxil.auth2(args.xnat_alias)
         yaxil.storerest(auth, args.artifacts_dir, 'dwiqc-resource')
 
-def get_random_int(self, num_ints):
+def get_random_int(num_ints):
     range_start = 10**(num_ints-1)
     range_end = (10**num_ints)-1
     return randint(range_start, range_end)
