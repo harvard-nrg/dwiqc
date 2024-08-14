@@ -14,11 +14,12 @@ date = datetime.today().strftime('%Y-%m-%d')
 
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, container_dir=None, parent=None, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, slurm_job_id, container_dir=None, parent=None, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
+		self._slurm_job_id = slurm_job_id
 		self._container_dir = container_dir
 		super().__init__(outdir, tempdir, pipenv)
 

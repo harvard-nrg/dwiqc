@@ -26,13 +26,14 @@ logger = logging.getLogger(__name__)
 
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config, fs_license, truncate_fmap=False, container_dir=None, custom_eddy_qsiprep=False, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, qsiprep_config, fs_license, slurm_job_id, truncate_fmap=False, container_dir=None, custom_eddy_qsiprep=False, no_gpu=False, output_resolution=None, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
 		self._bids = bids
 		self._qsiprep_config = qsiprep_config
 		self._fs_license = fs_license
+		self._slurm_job_id = slurm_job_id
 		self._truncate_fmap = truncate_fmap
 		self._container_dir = container_dir
 		self._custom_eddy = custom_eddy_qsiprep
@@ -534,12 +535,6 @@ class Task(tasks.BaseTask):
 		bind = [self._bids, self._tempdir, self._fs_license]
 		
 		os.environ["SINGULARITY_BIND"] = ','.join(bind)
-
-		try: 
-			self._slurm_job_id = os.environ['SLURM_JOB_ID']
-		except KeyError:
-			logger.warning('could not find slurm job id, populating value with random number')
-			self._slurm_job_id = self.get_random_int(7)
 
 	# create qsiprep command to be executed
 

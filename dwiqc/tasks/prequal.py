@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 # pull in some parameters from the BaseTask class in the __init__.py directory
 
 class Task(tasks.BaseTask):
-	def __init__(self, sub, ses, run, bids, outdir, prequal_config, fs_license, custom_eddy_stdev, container_dir=None, no_gpu=False, tempdir=None, pipenv=None):
+	def __init__(self, sub, ses, run, bids, outdir, prequal_config, fs_license, custom_eddy_stdev, slurm_job_id, container_dir=None, no_gpu=False, tempdir=None, pipenv=None):
 		self._sub = sub
 		self._ses = ses
 		self._run = run
@@ -34,6 +34,7 @@ class Task(tasks.BaseTask):
 		self._fs_license = fs_license
 		self._container_dir = container_dir
 		self._custom_eddy = custom_eddy_stdev
+		self._slurm_job_id = slurm_job_id
 		self._no_gpu = no_gpu
 		self._layout = BIDSLayout(bids)
 		self._date = datetime.today().strftime('%Y-%m-%d')
@@ -607,20 +608,6 @@ class Task(tasks.BaseTask):
 		bind = [self._bids, self._tempdir, self._fs_license]
 		
 		os.environ["SINGULARITY_BIND"] = ','.join(bind)
-
-		try: 
-			self._slurm_job_id = os.environ['SLURM_JOB_ID']
-		except KeyError:
-			logger.warning('could not find slurm job id, populating value with random number')
-			self._slurm_job_id = self.get_random_int(7)
-
-
-	def get_random_int(self, num_ints):
-		range_start = 10**(num_ints-1)
-		range_end = (10**num_ints)-1
-		return randint(range_start, range_end)
-
-
 
 	# build the prequal sbatch command and create job
 

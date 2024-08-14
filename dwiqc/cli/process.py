@@ -44,6 +44,12 @@ def do(args):
     if args.work_dir:
         os.environ['TMPDIR'] = args.work_dir
 
+    try: 
+        slurm_job_id = os.environ['SLURM_JOB_ID']
+    except KeyError:
+        logger.warning('could not find slurm job id, populating value with random number')
+        slurm_job_id = get_random_int(7)
+
 
     # load data into pybids as layout
 
@@ -87,6 +93,7 @@ def do(args):
             bids=args.bids_dir,
             outdir=prequal_outdir,
             fs_license = args.fs_license,
+            slurm_job_id=slurm_job_id,
             container_dir = args.container_dir,
             prequal_config=args.prequal_config,
             custom_eddy_stdev=args.custom_eddy_prequal_stdev,
@@ -113,6 +120,7 @@ def do(args):
             outdir=qsiprep_outdir,
             qsiprep_config=args.qsiprep_config,
             fs_license=args.fs_license,
+            slurm_job_id=slurm_job_id,
             truncate_fmap=args.truncate_qsiprep_fmap,
             container_dir = args.container_dir,
             custom_eddy_qsiprep=args.custom_eddy_qsiprep,
@@ -171,7 +179,10 @@ def do(args):
         auth = yaxil.auth2(args.xnat_alias)
         yaxil.storerest(auth, args.artifacts_dir, 'dwiqc-resource')
 
-
+def get_random_int(self, num_ints):
+    range_start = 10**(num_ints-1)
+    range_end = (10**num_ints)-1
+    return randint(range_start, range_end)
 
 
 def prequal_eddy(args, prequal_outdir):
@@ -183,6 +194,7 @@ def prequal_eddy(args, prequal_outdir):
             bids=args.bids_dir,
             outdir=prequal_outdir,
             container_dir = args.container_dir,
+            slurm_job_id=slurm_job_id,
             tempdir=tempfile.gettempdir(),
         )
 
@@ -197,6 +209,7 @@ def qsiprep_eddy(args, qsiprep_outdir):
             bids=args.bids_dir,
             outdir=qsiprep_outdir,
             container_dir = args.container_dir,
+            slurm_job_id=slurm_job_id,
             tempdir=tempfile.gettempdir(),
         )
 
