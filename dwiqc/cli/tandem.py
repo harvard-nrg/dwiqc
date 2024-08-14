@@ -183,6 +183,10 @@ def download_scan(args, auth, run, scan, config_label, input_config, verbose=Fal
         '--output-dir', args.bids_dir,
         '--output-format', 'bids',
     ]
+    if args.in_mem:
+        cmd.extend([
+            '--in-mem'
+        ])
     if args.project:
         cmd.extend([
             '--project', args.project
