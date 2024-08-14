@@ -50,6 +50,8 @@ def main():
         help='Path to xnattagger config file')
     parser_get.add_argument('--run-tagger', action='store_true', default=False,
         help='Run xnattagger')
+    parser_get.add_argument('--in-mem', action='store_true', default=False,
+        help='Tell yaxil to download data in memory. This can help with download speeds')
     parser_get.add_argument('--dry-run', action='store_true',
         help='Do not execute any jobs')
     parser_get.set_defaults(func=cli.get.do)
@@ -170,6 +172,8 @@ def main():
         help='List of cluster nodes to exclude from use.')
     parser_tandem.add_argument('--work-dir',
         help='Working directory that is shared across compute cluster')
+    parser_tandem.add_argument('--in-mem', action='store_true', default=False,
+        help='Tell yaxil to download data in memory. This can help with download speeds')
     parser_tandem.add_argument('--truncate-qsiprep-fmap', action='store_true',
         help='Truncate the fmap created from the main diffusion scan to just one b0 volume.')
     parser_tandem.set_defaults(func=cli.tandem.do)
