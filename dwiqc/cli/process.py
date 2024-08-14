@@ -46,10 +46,11 @@ def do(args):
         os.environ['TMPDIR'] = args.work_dir
 
     try: 
-        slurm_job_id = os.environ['SLURM_JOB_ID']
+        slurm_job_id = f"SLURM_JOB_{os.environ['SLURM_JOB_ID']}"
     except KeyError:
         logger.warning('could not find slurm job id, populating value with random number')
-        slurm_job_id = get_random_int(7)
+        random_int = get_random_int(7)
+        slurm_job_id = f"SLURM_JOB_{random_int}"
 
 
     # load data into pybids as layout
