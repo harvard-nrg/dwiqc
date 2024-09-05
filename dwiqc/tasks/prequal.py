@@ -345,13 +345,13 @@ class Task(tasks.BaseTask):
 
 		self.remove_unnecessary_json_files(filenames, remove_suffixes)
 
-		print(self._filtered_jsons)
-
 		logger.info(f'all json filtered json filenames {self._filtered_jsons}')
+
+		print(self._filtered_jsons)
 
 		sys.exit()
 
-		filtered_filenames = [file for file in filenames if not file.endswith(remove_suffix)] # create new list w/o T1w json file
+		#filtered_filenames = [file for file in filenames if not file.endswith(remove_suffix)] # create new list w/o T1w json file
 
 		# get scan and phase encode direction pairs
 
@@ -387,11 +387,10 @@ class Task(tasks.BaseTask):
 	def remove_unnecessary_json_files(self, file_list, suffixes):
 		self._filtered_jsons = []
 		for file in file_list:
-			for suffix in suffixes:
-				if file.endswith(suffix):
-					continue
-				else:
-					self._filtered_jsons.append(file)
+			if file.endswith('dataset_description.json') or file.endswith('T1w.json'):
+				continue
+			else:
+				self._filtered_jsons.append(file)
 
 
 	def get_phase_encode(self, json_file):
