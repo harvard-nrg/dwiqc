@@ -379,6 +379,7 @@ class Task(tasks.BaseTask):
 
 	def get_phase_encode(self, json_file):
 
+		logger.info(f'reading data from {json_file}')
 		with open(json_file, 'r') as foo:
 			data = json.load(foo)
 
