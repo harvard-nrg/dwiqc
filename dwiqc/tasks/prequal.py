@@ -341,15 +341,13 @@ class Task(tasks.BaseTask):
 
 		filenames = self._layout.get(subject=self._sub, session=self._ses, extension='.json', return_type='filename')
 
-		logger.info(f'all json filenames {filenames}')
-
-		sys.exit()
-
 		remove_suffixes = ['T1w.json', 'dataset_description.json']
 
 		self.remove_unnecessary_json_files(filenames, remove_suffixes)
 
 		print(self._filtered_jsons)
+
+		logger.info(f'all json filtered json filenames {self._filtered_jsons}')
 
 		sys.exit()
 
