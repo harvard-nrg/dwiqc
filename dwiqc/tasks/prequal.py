@@ -345,7 +345,13 @@ class Task(tasks.BaseTask):
 
 		sys.exit()
 
-		remove_suffix = 'T1w.json'
+		remove_suffixes = ['T1w.json', 'dataset_description.json']
+
+		self.remove_unnecessary_json_files(filenames, remove_suffixes)
+
+		print(self._filtered_jsons)
+
+		sys.exit()
 
 		filtered_filenames = [file for file in filenames if not file.endswith(remove_suffix)] # create new list w/o T1w json file
 
@@ -379,6 +385,15 @@ class Task(tasks.BaseTask):
 		with open(f'{inputs_dir}/dtiQA_config.csv', 'w') as csv:
 			for line in lines_to_write:
 				csv.write(f'{line}\n')
+
+	def remove_unnecessary_json_files(self, file_list, suffixes):
+		self._filtered_jsons = []
+		for file in file_list:
+			for suffix in suffixes:
+				if file.endswith(suffix):
+					continue
+				else:
+					self._filtered_jsons.append(file)
 
 
 	def get_phase_encode(self, json_file):
