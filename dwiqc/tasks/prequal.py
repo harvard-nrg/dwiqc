@@ -345,17 +345,15 @@ class Task(tasks.BaseTask):
 
 		self.remove_unnecessary_json_files(filenames, remove_suffixes)
 
-		logger.info(f'all json filtered json filenames {self._filtered_jsons}')
+		logger.info(f'all json filtered json filenames:\n {self._filtered_jsons}')
 
 		print(self._filtered_jsons)
 
-		sys.exit()
-
-		#filtered_filenames = [file for file in filenames if not file.endswith(remove_suffix)] # create new list w/o T1w json file
+		#self._filtered_jsons = [file for file in filenames if not file.endswith(remove_suffix)] # create new list w/o T1w json file
 
 		# get scan and phase encode direction pairs
 
-		for file in filtered_filenames:
+		for file in self._filtered_jsons:
 			phase_encode_pairs[file] = self.get_phase_encode(file)
 
 		# remove the preceding path information and extension from each file name key to prepare for writing into csv file
@@ -368,7 +366,7 @@ class Task(tasks.BaseTask):
 
 		# find out what the primary phase encode direction is
 
-		primary_phase_dir = self.get_primary_phase_dir(filtered_filenames)
+		primary_phase_dir = self.get_primary_phase_dir(self._filtered_jsons)
 
 		for key, value in phase_encode_pairs_no_ext.items():
 			if value == primary_phase_dir:
