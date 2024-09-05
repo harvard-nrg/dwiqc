@@ -341,6 +341,10 @@ class Task(tasks.BaseTask):
 
 		filenames = self._layout.get(subject=self._sub, session=self._ses, extension='.json', return_type='filename')
 
+		logger.info(f'all json filenames {filenames}')
+
+		sys.exit()
+
 		remove_suffix = 'T1w.json'
 
 		filtered_filenames = [file for file in filenames if not file.endswith(remove_suffix)] # create new list w/o T1w json file
