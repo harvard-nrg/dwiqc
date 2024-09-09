@@ -87,9 +87,13 @@ class Task(tasks.BaseTask):
 
 	def check_output_resolution(self):
 		if not self._output_resolution:
-			t1_file = self._layout.get(subject=self._sub, session=self._ses, suffix='T1w', extension='.nii.gz', return_type='filename').pop()
+			try:
+				t1_file = self._layout.get(subject=self._sub, session=self._ses, suffix='T1w', extension='.nii.gz', return_type='filename').pop()
 
-			self._output_resolution = str(nib.load(t1_file).header['pixdim'][1])
+				self._output_resolution = str(nib.load(t1_file).header['pixdim'][1])
+			except IndexError:
+				logger.info('no t1 file provded, defaulting to resolution of 1.0')
+				self._output_resolution = '1.0'
 
 
 	# this method creates the nipype config file necessary for qsiprep. This file ensures that intermediate files
