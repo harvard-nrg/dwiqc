@@ -182,7 +182,7 @@ class Task(tasks.BaseTask):
 
 	def match_bvec(self, directory):
 		for file in os.listdir(directory):
-			if file.endswith('.bvec') and self._run in file:
+			if file.endswith('.bvec') and str(self._run) in file:
 				return file
 
 
