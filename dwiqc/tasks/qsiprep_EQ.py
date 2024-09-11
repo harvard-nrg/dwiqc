@@ -113,7 +113,7 @@ class Task(tasks.BaseTask):
 	def match_bval(self, dir_path):
 		for file in os.listdir(dir_path):
 			if file.endswith('.bval') and str(self._run) in file:
-				return file
+				return Path(dir_path, file)
 
 
 	def match_preproc_string(self, input_dir):
@@ -183,7 +183,7 @@ class Task(tasks.BaseTask):
 	def match_bvec(self, directory):
 		for file in os.listdir(directory):
 			if file.endswith('.bvec') and str(self._run) in file:
-				return file
+				return Path(directory, file)
 
 
 	def parse_json(self, eddy_dir):
