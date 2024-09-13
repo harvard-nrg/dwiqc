@@ -113,7 +113,7 @@ class Task(tasks.BaseTask):
 	def match_bval(self, dir_path):
 		for file in os.listdir(dir_path):
 			if file.endswith('.bval') and str(self._run) in file:
-				return Path(dir_path, file)
+				return file
 
 
 	def match_preproc_string(self, input_dir):
