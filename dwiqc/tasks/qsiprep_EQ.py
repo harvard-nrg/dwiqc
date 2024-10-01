@@ -83,7 +83,7 @@ class Task(tasks.BaseTask):
 
 		full_bval_name = self.match_bval(f'{self._outdir}/qsiprep/sub-{self._sub}/ses-{self._ses}/dwi')
 
-		self.copy_file(full_bval_name, eddy_quad_dir)
+		self.copy_file(f'{self._outdir}/qsiprep/sub-{self._sub}/ses-{self._ses}/dwi/{full_bval_name}', eddy_quad_dir)
 
 		self.rename_file(f'{eddy_quad_dir}/{full_bval_name}', f'{eddy_quad_dir}/{self._sub}.bval')
 
