@@ -167,6 +167,7 @@ class Task(tasks.BaseTask):
 			new_bvec = self.match_bvec(f'{self._outdir}/qsiprep/sub-{self._sub}/ses-{self._ses}/dwi')
 			os.remove(f'{eddy_quad_dir}/{self._sub}_{self._ses}.eddy_rotated_bvecs')
 			shutil.copy(new_bvec, eddy_quad_dir)
+			os.rename(f'{eddy_quad_dir}/{os.path.basename(new_bvec)}', f'{eddy_quad_dir}/{self._sub}_{self._ses}.eddy_rotated_bvecs')
 
 			logging.info('Running eddy_quad for the 2nd time...')
 			proc1 = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
