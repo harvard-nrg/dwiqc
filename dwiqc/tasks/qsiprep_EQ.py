@@ -194,7 +194,7 @@ class Task(tasks.BaseTask):
 		bval_file_path = Path(eddy_quad_dir, self.match_bval(eddy_quad_dir))
 		nii_file_path = Path(eddy_quad_dir, f'{self._sub}_{self._ses}.nii.gz')
 
-		bvals = np.genfromtxt(bvalsFile, dtype=float)
+		bvals = np.genfromtxt(bval_file_path, dtype=float)
 		nii_file = nib.load(nii_file_path)
 
 		if nii_file.shape[3] != np.max(bvals.shape):
