@@ -9,6 +9,8 @@ import json
 from executors.models import Job
 from datetime import datetime
 from pathlib import Path
+import nibabel as nib
+import numpy as np
 
 date = datetime.today().strftime('%Y-%m-%d')
 
@@ -169,6 +171,8 @@ class Task(tasks.BaseTask):
 			shutil.copy(new_bvec, eddy_quad_dir)
 			os.rename(f'{eddy_quad_dir}/{os.path.basename(new_bvec)}', f'{eddy_quad_dir}/{self._sub}_{self._ses}.eddy_rotated_bvecs')
 
+			self.verify_bval_nii_match(eddy_quad_dir)
+
 			logging.info('Running eddy_quad for the 2nd time...')
 			proc1 = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
 			proc1.communicate()
@@ -185,6 +189,33 @@ class Task(tasks.BaseTask):
 		for file in os.listdir(directory):
 			if file.endswith('.bvec') and str(self._run) in file:
 				return Path(directory, file)
+
+	def verify_bval_nii_match(self, eddy_quad_dir):
+		bval_file_path = Path(eddy_quad_dir, self.match_bval(eddy_quad_dir))
+		nii_file_path = Path(eddy_quad_dir, f'{self._sub}_{self._ses}.nii.gz')
+
+		bvals = np.genfromtxt(bvalsFile, dtype=float)
+		nii_file = nib.load(nii_file_path)
+
+		if nii_file.shape[3] != np.max(bvals.shape):
+			new_bvals = self.adjust_bvals_shape(bvals, nii_file)
+			np.savetxt(f'{eddy_quad_dir}/{self._sub}.bval', new_bvals, fmt='%d')
+			return
+		else:
+			return
+
+	def adjust_bvals_shape(self, bvals, nii_file):
+
+		target_shape = nii_file.shape[3]
+		current_shape = np.max(bvals.shape)
+
+		if current_shape < target_shape:
+			additional_zeros = np.zeros(target_shape - current_shape)
+			bvals = np.append(bvals, additional_zeros)
+		elif current_shape > target_shape:
+			bvals = bvals[:target_shape]	
+
+	    return bvals
 
 
 	def parse_json(self, eddy_dir):
