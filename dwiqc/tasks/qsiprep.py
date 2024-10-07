@@ -72,6 +72,8 @@ class Task(tasks.BaseTask):
 		# divide that number by 3. That's the number passed to mporder.
 
 		# this will grab the dwi file, pop it off the list, get the slice timing metadata, then grab the length of the slice timing array
+		num_slices = len(self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz').pop().get_metadata()['SliceTiming'])
+
 		try:
 			multiband_factor = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz').pop().get_metadata()['MultibandAccelerationFactor']
 			mporder = (num_slices / multiband_factor) // 3
