@@ -213,9 +213,9 @@ class Task(tasks.BaseTask):
 			additional_zeros = np.zeros(target_shape - current_shape)
 			bvals = np.append(bvals, additional_zeros)
 		elif current_shape > target_shape:
-			bvals = bvals[:target_shape]	
+			bvals = bvals[:target_shape]
 
-	    return bvals
+		return bvals
 
 
 	def parse_json(self, eddy_dir):
