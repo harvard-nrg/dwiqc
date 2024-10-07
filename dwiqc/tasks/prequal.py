@@ -598,9 +598,12 @@ class Task(tasks.BaseTask):
 		# this will grab the dwi file, pop it off the list, get the slice timing metadata, then grab the length of the slice timing array
 		num_slices = len(self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz').pop().get_metadata()['SliceTiming'])
 
-		multiband_factor = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz').pop().get_metadata()['MultibandAccelerationFactor']
-
-		mporder = (num_slices / multiband_factor) // 3
+		try:
+			multiband_factor = self._layout.get(subject=self._sub, session=self._ses, run=self._run, suffix='dwi', extension='.nii.gz').pop().get_metadata()['MultibandAccelerationFactor']
+			mporder = (num_slices / multiband_factor) // 3
+		except KeyError:
+			logger.info('No multiband acceleration factor found, defaulting to 1')
+			mporder = 1
 
 		return int(mporder)
 
