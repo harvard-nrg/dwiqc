@@ -113,6 +113,7 @@ class Task(tasks.BaseTask):
 		self.parse_json(eddy_results_dir)
 
 	def match_bval(self, dir_path):
+		bval = None
 		for file in os.listdir(dir_path):
 			if file.endswith('.bval') and str(self._run) in file:
 				bval = file
