@@ -112,17 +112,6 @@ class Task(tasks.BaseTask):
 
 		self.parse_json(eddy_results_dir)
 
-	def match_bval(self, dir_path):
-		bval = None
-		for file in os.listdir(dir_path):
-			if file.endswith('.bval') and str(self._run) in file:
-				bval = file
-		if bval is None:
-			for file in os.listdir(dir_path):
-				if file.endswith('.bval'):
-					bval = file
-		return bval
-
 
 	def match_preproc_string(self, input_dir):
 		pattern = re.compile(r'^dwi_preproc_ses.*')
@@ -178,6 +167,7 @@ class Task(tasks.BaseTask):
 			os.rename(f'{eddy_quad_dir}/{os.path.basename(new_bvec)}', f'{eddy_quad_dir}/{self._sub}_{self._ses}.eddy_rotated_bvecs')
 
 			self.verify_bval_nii_match(eddy_quad_dir)
+			self.verify_bval_bvec_match(eddy_quad_dir)
 
 			logging.info('Running eddy_quad for the 2nd time...')
 			proc1 = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
@@ -192,9 +182,40 @@ class Task(tasks.BaseTask):
 				sys.exit()
 
 	def match_bvec(self, directory):
+		bvec = None
 		for file in os.listdir(directory):
 			if file.endswith('.bvec') and str(self._run) in file:
-				return Path(directory, file)
+				bvec = file
+		if bvec is None:
+			for file in os.listdir(directory):
+				if file.endswith('.bvec') or file.endswith('bvecs'):
+					bvec = file
+		return bvec
+
+	def match_bval(self, dir_path):
+		bval = None
+		for file in os.listdir(dir_path):
+			if file.endswith('.bval') and str(self._run) in file:
+				bval = file
+		if bval is None:
+			for file in os.listdir(dir_path):
+				if file.endswith('.bval'):
+					bval = file
+		return bval
+
+	def verify_bval_bvec_match(self, eddy_quad_dir):
+		bvec_file_path = Path(eddy_quad_dir, self.match_bvec(eddy_quad_dir))
+		bval_file_path = Path(eddy_quad_dir, self.match_bval(eddy_quad_dir))
+
+		bvals = np.genfromtxt(bval_file_path, dtype=float)
+		bvecs = np.genfromtxt(bvec_file_path, dtype=float)
+
+		if bvecs.shape[1] != bvals.size:
+			new_bvals = self.adjust_bvals_shape_bvec(bvals, bvecs)
+			np.savetxt(f'{eddy_quad_dir}/{self._sub}.bval', new_bvals, fmt='%d')
+			return
+		else:
+			return
 
 	def verify_bval_nii_match(self, eddy_quad_dir):
 		bval_file_path = Path(eddy_quad_dir, self.match_bval(eddy_quad_dir))
@@ -204,13 +225,26 @@ class Task(tasks.BaseTask):
 		nii_file = nib.load(nii_file_path)
 
 		if nii_file.shape[3] != np.max(bvals.shape):
-			new_bvals = self.adjust_bvals_shape(bvals, nii_file)
+			new_bvals = self.adjust_bvals_shape_nii(bvals, nii_file)
 			np.savetxt(f'{eddy_quad_dir}/{self._sub}.bval', new_bvals, fmt='%d')
 			return
 		else:
 			return
 
-	def adjust_bvals_shape(self, bvals, nii_file):
+	def adjust_bvals_shape_bvec(self, bvals, bvecs):
+		target_shape = bvecs.shape[1]
+		current_shape = bvals.size
+
+		if current_shape < target_shape:
+			additional_zeros = np.zeros(target_shape - current_shape)
+			bvals = np.append(bvals, additional_zeros)
+		elif current_shape > target_shape:
+			bvals = bvals[:target_shape]
+
+		return bvals
+
+
+	def adjust_bvals_shape_nii(self, bvals, nii_file):
 
 		target_shape = nii_file.shape[3]
 		current_shape = np.max(bvals.shape)
