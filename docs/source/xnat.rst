@@ -67,7 +67,7 @@ install-containers, get, process and tandem modes
 get mode
 ^^^^^^^^
 .. note::
-    *get* mode is only applicable if you have an XNAT instance (such as CBS Central) you're going to interact with. Please feel free to skip to the `process <#process-mode>`_ mode section if you're only going to use *DWIQC* outside of XNAT.
+    Some sections of *get* mode are only applicable if you have an XNAT instance you're going to interact with. However, non-XNAT users may benefit from reviewing the section on fieldmaps and experimental design (immediately below). Please feel free to skip to the `process <#process-mode>`_ mode section if you're only going to use *DWIQC* outside of XNAT and already have familiarity with diffusion imaging experimental design.
 
 get: Overview
 """""""""""""
@@ -352,7 +352,9 @@ Command Example:
 process: Expected Output
 """"""""""""""""""""""""
 
-*DWIQC* runtime varies based on available resources, size of data and desired processing steps. Users should expect one session to take 3-5 hours to complete prequal and 7-10 hours to complete qsiprep. Prequal and qsiprep are run in parallel, so total processing time rarely exceeds 10 hours. *DWIQC* also makes use of the FSL tool eddy quad. Eddy quad runs a series of quality assesment commands to generate images and quantitative metric tables. Eddy quad doesn't take more than 10 minutes to run in most cases. A successful *DWIQC* run will contain output from all three of these software packages. 
+*DWIQC* runtime varies based on available resources, size of data and desired processing steps. On an HPC with gpu nodes, users should expect one session to take 1-2 hours to complete prequal and 4-6 hours to complete qsiprep. Prequal and qsiprep are run in parallel, so total processing time rarely exceeds 8-10 hours. *DWIQC* also makes use of the FSL tool eddy quad. Eddy quad runs a series of quality assesment commands to generate images and quantitative metric tables. Eddy quad doesn't take more than 10 minutes to run in most cases. A successful *DWIQC* run will contain output from all three of these software packages. It is worth noting that *DWIQC* retains all generated output files from Prequal and Qsiprep and stores them under the file structure described `above <#process-expected-output>`_.
+
+*DWIQC* comes with CUDA 10.1 pre-compiled inside the respective qsiprep and prequal containers to unburden users from compiling specific CUDA versions.
 
 **Prequal Output:**
 
@@ -360,7 +362,7 @@ To find the prequal pdf report, navigate to the ``--bids-dir`` directory you pas
 
 derivatives ---> dwiqc-prequal ---> subject_dir ---> session_dir ---> sub_session_dir_run__dwi ---> OUTPUTS ---> PDF ---> dtiQA.pdf
 
-Download an example :download:`here <examples/dtiQA.pdf>`.
+See `Prequal documentation <https://github.com/MASILab/PreQual?tab=readme-ov-file#outputs>`_ for more information.
 
 **Qsiprep Output:**
 
@@ -368,7 +370,7 @@ To find the qsiprep html report, navigate to the ``--bids-dir`` directory you pa
 
 derivatives ---> dwiqc-qsiprep ---> subject_dir ---> session_dir ---> sub_session_dir_run__dwi ---> qsiprep_output ---> qsiprep ---> sub-SUBJECT-imbedded_images.html
 
-Download an example :download:`here <examples/sub-MS881355-imbedded_images.html>`.
+See `Qsiprep documentation <https://qsiprep.readthedocs.io/en/latest/preprocessing.html>`_ for more information.
 
 **Eddy Quad Output:**
 
@@ -378,7 +380,7 @@ derivatives ---> dwiqc-prequal ---> subject_dir ---> session_dir ---> OUTPUTS --
 
 derivatives ---> dwiqc-qsiprep ---> subject_dir ---> session_dir ---> qsiprep_output ---> EDDY ---> SUBJECT_SESSION.qc ---> qc.pdf
 
-Download an example :download:`here <examples/qc.pdf>`.
+See `FSL Eddy Quad documentation <https://git.fmrib.ox.ac.uk/nichols/docdev/-/blob/add-eddy-qc/docs/diffusion/eddyqc.md>`_ for more information.
 
 process: Common Errors
 """"""""""""""""""""""
@@ -409,7 +411,7 @@ process: Advanced Usage
 
 Only a few of the many possible *process* mode arguments will be discussed here. 
 
-| 1. ``--qsiprep-config`` and ``--prequal-config`` allow you to customize the arguments passed to qsiprep and prequal. These are the default `qsiprep config <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/qsiprep.yaml>`_ and `prequal config <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/prequal.yaml>`_ arguments being passed. Using these config files as a template, you can customize your prequal and qsiprep commands. Example usage: ``--prequal-config /users/nrg/PE201222_230719/prequal.yaml``
+| 1. ``--qsiprep-config`` and ``--prequal-config`` allow you to customize the arguments passed to qsiprep and prequal. These are the default `qsiprep config <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/qsiprep.yaml>`_ and `prequal config <https://github.com/harvard-nrg/dwiqc/blob/main/dwiqc/config/prequal.yaml>`_ arguments being passed. Using these config files as a template, you can customize your prequal and qsiprep commands by downloading and editing the examples with your preferred flags/options. Example usage: ``--prequal-config /users/nrg/PE201222_230719/prequal.yaml``
 
 | 2. ``--xnat-upload`` indicates that the output from *DWIQC* should be uploaded to your XNAT project. ``--xnat-alias`` (see *get* mode) must be passed for this argument to work. Example usage: ``--xnat-upload`` (just passing the argument is sufficient)
 
@@ -418,6 +420,8 @@ Only a few of the many possible *process* mode arguments will be discussed here.
 | 4. ``--sub-tasks`` is used to run either just qsiprep or prequal. Example usage: ``--sub-tasks qsiprep``
 
 | 5. ``--custom-eddy`` is used to pass custom FSL eddy parameters to qsiprep as noted under *Common Errors*. Example usage: ``--custom-eddy /users/nrg/PE201222_230719/eddy_params_s2v_mbs.json``
+
+| 6. ``--artifacts-dir`` is for developers debugging the upload to XNAT process.
 
 process: All Arguments
 """"""""""""""""""""""
