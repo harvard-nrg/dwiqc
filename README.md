@@ -2,6 +2,9 @@
 
 DWIQC is a diffusion MRI quality control pipeline built on the Prequal and QSIPREP software packages. Working closely with neuroimaging experts, we designed an ergonomic user interface for the XNAT informatics and data management platform that allows users to quickly assess image quality and use those insights to get ahead of issues within the data acquisition workflow.
 
+# Citation
+Asay et al., (2025). DWIQC: A Python package for preprocessing and quality assurance of diffusion weighted images. Journal of Open Source Software, 10(105), 6974, https://doi.org/10.21105/joss.06974
+
 # Installation
 
 See documentation: https://dwiqc.readthedocs.io/en/latest/developers.html#
