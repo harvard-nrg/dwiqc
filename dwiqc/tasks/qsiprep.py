@@ -51,15 +51,15 @@ class Task(tasks.BaseTask):
 				logger.error(f'{self._container_dir}/qsiprep.sif does not exist. Verify the path and file name.')
 				sys.exit(1)
 			try:
-				self._fsl_sif = f'{self._container_dir}/fsl_6.0.4.sif'
+				self._fsl_sif = f'{self._container_dir}/fsl_6.0.7.15.sif'
 			except FileNotFoundError:
-				logger.error(f'{self._container_dir}/fsl_6.0.4.sif does not exist. Verify the path and file name.')
+				logger.error(f'{self._container_dir}/fsl_6.0.7.15.sif does not exist. Verify the path and file name.')
 				sys.exit(1)
 
 		else:
 			home_dir = os.path.expanduser("~")
 			self._qsiprep_sif = os.path.join(home_dir, '.config/dwiqc/containers/qsiprep.sif')
-			self._fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.4.sif')
+			self._fsl_sif = os.path.join(home_dir, '.config/dwiqc/containers/fsl_6.0.7.15.sif')
 
 
 	def calc_mporder(self):
