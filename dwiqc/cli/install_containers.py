@@ -31,11 +31,11 @@ prequal_link = 'https://www.dropbox.com/scl/fi/vklkupolvs34kn8rpzsyo/prequal_nrg
 
 #fsl_link = 'https://www.dropbox.com/scl/fi/qboi0izu211j8fd5ffyym/fsl_6.0.4.sif?rlkey=qu7qsappf0w9ktluuqmvd8e8i&dl=1'
 
-fsl_link = 'https://www.dropbox.com/scl/fi/rnevz2gfgnnk2vrf3ofim/fsl_6.0.7.15.sif?rlkey=zt7z5g57n3ef8wz089ijfnogp&st=1'
+fsl_link = 'https://www.dropbox.com/scl/fi/yyz9vvg199t9uehp5jt5z/fsl_6.0.7.16.sif?rlkey=hmnqaxhfioq8a36tv0unt18io&st=1'
 
 qsiprep_link = 'https://www.dropbox.com/scl/fi/s8asxwmykyw7paqdcnaev/qsiprep.sif?rlkey=lnuffrzn9mf894q6j9tl2l2mc&dl=1'
 
-containers = ['chromium.sif','prequal_nrg.sif', 'qsiprep.sif', 'fsl_6.0.7.15.sif']
+containers = ['chromium.sif','prequal_nrg.sif', 'qsiprep.sif', 'fsl_6.0.7.16.sif']
 
 
 
@@ -132,7 +132,7 @@ def do(args):
 
 	### check if fsl already there
 
-	if os.path.isfile(f"{args.install_location}/fsl_6.0.7.15.sif"):
+	if os.path.isfile(f"{args.install_location}/fsl_6.0.7.16.sif"):
 		logger.warning(f'FSL has already been downloaded to {args.install_location}.\nDelete to re-download. Skipping...')
 		print('\n')
 
@@ -144,12 +144,12 @@ def do(args):
 		#proc4 = subprocess.Popen(download_fsl, shell=True, stdout=subprocess.PIPE)
 		#proc4.communicate()
 
-		fsl_location = f'{args.install_location}/fsl_6.0.7.15.sif'
+		fsl_location = f'{args.install_location}/fsl_6.0.7.16.sif'
 		download(fsl_link, fsl_location)
 
 	fsl_target_bytes = 6803890176
 
-	fsl_bytes = os.path.getsize(f'{args.install_location}/fsl_6.0.7.15.sif')
+	fsl_bytes = os.path.getsize(f'{args.install_location}/fsl_6.0.7.16.sif')
 
 	if fsl_target_bytes != fsl_bytes:
 		print('\n')
