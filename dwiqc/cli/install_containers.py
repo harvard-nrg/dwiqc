@@ -147,7 +147,9 @@ def do(args):
 		fsl_location = f'{args.install_location}/fsl_6.0.7.16.sif'
 		download(fsl_link, fsl_location)
 
-	fsl_target_bytes = 6803890176
+	#fsl_target_bytes = 6803890176
+
+	fsl_target_bytes = 4676882432
 
 	fsl_bytes = os.path.getsize(f'{args.install_location}/fsl_6.0.7.16.sif')
 
