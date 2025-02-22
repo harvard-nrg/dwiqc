@@ -11,7 +11,7 @@ See documentation: https://dwiqc.readthedocs.io/en/latest/developers.html#
 
 # Usage
 
-See documentation: https://dwiqc.readthedocs.io/en/latest/xnat.html#running-the-pipeline
+See documentation: https://dwiqc.readthedocs.io/en/latest
 
 # Contributing to DWIQC
 
