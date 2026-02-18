@@ -42,36 +42,32 @@ class Task(tasks.BaseTask):
 
 
 	# create an INPUTS dir next to the OUTPUTS dir
-	def copy_inputs(self, inputs_dir):
-		"""
-		try:
-			os.makedirs(inputs_dir)
-		except FileExistsError:
-			pass
-		"""
-
-		os.makedirs(inputs_dir, exist_ok=True)
-		
-		all_files = self._layout.get(subject=self._sub, session=self._ses, return_type='filename') # get a list of all of the subject's files
-
-		# remove all non b0volumes from the fieldmaps. return a list of paths to newly truncated files
-
-		fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')
-
-		if not fmap_files:
-			self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii', return_type='filename')
-
-		# truncate down the fmap files to include just b0 volumes
-
-		truncated_fmaps = self.truncate_fmaps(fmap_files, inputs_dir)
-
-		# copy the all the subject's files into the INPUTS directory
-		for file in all_files:
-			basename = os.path.basename(file)
-			dest = os.path.join(inputs_dir, basename)
-			shutil.copy(file, dest)
-
-		self.create_bfiles(inputs_dir, truncated_fmaps)
+    def copy_inputs(self, inputs_dir):
+        os.makedirs(inputs_dir, exist_ok=True)
+        
+        all_files = self._layout.get(subject=self._sub, session=self._ses, return_type='filename')
+        
+        fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii.gz', return_type='filename')
+        
+        if not fmap_files:
+            fmap_files = self._layout.get(subject=self._sub, session=self._ses, suffix='epi', extension='.nii', return_type='filename')
+        
+        # Only truncate fmaps if they exist
+        if fmap_files:
+            truncated_fmaps = self.truncate_fmaps(fmap_files, inputs_dir)
+        else:
+            truncated_fmaps = []
+            logger.info('No fieldmaps found - skipping fieldmap truncation')
+        
+        # Copy all the subject's files into the INPUTS directory
+        for file in all_files:
+            basename = os.path.basename(file)
+            dest = os.path.join(inputs_dir, basename)
+            shutil.copy(file, dest)
+        
+        # Only create bfiles if we have fieldmaps
+        if truncated_fmaps:
+            self.create_bfiles(inputs_dir, truncated_fmaps)
 		
 
 	# the fieldmap data needs accompanying 'dummy' bval and bvec files that consist of 0's
@@ -627,11 +623,43 @@ class Task(tasks.BaseTask):
 		
 		os.environ["SINGULARITY_BIND"] = ','.join(bind)
 
+    def check_fieldmaps_exist(self):
+        """
+        Check if fieldmaps exist for this subject/session
+        Returns True if fieldmaps are found, False otherwise
+        """
+        fmap_files = self._layout.get(
+            subject=self._sub, 
+            session=self._ses, 
+            suffix='epi', 
+            extension='.nii.gz', 
+            return_type='filename'
+        )
+        
+        if not fmap_files:
+            fmap_files = self._layout.get(
+                subject=self._sub, 
+                session=self._ses, 
+                suffix='epi', 
+                extension='.nii', 
+                return_type='filename'
+            )
+        
+        return len(fmap_files) > 0
+
 	# build the prequal sbatch command and create job
 
 	def build(self):
 		self.bind_environmentals()
-		self.add_intended_for()
+
+        # Check if fieldmaps exist
+        has_fieldmaps = self.check_fieldmaps_exist()
+        
+        if not has_fieldmaps:
+            logger.warning('No fieldmaps detected - will use synthb0 for distortion correction')
+        else:
+            self.add_intended_for()
+
 		inputs_dir = f"{self._tempdir}/PREQUAL_INPUTS_{self._date}/{self._slurm_job_id}/ses-{self._ses}"
 		self.copy_inputs(inputs_dir)
 		mporder = self.calc_mporder()
@@ -683,6 +711,9 @@ class Task(tasks.BaseTask):
 				self._ses
 				]
 
+            if not has_fieldmaps:
+                self._command.append('--use_synth_b0')
+
 			for item in prequal_options:
 				self._command.append(item)
 
@@ -716,6 +747,9 @@ class Task(tasks.BaseTask):
 				'--session',
 				self._ses
 				]
+
+            if not has_fieldmaps:
+                self._command.append('--use_synth_b0')
 
 			for item in prequal_options:
 				self._command.append(item)
