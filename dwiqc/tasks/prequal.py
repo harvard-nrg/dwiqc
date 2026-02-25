@@ -58,6 +58,8 @@ class Task(tasks.BaseTask):
         else:
             truncated_fmaps = []
             logger.info('No fieldmaps found - skipping fieldmap truncation')
+            self._nonzero_shells = False
+            self.create_spec(inputs_dir)
         
         # Copy all the subject's files into the INPUTS directory
         for file in all_files:
@@ -712,8 +714,8 @@ class Task(tasks.BaseTask):
                 ]
 
             if not has_fieldmaps:
-                self._command.append('--use_synth_b0')
-
+                self._command.append('--synb0 raw')
+                
             for item in prequal_options:
                 self._command.append(item)
 
@@ -747,9 +749,6 @@ class Task(tasks.BaseTask):
                 '--session',
                 self._ses
                 ]
-
-            if not has_fieldmaps:
-                self._command.append('--use_synth_b0')
 
             for item in prequal_options:
                 self._command.append(item)
