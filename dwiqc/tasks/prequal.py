@@ -57,7 +57,7 @@ class Task(tasks.BaseTask):
             truncated_fmaps = self.truncate_fmaps(fmap_files, inputs_dir)
         else:
             truncated_fmaps = []
-            logger.info('No fieldmaps found - skipping fieldmap truncation')
+            logger.warning('No fieldmaps found - will use synb0 for distortion correction')
             self._nonzero_shells = False
             self.create_spec(inputs_dir)
         
@@ -70,6 +70,8 @@ class Task(tasks.BaseTask):
         # Only create bfiles if we have fieldmaps
         if truncated_fmaps:
             self.create_bfiles(inputs_dir, truncated_fmaps)
+        else:
+            self.create_t1w_bfiles(inputs_dir)
         
 
     # the fieldmap data needs accompanying 'dummy' bval and bvec files that consist of 0's
@@ -117,6 +119,49 @@ class Task(tasks.BaseTask):
                     bvec.write(f'{row_to_write}\n')
 
         self.create_spec(inputs_dir)
+
+    def create_t1w_bfiles(self, inputs_dir):
+        """
+        Create dummy .bval and .bvec files for T1w when using synb0
+        These files contain a single zero value to indicate no diffusion weighting
+        """
+        # Get T1w file
+        t1w_files = self._layout.get(
+            subject=self._sub,
+            session=self._ses,
+            suffix='T1w',
+            extension=['.nii.gz', '.nii'],
+            return_type='filename'
+        )
+        
+        if not t1w_files:
+            logger.error('No T1w image found for synb0. This is required when no fieldmaps are present.')
+            raise DWISpecError('T1w image required for synb0 when no fieldmaps are present')
+        
+        t1w_file = t1w_files[0]
+        t1w_basename = os.path.basename(t1w_file)
+        
+        # Remove extension(s) to get base name
+        if t1w_basename.endswith('.nii.gz'):
+            no_ext = t1w_basename[:-7]  # Remove .nii.gz
+        elif t1w_basename.endswith('.nii'):
+            no_ext = t1w_basename[:-4]  # Remove .nii
+        else:
+            no_ext = os.path.splitext(t1w_basename)[0]
+        
+        # Create .bval file with single 0
+        bval_path = os.path.join(inputs_dir, f'{no_ext}.bval')
+        with open(bval_path, 'w') as bval:
+            bval.write('0\n')
+        logger.info(f'Created dummy .bval file for T1w: {bval_path}')
+        
+        # Create .bvec file with three rows of 0
+        bvec_path = os.path.join(inputs_dir, f'{no_ext}.bvec')
+        with open(bvec_path, 'w') as bvec:
+            bvec.write('0\n')
+            bvec.write('0\n')
+            bvec.write('0\n')
+        logger.info(f'Created dummy .bvec file for T1w: {bvec_path}')
         
 
 
