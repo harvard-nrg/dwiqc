@@ -714,8 +714,9 @@ class Task(tasks.BaseTask):
                 ]
 
             if not has_fieldmaps:
-                self._command.append('--synb0 raw')
-                
+                self._command.append('--synb0')
+                self._command.append('raw')
+
             for item in prequal_options:
                 self._command.append(item)
 
