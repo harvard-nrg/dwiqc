@@ -332,6 +332,9 @@ class Task(tasks.BaseTask):
 
         readout_time = dwi_file.get_metadata()['TotalReadoutTime']
 
+        # check if fieldmaps exist
+        has_fieldmaps = self.check_fieldmaps_exist()
+
         # create dictionary of all the scans (dwi or epi) matched with their primary phase encoding direction
         phase_encode_pairs = {}
 
@@ -373,6 +376,29 @@ class Task(tasks.BaseTask):
                 new_line = f'{key},-,{readout_time}'
 
             lines_to_write.append(new_line)
+
+        if not has_fieldmaps:
+            # Get T1w file
+            t1w_files = self._layout.get(
+                subject=self._sub,
+                session=self._ses,
+                suffix='T1w',
+                extension=['.nii.gz', '.nii'],
+                return_type='filename'
+            )
+            if t1w_files:
+                t1w_file = t1w_files[0]
+                t1w_basename = os.path.splitext(os.path.basename(t1w_file))[0]
+                if t1w_basename.endswith('.nii'):
+                    t1w_basename = os.path.splitext(t1w_basename)[0]
+                                                                      
+                # Add T1w line to csv
+                t1w_line = f'{t1w_basename},,0'
+                lines_to_write.append(t1w_line)
+                logger.info(f'Added T1w to dtiQA_config.csv for synthb0: {t1w_basename}')
+            else:
+                logger.error('No T1w image found for synthb0. This is required when no fieldmaps are present.')
+                raise DWISpecError('T1w image required for synthb0 when no fieldmaps are present')
 
         # write each of the created lines into a csv file
 
