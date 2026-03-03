@@ -3,6 +3,7 @@
 import os
 import re
 import sys
+import pdb
 import yaml
 import json
 import shutil
@@ -11,6 +12,7 @@ import tempfile
 import subprocess
 import numpy as np
 import nibabel as nib
+from pathlib import Path
 from pprint import pprint
 from random import randint
 from bids import BIDSLayout
@@ -649,6 +651,28 @@ class Task(tasks.BaseTask):
         
         return len(fmap_files) > 0
 
+    def bind_t1(self):
+
+        t1w_files = self._layout.get(
+            subject=self._sub,
+            session=self._ses,
+            suffix='T1w',
+            extension=['.nii.gz', '.nii'],
+            return_type='filename'
+        )
+        if t1w_files:
+            t1w_file = Path(t1w_files[0]).name
+
+        t1w_path = Path(self._inputs_dir, t1w_file)
+
+        # find index of first singularity bind token
+        first_bind_index = next((index for index, item in enumerate(self._command) if item == '-B'), -1)
+        self._command.insert(first_bind_index+2, '-B')
+        self._command.insert(first_bind_index+3, f'{t1w_path}:/INPUTS/t1.nii.gz')
+
+        self._command.append('--synb0')
+        self._command.append('raw')
+
     # build the prequal sbatch command and create job
 
     def build(self):
@@ -662,8 +686,8 @@ class Task(tasks.BaseTask):
         else:
             self.add_intended_for()
 
-        inputs_dir = f"{self._tempdir}/PREQUAL_INPUTS_{self._date}/{self._slurm_job_id}/ses-{self._ses}"
-        self.copy_inputs(inputs_dir)
+        self._inputs_dir = f"{self._tempdir}/PREQUAL_INPUTS_{self._date}/{self._slurm_job_id}/ses-{self._ses}"
+        self.copy_inputs(self._inputs_dir)
         mporder = self.calc_mporder()
         logger.info(f'TMPDIR: {self._tempdir}')
         if self._container_dir:
@@ -699,7 +723,7 @@ class Task(tasks.BaseTask):
                 '--pwd', self._tempdir,
                 '--contain',
                 '--nv',
-                '-B', f'{inputs_dir}:/INPUTS/',
+                '-B', f'{self._inputs_dir}:/INPUTS/',
                 '-B', f'{self._outdir}:/OUTPUTS',
                 '-B', f'{self._tempdir}:/tmp',
                 '-B', f'{self._fs_license}:/APPS/freesurfer/license.txt',
@@ -714,8 +738,7 @@ class Task(tasks.BaseTask):
                 ]
 
             if not has_fieldmaps:
-                self._command.append('--synb0')
-                self._command.append('raw')
+                self.bind_t1()
 
             for item in prequal_options:
                 self._command.append(item)
@@ -735,7 +758,7 @@ class Task(tasks.BaseTask):
                 '--pwd', self._tempdir,
                 '--contain',
                 '--nv',
-                '-B', f'{inputs_dir}:/INPUTS/',
+                '-B', f'{self._inputs_dir}:/INPUTS/',
                 '-B', f'{self._outdir}:/OUTPUTS',
                 '-B', f'{self._tempdir}:/tmp',
                 '-B', f'{self._fs_license}:/APPS/freesurfer/license.txt',
