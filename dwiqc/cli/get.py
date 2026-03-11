@@ -50,7 +50,7 @@ def do(args):
 
     # iterate over the scans dictionary, search for the scans with the correct note/tag
 
-    for run,scansr in scans.items():
+    for run,scansr in scans_to_download.items():
         for scan_label in scan_labels:
             if scan_label in scansr:
                 logger.info('getting run=%s, scan=%s', run, scansr[scan_label])
@@ -78,14 +78,15 @@ def parse_scan_notes(scan_labels, conf, auth, label, project):
                         anat_tags[scan['ID']] = note
     if count_t1w(scans) > 1:
         winning_t1w = determine_t1w(anat_tags)
-    if winning_t1w:
-        scans = assign_winning_t1w(scans, winning_t1w)
-    else:
-        logger.warning('Unable to determine which t1w image to use. See <documentation link> for more details.')
-        logger.warning('Continuing pipeline without t1w image. Pipeline quality may be affected or crash altogether.')
+        if winning_t1w:
+            scans = assign_winning_t1w(scans, winning_t1w)
+        else:
+            logger.warning('Unable to determine which t1w image to use. See <documentation link> for more details.')
+            logger.warning('Continuing pipeline without t1w image. Pipeline quality may be affected or crash altogether.')
     pdb.set_trace()
     logger.info('downloading the following scans:')
     logger.info(json.dumps(scans, indent=2))
+    return scans
 
 
 def assign_winning_t1w(scans, winning_t1w):
