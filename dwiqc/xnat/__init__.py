@@ -215,7 +215,7 @@ class Report:
         qcdir = os.path.join(self.dirs['qsiprep'], 'qsiprep_output', 'qsiprep', 'EDDY', f'{no_prefix_sub}_{self.ses}.qc')
         for filename in os.listdir(qcdir):
             fullfile = os.path.join(qcdir, filename)
-            match = re.match('avg_b(\d+).png', filename)
+            match = re.match(r'avg_b(\d+).png', filename)
             if not match:
                 continue
             shells.append(int(match.group(1)))
