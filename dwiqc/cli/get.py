@@ -6,7 +6,6 @@ import json
 import yaml
 import yaxil
 import logging
-import argparse as ap
 import subprocess as sp
 import collections as col
 from xnattagger import Tagger
@@ -48,7 +47,9 @@ def do(args):
     # query dwi and T1w scans from XNAT
     scans_to_download = find_scans_to_download(scan_labels, conf, auth, args.label, args.project)
 
-    # iterate over the scans dictionary, search for the scans with the correct note/tag
+    scan_labels = get_scan_types(conf)
+
+    # download scans
 
     for run,scansr in scans_to_download.items():
         for scan_label in scan_labels:
@@ -73,7 +74,7 @@ def find_scans_to_download(scan_labels, conf, auth, label, project):
 
     keeper_scans = populate_keeper_scans(keeper_scans, all_usable_scans, scan_labels, conf, num_diffusion_scans=len(keeper_scans))
 
-
+    return keeper_scans
 
 
 def find_main_diffusion_scans(keeper_scans, all_usable_scans, conf):
@@ -118,6 +119,8 @@ def populate_keeper_scans(keeper_scans, all_usable_scans, scan_labels, conf, num
             if contains_just_dwiqc_t1w(scan['note']):
                 for run in keeper_scans:
                     keeper_scans[run]['t1w'] = scan['ID']
+                scan_labels.remove('t1w')
+                break
             else:
                 run = is_match.group('run').lstrip('_')
                 if run not in keeper_scans:
@@ -125,32 +128,24 @@ def populate_keeper_scans(keeper_scans, all_usable_scans, scan_labels, conf, num
                     sys.exit()
                 keeper_scans[run]['t1w'] = scan['id']
 
-    
+    # populate fmap scans
+    for scan in all_usable_scans:
+        for scan_label in scan_labels:
+            is_match = match(scan['note'], conf['dwiqc'][scan_label]['tag'])
+            if is_match:
+                run = is_match.group('run').lstrip('_')
+                keeper_scans[run][scan_label] = scan['id']
+
+    return keeper_scans
 
 def contains_just_dwiqc_t1w(scan_note):
-    """
+    '''
     Check if '#DWIQC_T1w' exists as a standalone tag in the given scan note.
     Returns False if followed by additional characters (e.g. '_001').
     Case insensitive.
-    """
+    '''
     pattern = r'(?i)#DWIQC_T1w(?!\w)'
     return bool(re.search(pattern, scan_note))
-
-    '''
-
-    # check if there is more than one t1w image, determine which one to use if so                    
-    if count_t1w(scans) > 1:
-        winning_t1w = determine_t1w(anat_tags, scans)
-        if winning_t1w:
-            scans = assign_winning_t1w(scans, winning_t1w)
-        else:
-            logger.warning('Unable to determine which t1w image to use. See <documentation link> for more details.')
-            logger.warning('Continuing pipeline without t1w image. Pipeline quality may be affected or crash altogether.')
-    logger.info('downloading the following scans:')
-    logger.info(json.dumps(scans, indent=2))
-    return scans
-    '''
-
 
 def verify_dwi_label(conf):
     try:
@@ -158,69 +153,6 @@ def verify_dwi_label(conf):
     except:
         logger.error('please specify a "dwi_main" label in your download-config.yaml file')
         sys.exit()
-
-def assign_winning_t1w(scans, winning_t1w):
-    """
-    Remove all non-winning t1w entries from scans, delete any run that is
-    left with only a 't1w' entry, then insert the winning t1w scan ID into
-    every run that contains a 'dwi_main' key.
-    """
-    # Strip out any t1w entry that isn't the winner
-    for run_num in list(scans.keys()):
-        if 't1w' in scans[run_num] and scans[run_num]['t1w'] != winning_t1w:
-            logger.info(f'Removing non-winning t1w from run {run_num}')
-            del scans[run_num]['t1w']
-
-    # Delete any run that only contains a t1w entry
-    for run_num in list(scans.keys()):
-        if list(scans[run_num].keys()) == ['t1w']:
-            logger.info(f'Deleting run {run_num} as it only contains a t1w entry')
-            del scans[run_num]
-        elif not list(scans[run_num].keys()):
-            logger.info(f'Deleting run {run_num} as it is empty')
-            del scans[run_num]
-
-    # Pair the winning t1w with every run that has a dwi_main
-    for run_num in scans.keys():
-        if 'dwi_main' in scans[run_num]:
-            logger.info(f'Assigning winning t1w {winning_t1w} to run {run_num}')
-            scans[run_num]['t1w'] = winning_t1w
-
-    return scans
-
-
-def count_t1w(scans):
-    '''
-    Count the number of t1w images found in session
-    '''
-    num_t1w = 0
-    for _, inner_dict in scans.items():
-        if isinstance(inner_dict, dict) and 't1w' in inner_dict:
-            num_t1w += 1
-    return num_t1w
-
-
-def determine_t1w(anat_tags, scans):
-    '''
-    Try to determine which T1w image to use if more
-    than one is supplied. It will take the following
-    steps serially.
-    1. Look for the #t1w_dwiqc tag uniquely exists. If
-    so, use that image.
-    2. Check if any of the T1w images have been 
-    set to "unusable" in XNAT. If a remaining one is usable,
-    use that T1w image.
-    '''
-
-    # Look for winning scan with first method
-    winning_scan = check_t1w_tag(anat_tags)
-    if winning_scan:
-        return winning_scan
-
-    # Look for winning scan with second method
-    winning_scan = check_t1w_xnat_usability(anat_tags)
-    if winning_scan:
-        return winning_scan
 
 def get_usable_scans(auth, label, project):
     with yaxil.session(auth) as ses:
@@ -233,24 +165,10 @@ def get_usable_scans(auth, label, project):
                     all_scans.append(scan)
     return all_scans
 
-def check_t1w_tag(anat_tags):
-    try:
-        t1_scan_num = [key for key, value in anat_tags.items() if value.lower() == '#dwiqc_t1w'][0]
-    except IndexError:
-        logger.info('No T1w image note contains #t1w_dwiqc (case insensitive), checking for XNAT usability.')
-        return
-    if t1_scan_num:
-        logger.info('Found T1w image with #t1w_dwiqc tag, discarding others')    
-        return t1_scan_num
-    else:
-        logger.info('No T1w image note contains #t1w_dwiqc (case insensitive), checking for XNAT usability.')
-        return
-
 def run_xnattagger(args):
-    """
+    '''
     This function will run xnattagger with the supplied (or default) config file
-
-    """
+    '''
 
     logging.info('Running xnattagger...')
 
@@ -262,22 +180,18 @@ def run_xnattagger(args):
     tagger.apply_updates()
 
 def get_scan_types(conf):
-
-    """
+    '''
     Helper function to dynamically create a list of all the modalities/scans listed in the config file
-    
-    """
+    '''
     
     scan_types = [scan_type for scan_type in conf['dwiqc']]
 
     return scan_types
 
 def download_scan(args, auth, run, scan, config_label, input_config, verbose=False):
-
-    """
+    '''
     Function that downloads an individual scan based on information from the config input file and command line arguments.
-   
-    """
+    '''
 
     # check for bids sub-directory specification in config file
     try:
@@ -362,11 +276,10 @@ def download_scan(args, auth, run, scan, config_label, input_config, verbose=Fal
         sp.check_output(cmd, input=config.encode('utf-8'))
 
 def match(note, patterns):
-
-    """
+    '''
     This function uses regular expression matching to match the tags in the scan note field to the config file
+    '''
 
-    """
     for pattern in patterns:
         m = re.match(pattern, note, flags=re.IGNORECASE)
         if m:
