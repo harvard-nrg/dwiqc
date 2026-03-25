@@ -49,6 +49,9 @@ def do(args):
 
     scan_labels = get_scan_types(conf)
 
+    logger.info('downloading the following scans:')
+    logger.info(json.dumps(scans_to_download, indent=2))
+
     # download scans
 
     for run,scansr in scans_to_download.items():
@@ -159,7 +162,7 @@ def get_usable_scans(auth, label, project):
             all_scans = []
             for scan in ses.scans(label=label, project=project):
                 if scan['quality'] == 'unusable':
-                    logger.warning(f'scan {scan['ID']} is unusable and will not be downloaded')
+                    logger.warning(f"scan {scan['ID']} is unusable and will not be downloaded")
                     continue
                 else:
                     all_scans.append(scan)
@@ -174,6 +177,10 @@ def run_xnattagger(args):
 
     with open(args.tagger_config) as fo:
         filters = yaml.load(fo, Loader=yaml.SafeLoader)['xnat-tagger']
+
+    tagger_dwi = Tagger(args.xnat_alias, filters, 'dwi', args.label, append_tag_digits=True)
+    tagger_dwi.generate_updates()
+    tagger_dwi.apply_updates()
 
     tagger = Tagger(args.xnat_alias, filters, 't1w', args.label, append_tag_digits=False)
     tagger.generate_updates()
