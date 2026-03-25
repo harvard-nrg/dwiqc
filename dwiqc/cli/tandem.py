@@ -53,9 +53,9 @@ def do(args):
     scans_to_download = find_scans_to_download(scan_labels, conf, auth, args.label, args.project)
 
     logger.info('downloading the following scans:')
-    logger.info(json.dumps(scans, indent=2))
+    logger.info(json.dumps(scans_to_download, indent=2))
 
-    subject_label = scan['subject_label']
+    #subject_label = scan['subject_label']
 
     scan_labels = get_scan_types(conf)
 
@@ -148,6 +148,18 @@ def find_main_diffusion_scans(keeper_scans, all_usable_scans, conf):
         logger.debug('marking dwi_main scan label as complete')
         return keeper_scans, True
 
+def verify_dwi_label(conf):
+    try:
+        dwi_label = conf['dwiqc']['dwi_main']['tag']
+    except:
+        logger.error('please specify a "dwi_main" label in your download-config.yaml file')
+        sys.exit()
+
+def diffusion_exist(keeper_scans):
+    for value in keeper_scans.values():
+        if 'dwi_main' in value:
+            return True
+    return False
 
 def contains_just_dwiqc_t1w(scan_note):
     '''
