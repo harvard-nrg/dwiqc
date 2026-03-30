@@ -1,21 +1,21 @@
 import os
 import re
 import sys
+import pdb
 import json
 import yaml
 import yaxil
 import logging
+import yaxil.bids
 import argparse as ap
 import subprocess as sp
 import collections as col
-from xnattagger import Tagger
-from bids import BIDSLayout
-import dwiqc.cli.get as get
-import dwiqc.cli.process as process
 import collections as col
-import yaxil.bids
+import dwiqc.cli.get as get
+from bids import BIDSLayout
 from xnattagger import Tagger
-import xnattagger.config as config 
+import xnattagger.config as config
+import dwiqc.cli.process as process
 
 
 logger = logging.getLogger(__name__)
@@ -50,12 +50,10 @@ def do(args):
     scan_labels = get_scan_types(conf) ### get a list of the scan types/labels
 
     # query dwi and T1w scans from XNAT
-    scans_to_download = find_scans_to_download(scan_labels, conf, auth, args.label, args.project)
+    scans_to_download, subject_label = find_scans_to_download(scan_labels, conf, auth, args.label, args.project)
 
     logger.info('downloading the following scans:')
     logger.info(json.dumps(scans_to_download, indent=2))
-
-    #subject_label = scan['subject_label']
 
     scan_labels = get_scan_types(conf)
 
@@ -93,7 +91,7 @@ def find_scans_to_download(scan_labels, conf, auth, label, project):
 
     keeper_scans = populate_keeper_scans(keeper_scans, all_usable_scans, scan_labels, conf, num_diffusion_scans=len(keeper_scans))
 
-    return keeper_scans
+    return keeper_scans, all_usable_scans[0]['subject_label']
 
 def populate_keeper_scans(keeper_scans, all_usable_scans, scan_labels, conf, num_diffusion_scans):
     '''
