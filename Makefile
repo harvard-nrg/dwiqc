@@ -7,6 +7,7 @@ dist:
 	python3 setup.py sdist bdist_wheel --universal
 publish:
 	pip install 'twine>=1.5.0'
+	pip install setuptools
 	python3 setup.py sdist bdist_wheel --universal
 	twine upload dist/*.whl
 	rm -fr build dist .egg dwiqc.egg-info
