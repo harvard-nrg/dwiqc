@@ -105,7 +105,7 @@ The other popular design choice is having just one scan serve as the fieldmap. I
 
 Scan 36 is the reverse polarity scan, acquired in the PA direction, while scan 38 is the "main" diffusion a scan acquired in the AP direction. Scan 37 is an SBRef scan not used here.
 
-.. note:: You may notice the tags on the far right of the examples above (e.g. #DWI_REVPOL_A, #DWI_MAIN_001). The tags don't have to be anything in particular; it's completely up to you.
+.. note:: You may notice the tags on the far right of the examples above (e.g. ``#DWI_REVPOL_A``, ``#DWI_MAIN_001``). The tags don't have to be anything in particular; it's completely up to you.
 
 Now that you have a general idea of how diffusion scans are frequently collected we can get into the anatomy of the yaml config file. We'll look at an example for each of the above experimental designs. A quick note about yaml: Indentation, hyphens, spaces, and colons are very important to the yaml structure. Be sure to maintain the exact structure seen here when editing.
 
