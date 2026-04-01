@@ -29,9 +29,15 @@ The image below displays an MR Session report page with populated notes.
 
 .. image:: images/xnat-scan-notes.png
 
+Tagging T1w Scans
+^^^^^^^^^^^^^^^^^
+Users may follow the same tagging convention for T1w images as they do for diffusion and field map images (i.e. ``#T1w_001``, ``#T1w_002``, etc.). However, there are instances where users may want to use one T1w image for analysis of several diffusion runs. If a T1w scan is tagged with ``#DWIQC_T1w``, *DWIQC* will recognize that scan as the only one to be used for all diffusion runs. 
+
+There are also cases where there are more T1w images than there are diffusion images. Users must indicate which T1w image should be used by adding the ``#DWIQC_T1w`` tag to its note field. If there are an even number of diffusion and T1w images tagged as matches (``(#DWI_MAIN_001, #T1w_001), (#DWI_MAIN_002, #T1w_002))``, then *DWIQC* will analyze those images as pairs, meaning that ``#T1w_001`` will be used as the reference image for ``#DWI_MAIN_001`` and the same for the ``_002`` tags. If a ``#DWIQC_T1w`` tag is not present and there are more T1w images than diffusion images, *DWIQC* will print an error message and will not run.
+
 xnattagger
 ------------
-xnattagger automates the process of tagging scans in your XNAT project. xnattagger can optionally be run in the *get* and *tandem* modes of *DWIQC* using the ``--run-tagger`` argument. The default tagging convention is the same as seen here (and above), but can be configured to user specifications. Please see the `xnattagger documentation <xnattagger.html>`_ for details. 
+*xnattagger* automates the process of tagging scans in your XNAT project. xnattagger can optionally be run in the *get* and *tandem* modes of *DWIQC* using the ``--run-tagger`` argument. The default tagging convention is the same as seen here (and above) but can be configured to user specifications. Please see the `xnattagger documentation <xnattagger.html>`_ for details. 
 
 ================= =======
 DWI scan          run
@@ -47,7 +53,7 @@ For the time being, *DWIQC* can only be run outside of XNAT on a High Performanc
 
 Overview
 ^^^^^^^^^
-With *DWIQC* and it's necessary containers installed, you're ready to analyze some diffusion data! Let's start by giving you a broad idea of what *DWIQC* does. 
+With *DWIQC* and its necessary containers installed, you're ready to analyze some diffusion data! Let's start by giving you a broad idea of what *DWIQC* does. 
 
 *DWIQC* was designed with the goal of speeding up the quality check workflow of diffusion weighted imaging data. Ideally, *DWIQC* would be run on subjects while the study is ongoing as to help researchers catch problems (excessive motion, acquisition issues, etc.) as they happen, rather than discovering them after the data has been collected and the problems cannot be rectified. That being said, running *DWIQC* on previously acquired data can certainly provide helpful information. 
 
@@ -74,12 +80,12 @@ get: Overview
 
 *get* mode downloads data from XNAT to your local compute environment and converts it to BIDS format. Take a look at the official `docs <https://bids-specification.readthedocs.io/en/stable/>`_ if you're unfamiliar with BIDS.
 
-Before using *get* mode, I strongly recommend creating an `xnat_auth alias <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using the excellent `yaxil <https://yaxil.readthedocs.io/en/latest/>`_ python library. It's not stictly necessary to do so, but it will make your life easier. Example code will use an xnat alias. yaxil comes as a part of the *DWIQC* `installation <developers.html#hpc-installation>`_ (yaxil is a *DWIQC* dependency). 
+Before using *get* mode, I strongly recommend creating an `xnat_auth alias <https://yaxil.readthedocs.io/en/latest/xnat_auth.html>`_ using the excellent `yaxil <https://yaxil.readthedocs.io/en/latest/>`_ python library. It's not strictly necessary to do so, but it will make your life easier. Example code will use an xnat alias. yaxil comes as a part of the *DWIQC* `installation <developers.html#hpc-installation>`_ (yaxil is a *DWIQC* dependency). 
 
 get: The Config File
 """"""""""""""""""""
 
-Diffusion imaging is a burgeoning field with huge potential to deepen our understanding of the brain. While exciting, it also means that acquisition parameters, study designs, and theoretical analysis frameworks vary greatly. We've decided to rely heavily on yaml config files for downloading data to accomodate as many approaches as possible. The yaml config file tells *DWIQC* which scans to download from your XNAT instance based on information from each scan's notes field. It also tells *DWIQC* what to do with those scans once they've been downloaded (i.e. BIDS formatting). Let's dive in!
+Diffusion imaging is a burgeoning field with huge potential to deepen our understanding of the brain. While exciting, it also means that acquisition parameters, study designs, and theoretical analysis frameworks vary greatly. We've decided to rely heavily on yaml config files for downloading data to accommodate as many approaches as possible. The yaml config file tells *DWIQC* which scans to download from your XNAT instance based on information from each scan's notes field. It also tells *DWIQC* what to do with those scans once they've been downloaded (i.e. BIDS formatting). Let's dive in!
 
 Many diffusion study designs fall into two general camps (with many sub-variations, mind you). Let's discuss them here:
 
@@ -272,7 +278,7 @@ After running *DWIQC* *get* you should see two new directories and one new file 
 
 .. image:: images/get-output.png
 
-*dataset_description.json* conatains very basic information about the downloaded data. It's required by BIDS format. *sourcedata* contains the raw dicoms of all the downloaded scans. *sub-PE201222* (will differ for you) contains the downloaded data in proper BIDS format. If you enter the directory, you should see the subject session, then three more directories: *anat*, *dwi* and *fmap*. Those directories contain the MR Session's respective anatomical, diffusion and diffusion fieldmap data. If one of the directories is missing or empty, verify that your session's scans have been tagged correctly and that the data is downloadable.
+*dataset_description.json* contains very basic information about the downloaded data. It's required by BIDS format. *sourcedata* contains the raw dicoms of all the downloaded scans. *sub-PE201222* (will differ for you) contains the downloaded data in proper BIDS format. If you enter the directory, you should see the subject session, then three more directories: *anat*, *dwi* and *fmap*. Those directories contain the MR Session's respective anatomical, diffusion and diffusion fieldmap data. If one of the directories is missing or empty, verify that your session's scans have been tagged correctly and that the data is downloadable.
 
 get: Common Errors
 """"""""""""""""""
@@ -323,7 +329,7 @@ process: Required Arguments
 
 | 1. ``--sub`` is the subject's identifier in the BIDS hierarchy. If you've used *get* mode to download your data it will be in the ``--bids-dir`` directory. In the case of the example we're using here, it would be PE201222. Remember not to include the "sub-" prefix! 
 
-| 2. ``--ses`` is the specific session for your subject according to BIDS format. *get* mode will place a session direcory one step below the sub-SUBJECT directory and combine the subject and session identifier from XNAT. The example above downloaded data under the XNAT label PE201222_230719, so the session directory will be called ses-PE201222230719. See example below. *get* mode will remove any non alpha-numeric characters in the ``--label`` argument when creating the session name.
+| 2. ``--ses`` is the specific session for your subject according to BIDS format. *get* mode will place a session directory one step below the sub-SUBJECT directory and combine the subject and session identifier from XNAT. The example above downloaded data under the XNAT label PE201222_230719, so the session directory will be called ses-PE201222230719. See example below. *get* mode will remove any non alpha-numeric characters in the ``--label`` argument when creating the session name.
  
 .. image:: images/session-directory.png
 
@@ -352,7 +358,7 @@ Command Example:
 process: Expected Output
 """"""""""""""""""""""""
 
-*DWIQC* runtime varies based on available resources, size of data and desired processing steps. On an HPC with gpu nodes, users should expect one session to take 1-2 hours to complete prequal and 4-6 hours to complete qsiprep. Prequal and qsiprep are run in parallel, so total processing time rarely exceeds 8-10 hours. *DWIQC* also makes use of the FSL tool eddy quad. Eddy quad runs a series of quality assesment commands to generate images and quantitative metric tables. Eddy quad doesn't take more than 10 minutes to run in most cases. A successful *DWIQC* run will contain output from all three of these software packages. It is worth noting that *DWIQC* retains all generated output files from Prequal and Qsiprep and stores them under the file structure described `above <#process-expected-output>`_.
+*DWIQC* runtime varies based on available resources, size of data and desired processing steps. On an HPC with gpu nodes, users should expect one session to take 1-2 hours to complete prequal and 4-6 hours to complete qsiprep. Prequal and qsiprep are run in parallel, so total processing time rarely exceeds 8-10 hours. *DWIQC* also makes use of the FSL tool eddy quad. Eddy quad runs a series of quality assessment commands to generate images and quantitative metric tables. Eddy quad doesn't take more than 10 minutes to run in most cases. A successful *DWIQC* run will contain output from all three of these software packages. It is worth noting that *DWIQC* retains all generated output files from Prequal and Qsiprep and stores them under the file structure described `above <#process-expected-output>`_.
 
 *DWIQC* comes with CUDA 10.1 pre-compiled inside the respective qsiprep and prequal containers to unburden users from compiling specific CUDA versions.
 
@@ -393,7 +399,7 @@ This error means that the FSL tool ``eddy``, which both prequal and qsiprep use 
 
 | 1. Exclude that session from the larger dataset. This approach ensures that all data meet the same standard of stringency. 
 
-| 2. Change what FSL considers to be an outlier. *DWIQC* tells FSL that an outlier is anything more than 5 standard deviations from the mean. The user could change that to 6 standard deviations, which would increase the liklihood of eddy running successfully while keeping the same standard for all data. 
+| 2. Change what FSL considers to be an outlier. *DWIQC* tells FSL that an outlier is anything more than 5 standard deviations from the mean. The user could change that to 6 standard deviations, which would increase the likelihood of eddy running successfully while keeping the same standard for all data. 
 
 | 3. Change the number of standard deviations to 6 only for the subjects that are being affected. The theoretical implications of this approach (or any others) are not explored in depth here and it is left to the user to make informed decisions.
 
@@ -546,7 +552,6 @@ Argument                Description                                     Required
 ``--qsiprep-config``    Path to qsiprep command .yaml file              No
 ``--no-gpu``            Turn off GPU functionality                      No
 ``--sub-tasks``         Pass only prequal or qsiprep to be run          No
-``--xnat-alias``        Alias for XNAT project                          No
 ``--xnat-upload``       Indicate if results should be uploaded to XNAT  No
 ``--artifacts-dir``     Location for generated reports                  No
 ``--custom-eddy``       Path to customized eddy_params.json file        No
@@ -620,11 +625,11 @@ The ``Files`` pane contains the most commonly requested files. Clicking on any o
 ======================= ======================= ======================================================
 File                    From                    Description
 ======================= ======================= ======================================================
-B0 Average              Eddy Quad (FSL/Both)    BO Shell Average Image
+B0 Average              Eddy Quad (FSL/Both)    B0 Shell Average Image
 Brain Mask              Qsiprep                 Gray Matter, White Matter and Pial Boundaries
 FA Map                  Prequal                 Fractional Anisotropy Map
 MD Map                  Prequal                 Mean Diffusivity Map
-Eddy Outlier Sices      Prequal                 Plot of Slices with Motion Outliers
+Eddy Outlier Slices     Prequal                 Plot of Slices with Motion Outliers
 T1 Registration         Qsiprep                 GIF of T1w image to Template Registration
 Denoise                 Qsiprep                 GIF of DWI Image Pre and Post Denoising
 Motion Plot             Eddy Quad (FSL/Both)    Translational and rotational motion, displacement
@@ -684,10 +689,10 @@ File                              Description
 B0 Image                          B0 Volume/Shell
 BN Images                         Images from Each Shell
 FA Map                            Fractional Anisotropy Map
-MD Map                            Mead Diffusivity Map
+MD Map                            Mean Diffusivity Map
 Eddy Outlier Slices               Plot of Slices with Motion Outliers
 Motion Translations               Plot of motion translations across DWI scan
-Motion Rotations                  Plot of motion rorations acorss DWI scan
+Motion Rotations                  Plot of motion rotations across DWI scan
 Motion Displacements              Plot of motion displacements across DWI scan
 Prequal PDF Report                Complete Prequal Report
 Eddy Quad PDF Report              Complete Eddy Quad Report (run on both output)
