@@ -369,10 +369,10 @@ class Task(tasks.BaseTask):
         primary_phase_dir = self.get_primary_phase_dir(self._filtered_jsons)
 
         for key, value in phase_encode_pairs_no_ext.items():
-            if value == primary_phase_dir:
-                new_line = f'{key},+,{readout_time}'
-            else:
+            if '-' in value:
                 new_line = f'{key},-,{readout_time}'
+            else:
+                new_line = f'{key},+,{readout_time}'
 
             lines_to_write.append(new_line)
 
