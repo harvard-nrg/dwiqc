@@ -18,9 +18,10 @@ DWIQC is a diffusion MRI preprocessing and quality control pipeline built on the
 .. toctree::
    :maxdepth: 4
    :caption: Contents:
-   
+
    xnat
    developers
+   dependencies
    xnattagger
    citation
 
